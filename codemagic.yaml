@@ -41,6 +41,11 @@ workflows:
           cd mountaineering_app/ios
           bundle install
 
+      - name: Flutter Build iOS (Compile Dart & Install Pods)
+        script: |
+          cd mountaineering_app
+          flutter build ios --release --no-codesign
+
       - name: Build and Upload to TestFlight via Fastlane
         script: |
           cd mountaineering_app/ios
