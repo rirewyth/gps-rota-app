@@ -31,10 +31,10 @@ workflows:
           ruby -i -e "puts ARGF.read.gsub(/IPHONEOS_DEPLOYMENT_TARGET = .*?;/, %{IPHONEOS_DEPLOYMENT_TARGET = 15.0;})" Runner.xcodeproj/project.pbxproj
           pod repo update
 
-      - name: Bundle Identifier Ayarla
+      - name: Bundle Identifier and Team Settings
         script: |
           cd mountaineering_app/ios
-          sed -i '' 's/PRODUCT_BUNDLE_IDENTIFIER = .*/PRODUCT_BUNDLE_IDENTIFIER = com.rotaplus.emniyetteyim;/g' Runner.xcodeproj/project.pbxproj
+          sed -i '' 's/PRODUCT_BUNDLE_IDENTIFIER = .*/PRODUCT_BUNDLE_IDENTIFIER = com.rotaplus.emniyetteyim; DEVELOPMENT_TEAM = TAH5CSWX56; CODE_SIGNING_ALLOWED = NO;/g' Runner.xcodeproj/project.pbxproj
 
       - name: Install Ruby Dependencies (Fastlane)
         script: |
