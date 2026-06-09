@@ -121,12 +121,14 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   }
 
   void _nextPage() {
+    FocusScope.of(context).unfocus(); // Klavyeyi kapat
     if (_page < 9) {
       _pageCtrl.nextPage(duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
     }
   }
 
   void _prevPage() {
+    FocusScope.of(context).unfocus(); // Klavyeyi kapat
     if (_page > 0) {
       _pageCtrl.previousPage(duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
     }
@@ -174,10 +176,12 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: _kBg,
-      body: SafeArea(
-        child: Column(
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        backgroundColor: _kBg,
+        body: SafeArea(
+          child: Column(
           children: [
             // Progress bar
             _buildProgressBar(),
