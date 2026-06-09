@@ -5,8 +5,6 @@ platform :ios do
   lane :beta do
     
     # Apple API'ye Bağlan
-    setup_ci
-
     app_store_connect_api_key(
       key_id: ENV["API_KEY_ID"],
       issuer_id: ENV["API_ISSUER_ID"],
