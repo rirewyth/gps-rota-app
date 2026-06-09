@@ -16,9 +16,11 @@ platform :ios do
       in_house: false
     )
 
+    keychain_path = File.expand_path("~/Library/Keychains/#{ENV['MATCH_KEYCHAIN_NAME']}-db")
+
     # Sertifika ve Provisioning profillerini otomatik oluştur
     cert(
-      keychain_path: ENV["MATCH_KEYCHAIN_NAME"],
+      keychain_path: keychain_path,
       keychain_password: ENV["MATCH_KEYCHAIN_PASSWORD"]
     )
     sigh(force: true)
