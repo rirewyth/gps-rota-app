@@ -17,12 +17,6 @@ platform :ios do
     cert
     sigh(force: true)
 
-    # CocoaPods bağımlılıklarını kur (Capacitor için şart)
-    cocoapods(
-      clean_install: true,
-      podfile: "Podfile"
-    )
-
     # Xcode Derlemesini Başlat
     build_app(
       workspace: "App.xcworkspace",
