@@ -56,3 +56,4 @@ Lütfen bana bu uygulamanın temel yapısını kurmak için:
 1. Flutter'da hangi native izinlerin (Permissions) gerektiğini,
 2. Hangi kütüphanelerin (Location, SQLite, Background Service, Map/Routing) kullanılacağını,
 3. "Olası Rota Tahmini" algoritmasının mantığını ve SOS anında şebeke bekleyen arka plan SMS kod taslağını yaz.
+Triggering a new build...
