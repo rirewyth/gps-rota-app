@@ -17,12 +17,19 @@ platform :ios do
     cert
     sigh(force: true)
 
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "App.xcodeproj",
+      team_id: "TAH5CSWX56",
+      bundle_identifier: "com.rotaplus.emniyetteyim",
+      profile_name: ENV["SIGH_NAME"]
+    )
+
     # Xcode Derlemesini Başlat
     build_app(
       project: "App.xcodeproj",
       scheme: "App",
-      export_method: "app-store",
-      xcargs: "DEVELOPMENT_TEAM='TAH5CSWX56'"
+      export_method: "app-store"
     )
 
     # Derlenen uygulamayı App Store Connect'e gönder
