@@ -31,10 +31,6 @@ jobs:
         working-directory: ./mountaineering_app
         run: flutter create . --platforms ios
 
-      - name: CocoaPods Yükle
-        working-directory: ./mountaineering_app/ios
-        run: pod install
-
       - name: Bundle Identifier Ayarla
         working-directory: ./mountaineering_app/ios
         run: |
