@@ -13,14 +13,6 @@ platform :ios do
       in_house: false
     )
 
-    # Uygulamayı Apple portalında yoksa otomatik oluştur
-    produce(
-      app_name: "GPS Rota App",
-      app_identifier: "com.rotaplus.emniyetteyim",
-      sku: "com.rotaplus.emniyetteyim",
-      language: "Turkish"
-    )
-
     # Sertifika ve Provisioning profillerini otomatik oluştur
     cert
     sigh(force: true)
