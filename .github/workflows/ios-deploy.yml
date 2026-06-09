@@ -1,0 +1,42 @@
+name: iOS Build and TestFlight Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Manuel tetikleme için
+
+jobs:
+  deploy:
+    runs-on: macos-latest
+    steps:
+      - name: Kodları Al
+        uses: actions/checkout@v3
+
+      - name: Node.js Kur
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Paketleri Yükle
+        run: npm install
+
+      - name: Capacitor iOS Güncelle
+        run: npx cap sync ios
+
+      - name: Ruby ve Fastlane Kur
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+
+      - name: Fastlane Yükle
+        working-directory: ios/App
+        run: bundle install
+
+      - name: App Store'a Derle ve Yükle
+        working-directory: ios/App
+        env:
+          API_KEY_ID: ${{ secrets.API_KEY_ID }}
+          API_ISSUER_ID: ${{ secrets.API_ISSUER_ID }}
+          API_KEY_CONTENT: ${{ secrets.API_KEY_CONTENT }}
+        run: bundle exec fastlane beta
