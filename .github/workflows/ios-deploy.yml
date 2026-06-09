@@ -49,6 +49,11 @@ jobs:
         run: |
           sed -i '' 's/PRODUCT_BUNDLE_IDENTIFIER = .*/PRODUCT_BUNDLE_IDENTIFIER = com.rotaplus.emniyetteyim;/g' Runner.xcodeproj/project.pbxproj
 
+      - name: Xcode Hafıza Sınırlandırması (Çökmeyi Önlemek İçin)
+        run: |
+          defaults write com.apple.dt.Xcode IDEBuildOperationMaxNumberOfConcurrentCompileTasks 2
+          defaults write com.apple.dt.Xcode PBXNumberOfParallelBuildSubtasks 2
+
       - name: Flutter Build iOS
         working-directory: ./mountaineering_app
         run: flutter build ios --release --no-codesign
