@@ -1,0 +1,40 @@
+workflows:
+  ios-testflight:
+    name: iOS TestFlight Release
+    instance_type: mac_mini_m1
+    max_build_duration: 120
+    environment:
+      flutter: stable
+      xcode: latest
+      ruby: default
+    scripts:
+      - name: Disable Swift Package Manager
+        script: |
+          flutter config --no-enable-swift-package-manager
+
+      - name: Get Flutter dependencies
+        script: |
+          cd mountaineering_app
+          flutter pub get
+
+      - name: Fix Podfile and Project Target (iOS 15.0)
+        script: |
+          cd mountaineering_app/ios
+          ruby -i -e "lines = ARGF.readlines; lines.reject! { |l| l.match?(/platform :ios/) }; puts \"platform :ios, '15.0'\"; puts lines" Podfile
+          ruby -i -e "puts ARGF.read.gsub(/IPHONEOS_DEPLOYMENT_TARGET = .*?;/, %{IPHONEOS_DEPLOYMENT_TARGET = 15.0;})" Runner.xcodeproj/project.pbxproj
+          pod repo update
+
+      - name: Bundle Identifier Ayarla
+        script: |
+          cd mountaineering_app/ios
+          sed -i '' 's/PRODUCT_BUNDLE_IDENTIFIER = .*/PRODUCT_BUNDLE_IDENTIFIER = com.rotaplus.emniyetteyim;/g' Runner.xcodeproj/project.pbxproj
+
+      - name: Install Ruby Dependencies (Fastlane)
+        script: |
+          cd mountaineering_app/ios
+          bundle install
+
+      - name: Build and Upload to TestFlight via Fastlane
+        script: |
+          cd mountaineering_app/ios
+          bundle exec fastlane beta
