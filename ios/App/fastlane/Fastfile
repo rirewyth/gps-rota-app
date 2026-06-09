@@ -14,7 +14,9 @@ platform :ios do
     )
 
     # Sertifika ve Provisioning profillerini otomatik oluştur
-    cert
+    cert(
+      keychain_password: ""
+    )
     sigh(force: true)
 
     update_code_signing_settings(
