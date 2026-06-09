@@ -19,7 +19,7 @@ platform :ios do
 
     # Xcode Derlemesini Başlat
     build_app(
-      workspace: "App.xcworkspace",
+      project: "App.xcodeproj",
       scheme: "App",
       export_method: "app-store"
     )
