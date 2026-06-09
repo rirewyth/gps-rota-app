@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../database_helper.dart';
 import '../storage_helper.dart';
 import 'dart:developer';
+import '../firebase_options.dart';
 
 class CloudSyncService {
   static bool _isInitialized = false;
@@ -17,7 +18,9 @@ class CloudSyncService {
   static Future<void> initCloudServices() async {
     try {
       if (!_isInitialized) {
-        await Firebase.initializeApp();
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
         _isInitialized = true;
         _hasError = false;
         log("Firebase Cloud Service: INITIALIZED OKEY");
