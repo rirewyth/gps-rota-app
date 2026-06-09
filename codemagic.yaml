@@ -19,6 +19,11 @@ workflows:
           cd mountaineering_app
           flutter pub get
 
+      - name: Create missing iOS files
+        script: |
+          cd mountaineering_app
+          flutter create . --platforms ios
+
       - name: Fix Podfile and Project Target (iOS 15.0)
         script: |
           cd mountaineering_app/ios
