@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch: # Manuel tetikleme için
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -18,16 +18,31 @@ jobs:
         with:
           xcode-version: 'latest-stable'
 
-      - name: Node.js Kur
-        uses: actions/setup-node@v4
+      - name: Flutter Kurulumu
+        uses: subosito/flutter-action@v2
         with:
-          node-version: '22'
+          channel: 'stable'
 
-      - name: Paketleri Yükle
-        run: npm install
+      - name: Flutter Dependencies
+        working-directory: ./mountaineering_app
+        run: flutter pub get
 
-      - name: Capacitor iOS Güncelle
-        run: npx cap sync ios
+      - name: Eksik iOS Dosyalarını Oluştur
+        working-directory: ./mountaineering_app
+        run: flutter create . --platforms ios
+
+      - name: CocoaPods Yükle
+        working-directory: ./mountaineering_app/ios
+        run: pod install
+
+      - name: Bundle Identifier Ayarla
+        working-directory: ./mountaineering_app/ios
+        run: |
+          sed -i '' 's/PRODUCT_BUNDLE_IDENTIFIER = .*/PRODUCT_BUNDLE_IDENTIFIER = com.rotaplus.emniyetteyim;/g' Runner.xcodeproj/project.pbxproj
+
+      - name: Flutter Build iOS
+        working-directory: ./mountaineering_app
+        run: flutter build ios --release --no-codesign
 
       - name: Ruby ve Fastlane Kur
         uses: ruby/setup-ruby@v1
@@ -35,11 +50,11 @@ jobs:
           ruby-version: '3.2'
 
       - name: Fastlane Yükle
-        working-directory: ios/App
+        working-directory: ./mountaineering_app/ios
         run: bundle install
 
       - name: App Store'a Derle ve Yükle
-        working-directory: ios/App
+        working-directory: ./mountaineering_app/ios
         env:
           API_KEY_ID: ${{ secrets.API_KEY_ID }}
           API_ISSUER_ID: ${{ secrets.API_ISSUER_ID }}
