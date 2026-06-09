@@ -16,8 +16,8 @@ platform :ios do
     # Uygulamayı Apple portalında yoksa otomatik oluştur
     produce(
       app_name: "GPS Rota App",
-      app_identifier: "com.gpsrota.app",
-      sku: "com.gpsrota.app",
+      app_identifier: "com.rotaplus.emniyetteyim",
+      sku: "com.rotaplus.emniyetteyim",
       language: "Turkish"
     )
 
