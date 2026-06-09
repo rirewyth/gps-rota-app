@@ -73,5 +73,15 @@
 
     <key>MBXAccessToken</key>
     <string>pk.eyJ1Ijoic2VyY2Fub3JhbGwiLCJhIjoiY21vdGxneTR1MDZkNjJ1czl5OG4xZGRtNSJ9.aZd3CyiISCcxlcR0hXkhhQ</string>
+
+    <!-- Required Privacy Keys -->
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Acil durumlarda sesli komut alabilmek için mikrofon erişimine ihtiyaç vardır.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Profil fotoğrafı ve acil durum görselleri seçebilmek için galeri erişimine ihtiyaç vardır.</string>
+    <key>NSCameraUsageDescription</key>
+    <string>Anlık acil durum fotoğrafları çekebilmek için kamera erişimine ihtiyaç vardır.</string>
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>Acil durumlarda sesli komutlarınızı algılamak için ses tanıma iznine ihtiyaç vardır.</string>
 </dict>
 </plist>
