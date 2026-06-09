@@ -18,7 +18,8 @@ platform :ios do
 
     # Sertifika ve Provisioning profillerini otomatik oluştur
     cert(
-      skip_certificate_verification: true
+      keychain_path: ENV["MATCH_KEYCHAIN_NAME"],
+      keychain_password: ENV["MATCH_KEYCHAIN_PASSWORD"]
     )
     sigh(force: true)
 
