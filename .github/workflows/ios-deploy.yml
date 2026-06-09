@@ -23,6 +23,9 @@ jobs:
         with:
           channel: 'stable'
 
+      - name: Disable Swift Package Manager
+        run: flutter config --no-enable-swift-package-manager
+
       - name: Flutter Dependencies
         working-directory: ./mountaineering_app
         run: flutter pub get
