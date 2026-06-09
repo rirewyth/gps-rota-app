@@ -37,10 +37,10 @@ jobs:
       - name: Podfile Platformunu Düzelt ve Pod Install
         working-directory: ./mountaineering_app/ios
         run: |
-          sed -i '' "s/# platform :ios, '12.0'/platform :ios, '14.0'/g" Podfile
-          sed -i '' "s/# platform :ios, '11.0'/platform :ios, '14.0'/g" Podfile
-          sed -i '' "s/# platform :ios, '13.0'/platform :ios, '14.0'/g" Podfile
-          sed -i '' "s/platform :ios, '13.0'/platform :ios, '14.0'/g" Podfile
+          # Podfile içindeki tüm platform tanımlarını temizleyip en üste iOS 15.0 ekliyoruz
+          ruby -i -e "lines = ARGF.readlines; lines.reject! { |l| l.match?(/platform :ios/) }; puts \"platform :ios, '15.0'\"; puts lines" Podfile
+          # Xcode projesi içindeki minimum versiyonu iOS 15.0 yapıyoruz
+          ruby -i -e "puts ARGF.read.gsub(/IPHONEOS_DEPLOYMENT_TARGET = .*?;/, %{IPHONEOS_DEPLOYMENT_TARGET = 15.0;})" Runner.xcodeproj/project.pbxproj
           pod repo update
           pod install
 
