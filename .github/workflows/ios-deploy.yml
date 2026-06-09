@@ -34,6 +34,15 @@ jobs:
         working-directory: ./mountaineering_app
         run: flutter create . --platforms ios
 
+      - name: Podfile Platformunu Düzelt ve Pod Install
+        working-directory: ./mountaineering_app/ios
+        run: |
+          sed -i '' "s/# platform :ios, '12.0'/platform :ios, '13.0'/g" Podfile
+          sed -i '' "s/# platform :ios, '11.0'/platform :ios, '13.0'/g" Podfile
+          sed -i '' "s/# platform :ios, '13.0'/platform :ios, '13.0'/g" Podfile
+          pod repo update
+          pod install
+
       - name: Bundle Identifier Ayarla
         working-directory: ./mountaineering_app/ios
         run: |
