@@ -13,6 +13,14 @@ platform :ios do
       in_house: false
     )
 
+    # Uygulamayı Apple portalında yoksa otomatik oluştur
+    produce(
+      app_name: "GPS Rota App",
+      app_identifier: "com.gpsrota.app",
+      sku: "com.gpsrota.app",
+      language: "Turkish"
+    )
+
     # Sertifika ve Provisioning profillerini otomatik oluştur
     cert
     sigh(force: true)
