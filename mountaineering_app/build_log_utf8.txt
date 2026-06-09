@@ -1,0 +1,66 @@
+﻿Running Gradle task 'assembleRelease'...                        
+C:\flutter\bin\flutter.bat 
+: lib/screens/home_screen.d
+art:337:22: Error: The gett
+er '_cancelSos' isn't defin
+ed for the type '_HomeDashb
+oardState'.
+At line:1 char:1
++ C:\flutter\bin\flutter.ba
+t build apk --release > bui
+ld_log.txt 2>&1
++ ~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
+    + CategoryInfo         
+     : NotSpecified: (lib  
+  /screens/hom...ashboar   
+ dState'.:String) [], R    
+emoteException
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 
+ - '_HomeDashboardState' is
+ from 'package:mountaineeri
+ng_app/screens/home_screen.
+dart' ('lib/screens/home_sc
+reen.dart').
+Try correcting the name to 
+the name of an existing get
+ter, or defining a getter o
+r field named '_cancelSos'.
+              onTap: _cance
+lSos,
+                     ^^^^^^
+^^^^
+Target kernel_snapshot_prog
+ram failed: Exception
+
+
+FAILURE: Build failed with 
+an exception.
+
+* What went wrong:
+Execution failed for task '
+:app:compileFlutterBuildRel
+ease'.
+> Process 'command 'C:\flut
+ter\bin\flutter.bat'' finis
+hed with non-zero exit valu
+e 1
+
+* Try:
+> Run with --stacktrace opt
+ion to get the stack trace.
+> Run with --info or --debu
+g option to get more log ou
+tput.
+> Run with --scan to get fu
+ll insights.
+> Get more help at https://
+help.gradle.org.
+
+BUILD FAILED in 14s
+Running Gradle task 'assembleRelease'...                           14,5s
+Gradle task assembleRelease
+ failed with exit code 1

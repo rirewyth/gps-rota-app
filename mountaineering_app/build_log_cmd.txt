@@ -1,0 +1,2 @@
+Running Gradle task 'assembleDebug'...                              9,0s
+Gradle build failed to produce an .apk file. It's likely that this file was generated under C:\213\mountaineering_app\build, but the tool couldn't find it.

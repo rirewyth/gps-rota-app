@@ -1,0 +1,2 @@
+c:\213\mountaineering_app\android\app\build\outputs\apk\release\app-release.apk
+c:\213\mountaineering_app\android\app\build\outputs\flutter-apk\app-release.apk

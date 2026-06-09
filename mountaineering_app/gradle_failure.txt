@@ -1,0 +1,55 @@
+/kotlin-stdlib/2.2.0/fdfc65
+fbc42fda253a26f61dac3c0aca3
+35fae96/kotlin-stdlib-2.2.0
+.jar!/META-INF/kotlin-stdli
+b-jdk8.kotlin_module Module
+ was compiled with an incom
+patible version of Kotlin. 
+The binary version of its m
+etadata is 2.2.0, expected 
+version is 2.0.0.
+e: file:///C:/Users/rirew/.
+gradle/caches/modules-2/fil
+es-2.1/org.jetbrains.kotlin
+/kotlin-stdlib/2.2.0/fdfc65
+fbc42fda253a26f61dac3c0aca3
+35fae96/kotlin-stdlib-2.2.0
+.jar!/META-INF/kotlin-stdli
+b.kotlin_module Module was 
+compiled with an incompatib
+le version of Kotlin. The b
+inary version of its metada
+ta is 2.2.0, expected versi
+on is 2.0.0.
+3 warnings
+
+FAILURE: Build failed with 
+an exception.
+
+* What went wrong:
+Execution failed for task '
+:battery_plus:compileReleas
+eKotlin'.
+> A failure occurred while 
+executing org.jetbrains.kot
+lin.compilerRunner.GradleCo
+mpilerRunnerWithWorkers$Gra
+dleKotlinCompilerWorkAction
+   > Internal compiler erro
+r. See log for more details
+
+* Try:
+> Run with --stacktrace opt
+ion to get the stack trace.
+> Run with --info or --debu
+g option to get more log ou
+tput.
+> Run with --scan to get fu
+ll insights.
+> Get more help at https://
+help.gradle.org.
+
+BUILD FAILED in 8s
+Running Gradle task 'assembleRelease'...                            8,6s
+
+ÔöîÔöÇ Flutter Fix ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ

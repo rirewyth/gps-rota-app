@@ -1,0 +1,150 @@
+﻿> Task :sqflite:bundleReleaseAar UP-TO-DATE
+Caching disabled for task ':sqflite:bundleReleaseAar' because:
+  Build cache is disabled
+  Caching has been disabled for the task
+Skipping task ':sqflite:bundleReleaseAar' as it is up-to-date.
+Resolve mutations for :sqflite:mapReleaseSourceSetPaths (Thread[#11483,Execution worker Thread 6,5,main]) started.
+:sqflite:mapReleaseSourceSetPaths (Thread[#11483,Execution worker Thread 6,5,main]) started.
+
+> Task :sqflite:mapReleaseSourceSetPaths UP-TO-DATE
+Caching disabled for task ':sqflite:mapReleaseSourceSetPaths' because:
+  Build cache is disabled
+  Caching has been disabled for the task
+Skipping task ':sqflite:mapReleaseSourceSetPaths' as it is up-to-date.
+Resolve mutations for :sqflite:mergeReleaseResources (Thread[#11483,Execution worker Thread 6,5,main]) started.
+:sqflite:mergeReleaseResources (Thread[#11483,Execution worker Thread 6,5,main]) started.
+
+> Task :sqflite:mergeReleaseResources UP-TO-DATE
+Caching disabled for task ':sqflite:mergeReleaseResources' because:
+  Build cache is disabled
+Skipping task ':sqflite:mergeReleaseResources' as it is up-to-date.
+Resolve mutations for :sqflite:verifyReleaseResources (Thread[#11483,Execution worker Thread 6,5,main]) started.
+:sqflite:verifyReleaseResources (Thread[#11483,Execution worker Thread 6,5,main]) started.
+
+> Task :sqflite:verifyReleaseResources UP-TO-DATE
+Caching disabled for task ':sqflite:verifyReleaseResources' because:
+  Build cache is disabled
+Skipping task ':sqflite:verifyReleaseResources' as it is up-to-date.
+Resolve mutations for :sqflite:assembleRelease (Thread[#11483,Execution worker Thread 6,5,main]) started.
+:sqflite:assembleRelease (Thread[#11483,Execution worker Thread 6,5,main]) started.
+
+> Task :sqflite:assembleRelease UP-TO-DATE
+Skipping task ':sqflite:assembleRelease' as it has no actions.
+Resolve mutations for :torch_light:bundleReleaseAar (Thread[#11477,included builds,5,main]) started.
+:torch_light:bundleReleaseAar (Thread[#11477,included builds,5,main]) started.
+
+> Task :torch_light:bundleReleaseAar UP-TO-DATE
+Caching disabled for task ':torch_light:bundleReleaseAar' because:
+  Build cache is disabled
+  Caching has been disabled for the task
+Skipping task ':torch_light:bundleReleaseAar' as it is up-to-date.
+Resolve mutations for :torch_light:mapReleaseSourceSetPaths (Thread[#11477,included builds,5,main]) started.
+:torch_light:mapReleaseSourceSetPaths (Thread[#11477,included builds,5,main]) started.
+
+> Task :torch_light:mapReleaseSourceSetPaths UP-TO-DATE
+Caching disabled for task ':torch_light:mapReleaseSourceSetPaths' because:
+  Build cache is disabled
+  Caching has been disabled for the task
+Skipping task ':torch_light:mapReleaseSourceSetPaths' as it is up-to-date.
+Resolve mutations for :torch_light:mergeReleaseResources (Thread[#11477,included builds,5,main]) started.
+:torch_light:mergeReleaseResources (Thread[#11477,included builds,5,main]) started.
+
+> Task :torch_light:mergeReleaseResources UP-TO-DATE
+Caching disabled for task ':torch_light:mergeReleaseResources' because:
+  Build cache is disabled
+Skipping task ':torch_light:mergeReleaseResources' as it is up-to-date.
+Resolve mutations for :torch_light:verifyReleaseResources (Thread[#11477,included builds,5,main]) started.
+:torch_light:verifyReleaseResources (Thread[#11477,included builds,5,main]) started.
+
+> Task :torch_light:verifyReleaseResources UP-TO-DATE
+Caching disabled for task ':torch_light:verifyReleaseResources' because:
+  Build cache is disabled
+Skipping task ':torch_light:verifyReleaseResources' as it is up-to-date.
+Resolve mutations for :torch_light:assembleRelease (Thread[#11477,included builds,5,main]) started.
+:torch_light:assembleRelease (Thread[#11477,included builds,5,main]) started.
+
+> Task :torch_light:assembleRelease UP-TO-DATE
+Skipping task ':torch_light:assembleRelease' as it has no actions.
+
+> Task :app:packageRelease
+Custom actions are attached to task ':app:packageRelease'.
+Caching disabled for task ':app:packageRelease' because:
+  Build cache is disabled
+  Caching has been disabled for the task
+Task ':app:packageRelease' is not up-to-date because:
+  Input property 'allInputFilesWithRelativePathSensitivity' file C:\213\mountaineering_app\android\app\build\intermediates\compressed_assets\release\compressReleaseAssets\out\assets\flutter_assets\fonts\MaterialIcons-Regular.otf.jar has changed.
+The input changes require a full rebuild for incremental task ':app:packageRelease'.
+Resolve mutations for :app:createReleaseApkListingFileRedirect (Thread[#11484,Execution worker Thread 7,5,main]) started.
+:app:createReleaseApkListingFileRedirect (Thread[#11484,Execution worker Thread 7,5,main]) started.
+
+> Task :app:createReleaseApkListingFileRedirect UP-TO-DATE
+Caching disabled for task ':app:createReleaseApkListingFileRedirect' because:
+  Build cache is disabled
+  Caching has been disabled for the task
+Skipping task ':app:createReleaseApkListingFileRedirect' as it is up-to-date.
+
+> Task :audioplayers_android:lintVitalAnalyzeRelease
+Caching disabled for task ':audioplayers_android:lintVitalAnalyzeRelease' because:
+  Build cache is disabled
+Task ':audioplayers_android:lintVitalAnalyzeRelease' is not up-to-date because:
+  Value of input property 'printStackTrace' has changed for task ':audioplayers_android:lintVitalAnalyzeRelease'
+Android Lint: Reusing lint classloader 31.7.2_true
+work action resolve out (project :audioplayers_android) (Thread[#11488,Execution worker Thread 11,5,main]) started.
+work action resolve out (project :audioplayers_android) (Thread[#11488,Execution worker Thread 11,5,main]) started.
+
+> Task :shared_preferences_android:lintVitalAnalyzeRelease
+Caching disabled for task ':shared_preferences_android:lintVitalAnalyzeRelease' because:
+  Build cache is disabled
+Task ':shared_preferences_android:lintVitalAnalyzeRelease' is not up-to-date because:
+  Value of input property 'printStackTrace' has changed for task ':shared_preferences_android:lintVitalAnalyzeRelease'
+Android Lint: Reusing lint classloader 31.7.2_true
+work action resolve out (project :shared_preferences_android) (Thread[#11493,Execution worker Thread 15,5,main]) started.
+work action resolve out (project :shared_preferences_android) (Thread[#11493,Execution worker Thread 15,5,main]) started.
+Resolve mutations for :app:lintVitalAnalyzeRelease (Thread[#11493,Execution worker Thread 15,5,main]) started.
+:app:lintVitalAnalyzeRelease (Thread[#11493,Execution worker Thread 15,5,main]) started.
+
+> Task :app:lintVitalAnalyzeRelease
+Caching disabled for task ':app:lintVitalAnalyzeRelease' because:
+  Build cache is disabled
+Task ':app:lintVitalAnalyzeRelease' is not up-to-date because:
+  Value of input property 'printStackTrace' has changed for task ':app:lintVitalAnalyzeRelease'
+Android Lint: Reusing lint classloader 31.7.2_true
+Resolve mutations for :app:lintVitalReportRelease (Thread[#11493,Execution worker Thread 15,5,main]) started.
+:app:lintVitalReportRelease (Thread[#11493,Execution worker Thread 15,5,main]) started.
+
+> Task :app:lintVitalReportRelease
+Caching disabled for task ':app:lintVitalReportRelease' because:
+  Build cache is disabled
+  Caching has been disabled for the task
+Task ':app:lintVitalReportRelease' is not up-to-date because:
+  Value of input property 'printStackTrace' has changed for task ':app:lintVitalReportRelease'
+Android Lint: Reusing lint classloader 31.7.2_true
+Resolve mutations for :app:lintVitalRelease (Thread[#11493,Execution worker Thread 15,5,main]) started.
+:app:lintVitalRelease (Thread[#11493,Execution worker Thread 15,5,main]) started.
+
+> Task :app:lintVitalRelease
+Caching disabled for task ':app:lintVitalRelease' because:
+  Build cache is disabled
+Task ':app:lintVitalRelease' is not up-to-date because:
+  Task has not declared any outputs despite executing actions.
+Resolve mutations for :app:assembleRelease (Thread[#11493,Execution worker Thread 15,5,main]) started.
+:app:assembleRelease (Thread[#11493,Execution worker Thread 15,5,main]) started.
+
+> Task :app:assembleRelease
+Caching disabled for task ':app:assembleRelease' because:
+  Build cache is disabled
+Task ':app:assembleRelease' is not up-to-date because:
+  Task has not declared any outputs despite executing actions.
+Android Lint: Disposing Uast application environment in lint classloaders [31.7.2_true, 31.7.2_false]
+
+[Incubating] Problems report is available at: file:///C:/213/mountaineering_app/android/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 38s
+482 actionable tasks: 28 executed, 454 up-to-date
+Watched directory hierarchies: [C:\flutter\packages\flutter_tools\gradle, C:\213\mountaineering_app\android]

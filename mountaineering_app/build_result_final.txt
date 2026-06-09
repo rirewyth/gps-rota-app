@@ -1,0 +1,28 @@
+Running Gradle task 'assembleRelease'...                        
+Error: Unable to read file: C:\Users\rirew\OneDrive\Masa�st�\213\mountaineering_app\.dart_tool\flutter_build\18605ff0abbcce65373f9b40bf17a2a4\app.dill
+Error: Unable to read file: C:\Users\rirew\OneDrive\Masa�st�\213\mountaineering_app\.dart_tool\flutter_build\18605ff0abbcce65373f9b40bf17a2a4\app.dill
+Error: Unable to read file: C:\Users\rirew\OneDrive\Masa�st�\213\mountaineering_app\.dart_tool\flutter_build\18605ff0abbcce65373f9b40bf17a2a4\app.dill
+Dart snapshot generator failed with exit code 255
+Dart snapshot generator failed with exit code 255
+Dart snapshot generator failed with exit code 255
+Font asset "MaterialIcons-Regular.otf" was tree-shaken, reducing it from 1645184 to 1376 bytes (99.9% reduction). Tree-shaking can be disabled by providing the --no-tree-shake-icons flag when building your app.
+Target android_aot_release_android-arm failed: Exception: AOT snapshotter exited with code 255
+Target android_aot_release_android-arm64 failed: Exception: AOT snapshotter exited with code 255
+Target android_aot_release_android-x64 failed: Exception: AOT snapshotter exited with code 255
+
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileFlutterBuildRelease'.
+> Process 'command 'C:\flutter\bin\flutter.bat'' finished with non-zero exit value 1
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 39s
+Running Gradle task 'assembleRelease'...                           39,8s
+Gradle task assembleRelease failed with exit code 1

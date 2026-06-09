@@ -1,0 +1,95 @@
+name: mountaineering_app
+description: "Rota+: Doğa sporları, trekking ve ekip koordinasyon sistemi. Çevrimdışı haritalar ve güvenli konum paylaşımı."
+publish_to: 'none'
+version: 1.0.55+73
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # Ağ istekleri (Arama ve Yol Tarifi)
+  http: ^1.2.0
+
+  # Konum takip
+  geolocator: ^13.0.2
+  
+  # Çevrimdışı Harita
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
+  mapbox_maps_flutter: ^2.5.1
+  
+  # Veri saklama
+  shared_preferences: ^2.3.2
+  permission_handler: ^11.3.1
+  path_provider: ^2.1.4
+  sqflite: 2.3.3+1
+  path: ^1.9.0
+  
+  # Cihaz durumu (Pil vb.)
+  battery_plus: ^4.0.2
+  flutter_compass: ^0.7.0
+
+  # Animasyonlar ve Premium UI
+  lottie: ^3.1.2
+  animate_do: ^3.3.4
+  google_fonts: ^6.2.1
+  fl_chart: ^0.69.0 # Grafik kütüphanesi
+
+  # Güvenlik ve Donanım
+  crypto: ^3.0.3
+  torch_light: ^1.1.0 # Flaş kontrolü
+  audioplayers: ^6.1.1 # Siren Sesi için
+  sensors_plus: ^6.1.1 # Su Terazisi ve Barometre için
+  url_launcher: 6.2.5
+  firebase_core: ^4.6.0
+  cloud_firestore: ^6.2.0
+  firebase_auth: ^6.4.0
+  firebase_messaging: ^16.2.0
+  google_sign_in: ^6.2.1
+  image_picker: ^1.2.1
+  file_picker: ^8.1.2
+  firebase_storage: ^13.3.0
+  share_plus: ^10.0.0
+  package_info_plus: ^8.0.0
+
+  camera: ^0.12.0+1
+  nearby_connections: ^4.3.0
+  dio: ^5.9.2
+  flutter_local_notifications: ^17.1.2
+  flutter_tts: ^4.0.2
+  in_app_purchase: ^3.2.0
+  google_mobile_ads: ^5.2.0
+  flutter_native_splash: ^2.4.0
+  flutter_background_service: ^5.0.5
+  device_info_plus: ^11.0.0
+  speech_to_text: ^7.3.0
+  vibration: ^3.1.8
+  record: ^6.2.0
+  another_telephony: ^0.4.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_launcher_icons: "^0.13.1"
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icon/tactical_logo.jpg"
+flutter_native_splash:
+  color: "#0A0A0A"
+  image: "assets/icon/tactical_logo.jpg"
+  android: true
+  ios: false
+
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/icon/
+    - assets/badges/
+    - assets/guides/
+    - assets/audio/

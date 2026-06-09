@@ -1,0 +1,199 @@
+ings.gradle` file (C:\21
+
+3\mountaineering_app\and
+
+roid/settings.gradle), b
+
+y a plugin with the id o
+
+f org.jetbrains.kotlin.a
+
+ndroid. 
+
+If you don't see a plugi
+
+ns block, your project w
+
+as likely created with a
+
+n older template version
+
+, in which case it is mo
+
+st likely defined in the
+
+ top-level build.gradle 
+
+file (C:\213\mountaineer
+
+ing_app\android/build.gr
+
+adle) by the ext.kotlin_
+
+version property.
+
+
+
+lib/screens/home_screen.
+
+dart:12:8: Error: Error 
+
+when reading 'lib/backgr
+
+ound_sms_service.dart': 
+
+Sistem belirtilen dosyay
+
+─▒ bulam─▒yor
+
+import '../background_sm
+
+s_service.dart';
+
+       ^
+
+lib/screens/home_screen.
+
+dart:268:25: Error: The 
+
+method 'sosMesajiGonder'
+
+ isn't defined for the t
+
+ype '_HomeDashboardState
+
+'.
+
+ - '_HomeDashboardState'
+
+ is from 'package:mounta
+
+ineering_app/screens/hom
+
+e_screen.dart' ('lib/scr
+
+eens/home_screen.dart').
+
+Try correcting the name 
+
+to the name of an existi
+
+ng method, or defining a
+
+ method named 'sosMesaji
+
+Gonder'.
+
+    final sonuc = await 
+
+sosMesajiGonder();
+
+                        
+
+^^^^^^^^^^^^^^^
+
+lib/screens/home_screen.
+
+dart:297:29: Error: The 
+
+method 'sosMesajiGonder'
+
+ isn't defined for the t
+
+ype '_HomeDashboardState
+
+'.
+
+ - '_HomeDashboardState'
+
+ is from 'package:mounta
+
+ineering_app/screens/hom
+
+e_screen.dart' ('lib/scr
+
+eens/home_screen.dart').
+
+Try correcting the name 
+
+to the name of an existi
+
+ng method, or defining a
+
+ method named 'sosMesaji
+
+Gonder'.
+
+        final sonuc = aw
+
+ait sosMesajiGonder();
+
+                        
+
+    ^^^^^^^^^^^^^^^
+
+Target kernel_snapshot_p
+
+rogram failed: Exception
+
+
+
+
+
+FAILURE: Build failed wi
+
+th an exception.
+
+
+
+* What went wrong:
+
+Execution failed for tas
+
+k ':app:compileFlutterBu
+
+ildRelease'.
+
+> Process 'command 'C:\f
+
+lutter\bin\flutter.bat''
+
+ finished with non-zero 
+
+exit value 1
+
+
+
+* Try:
+
+> Run with --stacktrace 
+
+option to get the stack 
+
+trace.
+
+> Run with --info or --d
+
+ebug option to get more 
+
+log output.
+
+> Run with --scan to get
+
+ full insights.
+
+> Get more help at https
+
+://help.gradle.org.
+
+
+
+BUILD FAILED in 16s
+
+Running Gradle task 'assembleRelease'...                           17,2s
+
+Gradle task assembleRele
+
+ase failed with exit cod
+
+e 1

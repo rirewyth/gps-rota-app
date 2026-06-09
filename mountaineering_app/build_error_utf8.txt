@@ -1,0 +1,99 @@
+Running Gradle task 'assembleRelease'...                        
+C:\flutter\bin\flutter.bat 
+: lib/screens/map_screen.da
+rt:729:8: Error: '_notify' 
+is already declared in this
+ scope.
+At line:1 char:1
++ C:\flutter\bin\flutter.ba
+t build apk --release > bui
+ld_error.txt 2>&1
++ ~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+    + CategoryInfo         
+     : NotSpecified: (lib  
+  /screens/map... in thi   
+ s scope.:String) [], R    
+emoteException
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 
+  void _notify(String mesaj
+, {bool hata = false}) {
+       ^^^^^^^
+lib/screens/map_screen.dart
+:350:8: Context: Previous d
+eclaration of '_notify'.
+  void _notify(String mesaj
+, {bool hata = false}) {
+       ^^^^^^^
+lib/screens/map_screen.dart
+:221:21: Error: The method 
+'_aktifRotayiYukle' isn't d
+efined for the type '_MapSc
+reenState'.
+ - '_MapScreenState' is fro
+m 'package:mountaineering_a
+pp/screens/map_screen.dart'
+ ('lib/screens/map_screen.d
+art').
+Try correcting the name to 
+the name of an existing met
+hod, or defining a method n
+amed '_aktifRotayiYukle'.
+              await _aktifR
+otayiYukle();
+                    ^^^^^^^
+^^^^^^^^^^
+lib/screens/map_screen.dart
+:295:39: Error: The method 
+'_aktifRotayiYukle' isn't d
+efined for the type '_MapSc
+reenState'.
+ - '_MapScreenState' is fro
+m 'package:mountaineering_a
+pp/screens/map_screen.dart'
+ ('lib/screens/map_screen.d
+art').
+Try correcting the name to 
+the name of an existing met
+hod, or defining a method n
+amed '_aktifRotayiYukle'.
+                           
+     await _aktifRotayiYukl
+e();
+                           
+           ^^^^^^^^^^^^^^^^
+^
+Target kernel_snapshot_prog
+ram failed: Exception
+
+
+FAILURE: Build failed with 
+an exception.
+
+* What went wrong:
+Execution failed for task '
+:app:compileFlutterBuildRel
+ease'.
+> Process 'command 'C:\flut
+ter\bin\flutter.bat'' finis
+hed with non-zero exit valu
+e 1
+
+* Try:
+> Run with --stacktrace opt
+ion to get the stack trace.
+> Run with --info or --debu
+g option to get more log ou
+tput.
+> Run with --scan to get fu
+ll insights.
+> Get more help at https://
+help.gradle.org.
+
+BUILD FAILED in 19s
+Running Gradle task 'assembleRelease'...                           19,9s
+Gradle task assembleRelease
+ failed with exit code 1

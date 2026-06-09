@@ -1,0 +1,120 @@
+﻿Execution failed
+ for task ':app:checkReleas
+eAarMetadata'.
+[        ] > A failure occu
+rred while executing com.an
+droid.build.gradle.internal
+.tasks.CheckAarMetadataWork
+Action
+[        ]    > 2 issues we
+re found when checking AAR 
+metadata:
+[        ]        1.  Depen
+dency 'androidx.core:core-k
+tx:1.18.0' requires librari
+es and applications that
+[        ]            depen
+d on it to compile against 
+version 36 or later of the
+[        ]            Andro
+id APIs.
+[        ]            :app 
+is currently compiled again
+st android-35.
+[        ]            Recom
+mended action: Update this 
+project to use a newer comp
+ileSdk
+[        ]            of at
+ least 36, for example 36.
+[        ]            Note 
+that updating a library or 
+application's compileSdk (w
+hich
+[        ]            allow
+s newer APIs to be used) ca
+n be done separately from u
+pdating
+[        ]            targe
+tSdk (which opts the app in
+ to new runtime behavior) a
+nd
+[        ]            minSd
+k (which determines which d
+evices the app can be insta
+lled
+[        ]            on).
+[        ]        2.  Depen
+dency 'androidx.core:core:1
+.18.0' requires libraries a
+nd applications that
+[        ]            depen
+d on it to compile against 
+version 36 or later of the
+[        ]            Andro
+id APIs.
+[        ]            :app 
+is currently compiled again
+st android-35.
+[        ]            Recom
+mended action: Update this 
+project to use a newer comp
+ileSdk
+[        ]            of at
+ least 36, for example 36.
+[        ]            Note 
+that updating a library or 
+application's compileSdk (w
+hich
+[        ]            allow
+s newer APIs to be used) ca
+n be done separately from u
+pdating
+[        ]            targe
+tSdk (which opts the app in
+ to new runtime behavior) a
+nd
+[        ]            minSd
+k (which determines which d
+evices the app can be insta
+lled
+[        ]            on).
+[        ] * Try:
+[        ] > Run with --deb
+ug option to get more log o
+utput.
+[        ] > Run with --sca
+n to get full insights.
+[        ] > Get more help 
+at https://help.gradle.org.
+[        ] * Exception is:
+[        ] org.gradle.api.t
+asks.TaskExecutionException
+: Execution failed for task
+ ':app:checkReleaseAarMetad
+ata'.
+[        ] 	at org.gradle.a
+pi.internal.tasks.execution
+.ExecuteActionsTaskExecuter
+.lambda$executeIfValid$1(Ex
+ecuteActionsTaskExecuter.ja
+va:130)
+[        ] 	at org.gradle.i
+nternal.Try$Failure.ifSucce
+ssfulOrElse(Try.java:293)
+[        ] 	at org.gradle.a
+pi.internal.tasks.execution
+.ExecuteActionsTaskExecuter
+.executeIfValid(ExecuteActi
+onsTaskExecuter.java:128)
+[        ] 	at org.gradle.a
+pi.internal.tasks.execution
+.ExecuteActionsTaskExecuter
+.execute(ExecuteActionsTask
+Executer.java:116)
+[        ] 	at org.gradle.a
+pi.internal.tasks.execution
+.ProblemsTaskPathTrackingTa
+skExecuter.execute(Problems
+TaskPathTrackingTaskExecute
+r.java:

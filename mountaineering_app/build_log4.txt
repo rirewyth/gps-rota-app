@@ -1,0 +1,22 @@
+﻿Running Gradle task 'assembleRelease'...                            4,1s
+C:\flutter\bin\flutter.bat 
+: Gradle build failed to pr
+oduce an .apk file. It's li
+kely that this file was gen
+erated under C:\213\mountai
+neering_app\build, but the 
+tool couldn't find it.
+At line:1 char:1
++ C:\flutter\bin\flutter.ba
+t build apk --release 2>&1 
+| Out-File -Encod ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo         
+     : NotSpecified: (Gra  
+  dle build fa...uldn't    
+ find it.:String) [], R    
+emoteException
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 

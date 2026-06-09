@@ -1,0 +1,11 @@
+﻿Running Gradle task 'assembleRelease'...                        
+Font asset "MaterialIcons-Regular.otf" was tree-shaken, reducing it from 1645184 to 12096 bytes (99.3% reduction). Tree-shaking can be disabled by providing the --no-tree-shake-icons flag when building your app.
+Running Gradle task 'assembleRelease'...                           15,7s
+C:\flutter\bin\flutter.bat : Gradle build failed to produce an .apk file. It's likely that this file was generated unde
+r C:\213\mountaineering_app\build, but the tool couldn't find it.
+At line:1 char:1564
++ ... at pub get; C:\flutter\bin\flutter.bat build apk --release 2>&1 | Out ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Gradle build fa...uldn't find it.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
