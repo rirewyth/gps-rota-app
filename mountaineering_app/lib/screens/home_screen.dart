@@ -432,7 +432,8 @@ class _HomeDashboardState extends State<HomeDashboard>
 
   void _checkAndRequestPermissions() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      bool smsGranted = await Permission.sms.isGranted;
+      bool isIOS = Theme.of(context).platform == TargetPlatform.iOS;
+      bool smsGranted = isIOS ? true : await Permission.sms.isGranted;
       bool locGranted = await Permission.location.isGranted;
       
       if (smsGranted && locGranted) return;
@@ -458,12 +459,18 @@ class _HomeDashboardState extends State<HomeDashboard>
             TextButton(
               onPressed: () async {
                 Navigator.pop(context);
-                Map<Permission, PermissionStatus> statuses = await [
+                bool isIOS = Theme.of(context).platform == TargetPlatform.iOS;
+                
+                List<Permission> permsToRequest = [
                   Permission.location,
                   Permission.notification,
                   Permission.microphone,
-                  Permission.sms,
-                ].request();
+                ];
+                if (!isIOS) {
+                  permsToRequest.add(Permission.sms);
+                }
+                
+                Map<Permission, PermissionStatus> statuses = await permsToRequest.request();
                 bool allGranted = statuses.values.every((status) => status.isGranted || status.isLimited);
                 if (!allGranted && mounted) {
                   _showMandatoryPermissionsDialog();
