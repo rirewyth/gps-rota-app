@@ -79,19 +79,19 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
     _audioPlayer.setAudioContext(AudioContext(
       iOS: AudioContextIOS(
         category: AVAudioSessionCategory.playAndRecord,
-        options: [
+        options: {
           AVAudioSessionOptions.defaultToSpeaker,
           AVAudioSessionOptions.allowBluetooth,
-        ],
+        },
       ),
     ));
     _sfxPlayer.setAudioContext(AudioContext(
       iOS: AudioContextIOS(
         category: AVAudioSessionCategory.playAndRecord,
-        options: [
+        options: {
           AVAudioSessionOptions.defaultToSpeaker,
           AVAudioSessionOptions.allowBluetooth,
-        ],
+        },
       ),
     ));
     _tabController = TabController(length: 4, vsync: this);
