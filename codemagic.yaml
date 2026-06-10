@@ -34,7 +34,7 @@ workflows:
       - name: Bundle Identifier and Team Settings
         script: |
           cd mountaineering_app/ios
-          sed -i '' 's/PRODUCT_BUNDLE_IDENTIFIER = .*/PRODUCT_BUNDLE_IDENTIFIER = com.rotaplus.emniyetteyim; DEVELOPMENT_TEAM = TAH5CSWX56; CODE_SIGNING_ALLOWED = NO;/g' Runner.xcodeproj/project.pbxproj
+          sed -i '' 's/PRODUCT_BUNDLE_IDENTIFIER = .*/PRODUCT_BUNDLE_IDENTIFIER = com.rotaplus.emniyetteyim; DEVELOPMENT_TEAM = TAH5CSWX56;/g' Runner.xcodeproj/project.pbxproj
 
       - name: Install Ruby Dependencies (Fastlane)
         script: |
