@@ -18,11 +18,16 @@ class BarometerService {
 
   void startMonitoring() {
     _pressureSub?.cancel();
-    // sensors_plus usage
-    _pressureSub = barometerEventStream().listen((BarometerEvent event) {
-      _currentPressure = event.pressure;
-      _checkPressureTrend(event.pressure);
-    });
+    try {
+      _pressureSub = barometerEventStream().listen((BarometerEvent event) {
+        _currentPressure = event.pressure;
+        _checkPressureTrend(event.pressure);
+      }, onError: (e) {
+        print("Barometer Error: $e");
+      });
+    } catch(e) {
+      print("Barometer Stream Error: $e");
+    }
   }
 
   void stopMonitoring() {

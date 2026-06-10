@@ -303,8 +303,8 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
     setState(() => _isAcousticSosActive = forceActive ? true : !_isAcousticSosActive);
     _sosCycleTimer?.cancel();
     _vibrationTimer?.cancel();
-    _audioPlayer.stop();
-    Vibration.cancel();
+    try { await _audioPlayer.stop(); } catch(_) {}
+    try { Vibration.cancel(); } catch(_) {}
     if (_isAcousticSosActive) {
       _playSosCycle();
       _sosCycleTimer = Timer.periodic(const Duration(minutes: 1), (timer) => _playSosCycle());
@@ -313,24 +313,27 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
 
   void _playSosCycle() async {
     if (!_isAcousticSosActive || !mounted) return;
-    await _audioPlayer.setAudioContext(AudioContext(
-      android: AudioContextAndroid(
-        usageType: AndroidUsageType.alarm,
-        contentType: AndroidContentType.sonification,
-        audioFocus: AndroidAudioFocus.gainTransient,
-      ),
-      iOS: AudioContextIOS(
-        category: AVAudioSessionCategory.playback,
-        options: {
-          AVAudioSessionOptions.defaultToSpeaker,
-          AVAudioSessionOptions.duckOthers,
-        },
-      ),
-    ));
-    await _audioPlayer.setVolume(1.0);
-    _audioPlayer.setReleaseMode(ReleaseMode.loop);
-    Uint8List audioBytes = base64Decode(base64Beep);
-    await _audioPlayer.play(BytesSource(audioBytes));
+    try {
+      await _audioPlayer.setAudioContext(AudioContext(
+        android: AudioContextAndroid(
+          usageType: AndroidUsageType.alarm,
+          contentType: AndroidContentType.sonification,
+          audioFocus: AndroidAudioFocus.gainTransient,
+        ),
+        iOS: AudioContextIOS(
+          category: AVAudioSessionCategory.playback,
+          options: {
+            AVAudioSessionOptions.defaultToSpeaker,
+          },
+        ),
+      ));
+      await _audioPlayer.setVolume(1.0);
+      _audioPlayer.setReleaseMode(ReleaseMode.loop);
+      Uint8List audioBytes = base64Decode(base64Beep);
+      await _audioPlayer.play(BytesSource(audioBytes));
+    } catch (e) {
+      debugPrint("AudioPlayer Error: $e");
+    }
     
     /* Titreşim kaldırıldı - Kullanıcı isteği
     _vibrationTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
@@ -340,7 +343,11 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
     */
     
     Future.delayed(const Duration(seconds: 15), () {
-      if (_isAcousticSosActive && mounted) { _audioPlayer.stop(); _vibrationTimer?.cancel(); Vibration.cancel(); }
+      if (_isAcousticSosActive && mounted) {
+        try { _audioPlayer.stop(); } catch(_) {}
+        _vibrationTimer?.cancel();
+        try { Vibration.cancel(); } catch(_) {}
+      }
     });
   }
 

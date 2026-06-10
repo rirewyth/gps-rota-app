@@ -7,8 +7,10 @@ import 'package:battery_plus/battery_plus.dart';
 import '../storage_helper.dart';
 import '../database_helper.dart';
 import 'ai_advisor_service.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:io' show Platform;
+import 'package:url_launcher/url_launcher.dart';
 
 class BackgroundSmsService {
   static final Telephony _telephony = Telephony.instance;
@@ -20,14 +22,20 @@ class BackgroundSmsService {
   static Future<bool> sendSms(String to, String message) async {
     try {
       final sanitizedTo = _sanitizePhoneNumber(to);
-      final SmsSendStatusListener listener = (SendStatus status) {};
-      _telephony.sendSms(
-        to: sanitizedTo,
-        message: message,
-        statusListener: listener,
-        isMultipart: true,
-      );
-      return true;
+      if (Platform.isIOS) {
+        final uri = Uri.parse('sms:$sanitizedTo&body=${Uri.encodeComponent(message)}');
+        await launchUrl(uri);
+        return true;
+      } else {
+        final SmsSendStatusListener listener = (SendStatus status) {};
+        _telephony.sendSms(
+          to: sanitizedTo,
+          message: message,
+          statusListener: listener,
+          isMultipart: true,
+        );
+        return true;
+      }
     } catch (_) {
       return false;
     }
@@ -146,13 +154,18 @@ class BackgroundSmsService {
       fullSms = _turkceKarakterleriCevir(fullSms).replaceAll(RegExp(r'\s+'), ' ').trim();
 
       // --- Otomatik SMS Gönder ---
-      final SmsSendStatusListener listener = (SendStatus status) {};
-      _telephony.sendSms(
-        to: telefon,
-        message: fullSms,
-        statusListener: listener,
-        isMultipart: true,
-      );
+      if (Platform.isIOS) {
+        final uri = Uri.parse('sms:$telefon&body=${Uri.encodeComponent(fullSms)}');
+        await launchUrl(uri);
+      } else {
+        final SmsSendStatusListener listener = (SendStatus status) {};
+        _telephony.sendSms(
+          to: telefon,
+          message: fullSms,
+          statusListener: listener,
+          isMultipart: true,
+        );
+      }
 
       // 7. Mesajı veritabanına kaydet
       await DatabaseHelper.instance.insertMessage(
