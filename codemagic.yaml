@@ -28,6 +28,7 @@ workflows:
         script: |
           cd mountaineering_app/ios
           ruby -i -e "lines = ARGF.readlines; lines.reject! { |l| l.match?(/platform :ios/) }; puts \"platform :ios, '15.0'\"; puts lines" Podfile
+          ruby -i -e "lines = ARGF.read; lines.gsub!(/flutter_additional_ios_build_settings\\(target\\)/, %Q{flutter_additional_ios_build_settings(target)\n      target.build_configurations.each do |config|\n        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)', 'PERMISSION_LOCATION=1', 'PERMISSION_NOTIFICATIONS=1', 'PERMISSION_CAMERA=1', 'PERMISSION_MICROPHONE=1', 'PERMISSION_PHOTOS=1']\n      end}); puts lines" Podfile
           ruby -i -e "puts ARGF.read.gsub(/IPHONEOS_DEPLOYMENT_TARGET = .*?;/, %{IPHONEOS_DEPLOYMENT_TARGET = 15.0;})" Runner.xcodeproj/project.pbxproj
           pod repo update
 
