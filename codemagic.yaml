@@ -32,6 +32,11 @@ workflows:
           plutil -insert NSLocationAlwaysUsageDescription -string "Arka planda acil durum SOS takibi için konumunuz gereklidir." Info.plist
           plutil -insert NSLocationAlwaysAndWhenInUseUsageDescription -string "Arka planda acil durum SOS takibi için konumunuz gereklidir." Info.plist
           plutil -insert NSMicrophoneUsageDescription -string "Sesli komutlar ve acil durum dinlemesi için mikrofona erişim gereklidir." Info.plist
+          plutil -insert NSCameraUsageDescription -string "Kamera ile fotoğraf çekmek için gereklidir." Info.plist
+          plutil -insert NSPhotoLibraryUsageDescription -string "Profil fotoğrafı seçmek için gereklidir." Info.plist
+          plutil -insert NSSpeechRecognitionUsageDescription -string "Sesli komutları metne çevirmek için gereklidir." Info.plist
+          plutil -insert NSBluetoothAlwaysUsageDescription -string "Yakındaki ekip arkadaşlarıyla çevrimdışı bağlantı kurmak için gereklidir." Info.plist
+          plutil -insert NSBluetoothPeripheralUsageDescription -string "Yakındaki ekip arkadaşlarıyla çevrimdışı bağlantı kurmak için gereklidir." Info.plist
           plutil -insert UIBackgroundModes -array Info.plist
           plutil -insert UIBackgroundModes.0 -string "location" Info.plist
           plutil -insert UIBackgroundModes.1 -string "fetch" Info.plist
