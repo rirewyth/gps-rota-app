@@ -11,6 +11,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:io' show Platform;
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/services.dart';
 
 class BackgroundSmsService {
   static Telephony? __telephony;
@@ -28,50 +29,20 @@ class BackgroundSmsService {
   /// Boş başlatıcı (servis altyapısı için)
   static Future<void> initializeService() async {}
 
-  /// iOS için son derece dayanıklı SMS gönderme fonksiyonu.
-  /// Farklı iOS sürümleri ve alıcı numara formatları için tüm olasılıkları dener.
+  static const MethodChannel _iosSmsChannel = MethodChannel('com.rotaplus.emniyetteyim/sms');
+
+  /// iOS için yerel (native) MFMessageComposeViewController ile SMS gönderme
   static Future<bool> _launchIosSms(String phone, String message) async {
-    final encodedMessage = Uri.encodeComponent(message);
-    
-    // Alıcı numarasını iOS SMS protokolü için optimize et:
-    // Türkiye numaraları için yerel format ('05xxxxxxxxx') uluslararası formata göre çok daha kararlıdır.
-    String cleanPhone = phone;
-    if (phone.startsWith('+90') && phone.length == 13) {
-      cleanPhone = '0${phone.substring(3)}';
-    } else if (phone.startsWith('90') && phone.length == 12) {
-      cleanPhone = '0${phone.substring(2)}';
-    }
-
-    // iOS SMS şemalarında denenecek tüm olası varyasyonlar (En kararlı olandan başlayarak)
-    final List<String> urlsToTry = [
-      'sms:$cleanPhone&body=$encodedMessage',    // 1. Tercih: Yerel format + '&' ayırıcı
-      'sms:$cleanPhone;body=$encodedMessage',    // 2. Tercih: Yerel format + ';' ayırıcı
-      'sms:$phone&body=$encodedMessage',         // 3. Tercih: Orijinal format + '&' ayırıcı
-      'sms:$phone;body=$encodedMessage',         // 4. Tercih: Orijinal format + ';' ayırıcı
-      'sms:$cleanPhone?body=$encodedMessage',    // 5. Tercih: Yerel format + standart '?' ayırıcı
-      'sms:$phone?body=$encodedMessage',         // 6. Tercih: Orijinal format + standart '?' ayırıcı
-    ];
-
-    for (final urlStr in urlsToTry) {
-      try {
-        final uri = Uri.parse(urlStr);
-        if (await canLaunchUrl(uri)) {
-          final success = await launchUrl(uri, mode: LaunchMode.externalApplication);
-          if (success) return true;
-        }
-      } catch (_) {}
-    }
-
-    // Fallback: Yukarıdakiler başarısız olursa sadece SMS uygulamasını alıcı doldurarak açmayı dene
     try {
-      final fallbackUri = Uri.parse('sms:$cleanPhone');
-      if (await canLaunchUrl(fallbackUri)) {
-        await launchUrl(fallbackUri, mode: LaunchMode.externalApplication);
-        return true;
-      }
-    } catch (_) {}
-
-    return false;
+      final result = await _iosSmsChannel.invokeMethod('sendSms', {
+        'phone': phone,
+        'message': message,
+      });
+      return result == true;
+    } catch (e) {
+      print("Native iOS SMS Hatası: $e");
+      return false;
+    }
   }
 
   /// Direkt SMS gönderir — iOS'te SMS uygulamasını açar, Android'de otomatik gönderir
