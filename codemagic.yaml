@@ -37,6 +37,11 @@ workflows:
           plutil -insert NSSpeechRecognitionUsageDescription -string "Sesli komutları metne çevirmek için gereklidir." Info.plist
           plutil -insert NSBluetoothAlwaysUsageDescription -string "Yakındaki ekip arkadaşlarıyla çevrimdışı bağlantı kurmak için gereklidir." Info.plist
           plutil -insert NSBluetoothPeripheralUsageDescription -string "Yakındaki ekip arkadaşlarıyla çevrimdışı bağlantı kurmak için gereklidir." Info.plist
+          plutil -insert NSMotionUsageDescription -string "Acil durum ve fırtına uyarısı için barometre / basınç verilerine erişim gereklidir." Info.plist
+          plutil -insert NSLocalNetworkUsageDescription -string "Çevrimdışı acil durum mesajlaşması (Mesh Network) için yerel ağ erişimi gereklidir." Info.plist
+          plutil -insert NSBonjourServices -array Info.plist
+          plutil -insert NSBonjourServices.0 -string "_mp-connection._tcp" Info.plist
+          plutil -insert NSBonjourServices.1 -string "_dartobservatory._tcp" Info.plist
           plutil -insert UIBackgroundModes -array Info.plist
           plutil -insert UIBackgroundModes.0 -string "location" Info.plist
           plutil -insert UIBackgroundModes.1 -string "fetch" Info.plist

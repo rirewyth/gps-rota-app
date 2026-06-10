@@ -19,13 +19,13 @@ class BarometerService {
 
   void startMonitoring() {
     _pressureSub?.cancel();
-    if (Platform.isIOS) return; // iOS'te Barometre donanımı olmayan cihazlarda (iPad vb.) direkt çöküyor
     try {
       _pressureSub = barometerEventStream().listen((BarometerEvent event) {
         _currentPressure = event.pressure;
         _checkPressureTrend(event.pressure);
       }, onError: (e) {
         print("Barometer Error: $e");
+        _pressureSub?.cancel(); // Cancel subscription if sensor is unavailable or permission denied
       });
     } catch(e) {
       print("Barometer Stream Error: $e");

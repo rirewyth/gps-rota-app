@@ -88,5 +88,24 @@
     <string>Anlık acil durum fotoğrafları çekebilmek için kamera erişimine ihtiyaç vardır.</string>
     <key>NSSpeechRecognitionUsageDescription</key>
     <string>Acil durumlarda sesli komutlarınızı algılamak için ses tanıma iznine ihtiyaç vardır.</string>
+    <key>NSMotionUsageDescription</key>
+    <string>Acil durum ve fırtına uyarısı için barometre / basınç verilerine erişim gereklidir.</string>
+    
+    <!-- Background Location Fallback for older iOS versions -->
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>Arka planda rotanızı kaydetmek ve acil durumlarda kullanmak için bu izin şarttır.</string>
+
+    <!-- Bluetooth and P2P Mesh Network Permissions -->
+    <key>NSBluetoothAlwaysUsageDescription</key>
+    <string>Çevrimdışı acil durum mesajlaşması (Mesh Network) için Bluetooth erişimi gereklidir.</string>
+    <key>NSBluetoothPeripheralUsageDescription</key>
+    <string>Çevrimdışı acil durum mesajlaşması (Mesh Network) için Bluetooth erişimi gereklidir.</string>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>Çevrimdışı acil durum mesajlaşması (Mesh Network) için yerel ağ erişimi gereklidir.</string>
+    <key>NSBonjourServices</key>
+    <array>
+        <string>_mp-connection._tcp</string>
+        <string>_dartobservatory._tcp</string>
+    </array>
 </dict>
 </plist>

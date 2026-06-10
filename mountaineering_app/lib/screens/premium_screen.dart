@@ -4,6 +4,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'dart:ui';
 import 'dart:async';
+import 'dart:io' show Platform;
 import '../services/premium_service.dart';
 
 class PremiumScreen extends StatefulWidget {
@@ -355,12 +356,13 @@ class _PremiumScreenState extends State<PremiumScreen> {
                         return;
                       }
                       if (_products.isEmpty) {
+                        final storeName = Platform.isAndroid ? 'Google Play' : 'App Store';
                         showDialog(
                           context: context,
                           builder: (ctx) => AlertDialog(
                             backgroundColor: Colors.white,
                             title: const Text('Bağlantı Hatası'),
-                            content: const Text('Google Play ürünleri yüklenemedi. Lütfen internet bağlantınızı kontrol edin veya Google Play hesabınızla giriş yaptığınızdan emin olun.'),
+                            content: Text('$storeName ürünleri yüklenemedi. Lütfen internet bağlantınızı kontrol edin veya $storeName hesabınızla giriş yaptığınızdan emin olun.'),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(ctx),
@@ -411,7 +413,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Text(
-                'Dilediğiniz zaman iptal edebilirsiniz, yenilenen faturalandırma. Endişelenmeyin, aboneliğinizin kontrolü tamamen sizdedir. Ödeme, satın alma onayının ya da deneme döneminin (varsa) sonunda Google Play hesabınızdan tahsil edilir. Rota+ Premium aboneliğiniz, iptal edilmediği sürece otomatik olarak yenilenir. Aboneliğinizi yenilenme tarihinden en az 24 saat öncesine kadar iptal etmeye karar vermediğiniz sürece, mevcut dönemin bitiminden önceki 24 saat içinde hesabınızdan yenilenme ücreti alınır. Aboneliğinizi Google Play hesap ayarları üzerinden yönetebilirsiniz.',
+                'Dilediğiniz zaman iptal edebilirsiniz, yenilenen faturalandırma. Endişelenmeyin, aboneliğinizin kontrolü tamamen sizdedir. Ödeme, satın alma onayının ya da deneme döneminin (varsa) sonunda ${Platform.isAndroid ? "Google Play" : "App Store"} hesabınızdan tahsil edilir. Rota+ Premium aboneliğiniz, iptal edilmediği sürece otomatik olarak yenilenir. Aboneliğinizi yenilenme tarihinden en az 24 saat öncesine kadar iptal etmeye karar vermediğiniz sürece, mevcut dönemin bitiminden önceki 24 saat içinde hesabınızdan yenilenme ücreti alınır. Aboneliğinizi ${Platform.isAndroid ? "Google Play" : "App Store"} hesap ayarları üzerinden yönetebilirsiniz.',
                 textAlign: TextAlign.start,
                 style: TextStyle(color: Colors.grey.shade500, fontSize: 10.5, height: 1.4),
               ),

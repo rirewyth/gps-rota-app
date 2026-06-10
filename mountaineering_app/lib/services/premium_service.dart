@@ -98,10 +98,10 @@ class PremiumService {
       if (response.productDetails.isNotEmpty) {
         products = response.productDetails;
       } else if (response.error == null) {
-        lastError = 'Ürün ID leri (rota_premium_6m, rota_premium_12m) Google Play de bulunamadı veya aktif değil.';
+        lastError = 'Ürün ID\'leri (rota_premium_6m, rota_premium_12m) ${Platform.isAndroid ? "Google Play" : "App Store"}\'de bulunamadı veya aktif değil.';
       }
     } else {
-      lastError = 'Google Play Ödeme sistemi bu cihazda kullanılamıyor (Hesap açık değil veya desteklenmiyor).';
+      lastError = '${Platform.isAndroid ? "Google Play" : "App Store"} ödeme sistemi bu cihazda kullanılamıyor (Hesap açık değil veya desteklenmiyor).';
     }
 
     return products;
@@ -122,7 +122,7 @@ class PremiumService {
     // Non-consumable for these types of products usually
     final bool success = await _iap.buyNonConsumable(purchaseParam: purchaseParam);
     if (!success) {
-      throw Exception('Google Play ödeme ekranı açılamadı. Devam eden bir işleminiz veya mevcut aboneliğiniz olabilir.');
+      throw Exception('${Platform.isAndroid ? "Google Play" : "App Store"} ödeme ekranı açılamadı. Devam eden bir işleminiz veya mevcut aboneliğiniz olabilir.');
     }
   }
   // --- END IAP INTEGRATION ---

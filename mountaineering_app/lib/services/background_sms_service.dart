@@ -13,30 +13,75 @@ import 'dart:io' show Platform;
 import 'package:url_launcher/url_launcher.dart';
 
 class BackgroundSmsService {
-  static final Telephony _telephony = Telephony.instance;
+  static Telephony? __telephony;
+  static Telephony get _telephony {
+    if (__telephony == null) {
+      if (Platform.isAndroid) {
+        __telephony = Telephony.instance;
+      } else {
+        throw UnsupportedError('Telephony is only supported on Android');
+      }
+    }
+    return __telephony!;
+  }
 
   /// Boş başlatıcı (servis altyapısı için)
   static Future<void> initializeService() async {}
+
+  /// iOS için son derece dayanıklı SMS gönderme fonksiyonu.
+  /// Farklı iOS sürümleri ve alıcı numara formatları için tüm olasılıkları dener.
+  static Future<bool> _launchIosSms(String phone, String message) async {
+    final encodedMessage = Uri.encodeComponent(message);
+    
+    // Alıcı numarasını iOS SMS protokolü için optimize et:
+    // Türkiye numaraları için yerel format ('05xxxxxxxxx') uluslararası formata göre çok daha kararlıdır.
+    String cleanPhone = phone;
+    if (phone.startsWith('+90') && phone.length == 13) {
+      cleanPhone = '0${phone.substring(3)}';
+    } else if (phone.startsWith('90') && phone.length == 12) {
+      cleanPhone = '0${phone.substring(2)}';
+    }
+
+    // iOS SMS şemalarında denenecek tüm olası varyasyonlar (En kararlı olandan başlayarak)
+    final List<String> urlsToTry = [
+      'sms:$cleanPhone&body=$encodedMessage',    // 1. Tercih: Yerel format + '&' ayırıcı
+      'sms:$cleanPhone;body=$encodedMessage',    // 2. Tercih: Yerel format + ';' ayırıcı
+      'sms:$phone&body=$encodedMessage',         // 3. Tercih: Orijinal format + '&' ayırıcı
+      'sms:$phone;body=$encodedMessage',         // 4. Tercih: Orijinal format + ';' ayırıcı
+      'sms:$cleanPhone?body=$encodedMessage',    // 5. Tercih: Yerel format + standart '?' ayırıcı
+      'sms:$phone?body=$encodedMessage',         // 6. Tercih: Orijinal format + standart '?' ayırıcı
+    ];
+
+    for (final urlStr in urlsToTry) {
+      try {
+        final uri = Uri.parse(urlStr);
+        if (await canLaunchUrl(uri)) {
+          final success = await launchUrl(uri, mode: LaunchMode.externalApplication);
+          if (success) return true;
+        }
+      } catch (_) {}
+    }
+
+    // Fallback: Yukarıdakiler başarısız olursa sadece SMS uygulamasını alıcı doldurarak açmayı dene
+    try {
+      final fallbackUri = Uri.parse('sms:$cleanPhone');
+      if (await canLaunchUrl(fallbackUri)) {
+        await launchUrl(fallbackUri, mode: LaunchMode.externalApplication);
+        return true;
+      }
+    } catch (_) {}
+
+    return false;
+  }
 
   /// Direkt SMS gönderir — iOS'te SMS uygulamasını açar, Android'de otomatik gönderir
   static Future<bool> sendSms(String to, String message) async {
     try {
       final sanitizedTo = _sanitizePhoneNumber(to);
+      if (sanitizedTo.isEmpty) return false;
+
       if (Platform.isIOS) {
-        // iOS: sms: URI şeması ile yerel SMS uygulamasını aç
-        final uri = Uri(
-          scheme: 'sms',
-          path: sanitizedTo,
-          queryParameters: <String, String>{'body': message},
-        );
-        if (await canLaunchUrl(uri)) {
-          await launchUrl(uri, mode: LaunchMode.externalApplication);
-        } else {
-          // Fallback: smsTo şeması dene
-          final fallback = Uri.parse('sms:$sanitizedTo?body=${Uri.encodeComponent(message)}');
-          await launchUrl(fallback, mode: LaunchMode.externalApplication);
-        }
-        return true;
+        return await _launchIosSms(sanitizedTo, message);
       } else {
         final SmsSendStatusListener listener = (SendStatus status) {};
         _telephony.sendSms(
@@ -61,6 +106,9 @@ class BackgroundSmsService {
         return {'basarili': false, 'hata': 'İletişim numarası girilmemiş!'};
       }
       telefon = _sanitizePhoneNumber(telefon);
+      if (telefon.isEmpty) {
+        return {'basarili': false, 'hata': 'İletişim numarası geçersiz!'};
+      }
 
       // 2. Kullanıcının özel şablonu
       String customSos = overrideMessage ?? (await StorageHelper.getSosMesaji() ?? 'ACİL YARDIM');
@@ -111,31 +159,8 @@ class BackgroundSmsService {
 
       // 8. SMS Gönder
       if (Platform.isIOS) {
-        // iOS: yerel SMS uygulamasını metin dolu halde aç — kullanıcı sadece Gönder'e basar
-        bool launched = false;
-        try {
-          final uri = Uri(
-            scheme: 'sms',
-            path: telefon,
-            queryParameters: <String, String>{'body': fullSms},
-          );
-          if (await canLaunchUrl(uri)) {
-            launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
-          }
-        } catch (_) {}
-
-        if (!launched) {
-          try {
-            // Fallback URI formatı: sms:NUMARA?body=METIN
-            final encoded = Uri.encodeComponent(fullSms);
-            final fallback = Uri.parse('sms:$telefon?body=$encoded');
-            await launchUrl(fallback, mode: LaunchMode.externalApplication);
-            launched = true;
-          } catch (_) {}
-        }
-
-        // iOS'te SMS kutusu açıldığında başarılı say
-        return {'basarili': true, 'mesaj': fullSms, 'telefon': telefon};
+        final launched = await _launchIosSms(telefon, fullSms);
+        return {'basarili': launched, 'mesaj': fullSms, 'telefon': telefon};
       } else {
         // Android: doğrudan otomatik gönder
         final SmsSendStatusListener listener = (SendStatus status) {};
