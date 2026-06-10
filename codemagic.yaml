@@ -24,6 +24,19 @@ workflows:
           cd mountaineering_app
           flutter create . --platforms ios
 
+      - name: Add Info.plist Keys
+        script: |
+          cd mountaineering_app/ios/Runner
+          plutil -insert ITSAppUsesNonExemptEncryption -bool NO Info.plist
+          plutil -insert NSLocationWhenInUseUsageDescription -string "Haritada konumunuzu görebilmek için izin gereklidir." Info.plist
+          plutil -insert NSLocationAlwaysUsageDescription -string "Arka planda acil durum SOS takibi için konumunuz gereklidir." Info.plist
+          plutil -insert NSLocationAlwaysAndWhenInUseUsageDescription -string "Arka planda acil durum SOS takibi için konumunuz gereklidir." Info.plist
+          plutil -insert NSMicrophoneUsageDescription -string "Sesli komutlar ve acil durum dinlemesi için mikrofona erişim gereklidir." Info.plist
+          plutil -insert UIBackgroundModes -array Info.plist
+          plutil -insert UIBackgroundModes.0 -string "location" Info.plist
+          plutil -insert UIBackgroundModes.1 -string "fetch" Info.plist
+          plutil -insert UIBackgroundModes.2 -string "remote-notification" Info.plist
+
       - name: Fix Podfile and Project Target (iOS 15.0)
         script: |
           cd mountaineering_app/ios
