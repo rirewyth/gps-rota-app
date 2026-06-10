@@ -47,6 +47,7 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
   String? _myUid;
   bool _isPremiumUser = false;
   bool _isRecordingVoice = false;
+  bool _isPressingPtt = false;
   
   StreamSubscription<Position>? _syncStream;
   DateTime? _lastSyncTime;
@@ -939,38 +940,60 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                     return;
                   }
                   
+                  _isPressingPtt = true;
                   if (await _audioRecorder.hasPermission()) {
                     final dir = await getTemporaryDirectory();
                     final path = '${dir.path}/voice_${DateTime.now().millisecondsSinceEpoch}.m4a';
                     
-                    await _audioRecorder.start(const RecordConfig(), path: path);
-                    setState(() {
-                      _isRecordingVoice = true;
-                      _currentRecordingPath = path;
-                    });
+                    await Future.delayed(const Duration(milliseconds: 150));
+                    if (!_isPressingPtt) return;
                     
-                    Vibration.vibrate(duration: 50);
-                    
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text('🎤 Walkie-Talkie: Ses kaydediliyor...', style: TextStyle(fontWeight: FontWeight.bold)), 
-                      backgroundColor: Colors.redAccent,
-                      duration: Duration(seconds: 1),
-                    ));
+                    try {
+                      await _audioRecorder.start(const RecordConfig(), path: path);
+                      if (_isPressingPtt) {
+                        setState(() {
+                          _isRecordingVoice = true;
+                          _currentRecordingPath = path;
+                        });
+                        try { Vibration.vibrate(duration: 50); } catch(_) {}
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content: Text('🎙️ Walkie-Talkie: Ses kaydediliyor...', style: TextStyle(fontWeight: FontWeight.bold)), 
+                          backgroundColor: Colors.redAccent,
+                          duration: Duration(seconds: 1),
+                        ));
+                      } else {
+                        await _audioRecorder.stop();
+                      }
+                    } catch (e) {
+                      debugPrint("PTT Start Error: $e");
+                    }
                   }
                 },
                 onLongPressEnd: (_) async {
+                  _isPressingPtt = false;
                   if (!_isPremiumUser || !_isRecordingVoice) return;
                   
-                  final path = await _audioRecorder.stop();
-                  setState(() => _isRecordingVoice = false);
-                  
-                  if (path != null) {
-                    _sendVoiceMessage(path);
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text('📤 Ses iletiliyor...', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)), 
-                      backgroundColor: kTGreen,
-                      duration: Duration(seconds: 2),
-                    ));
+                  try {
+                    final path = await _audioRecorder.stop();
+                    setState(() => _isRecordingVoice = false);
+                    
+                    if (path != null) {
+                      _sendVoiceMessage(path);
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('📻 Ses iletiliyor...', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)), 
+                        backgroundColor: kTGreen,
+                        duration: Duration(seconds: 2),
+                      ));
+                    }
+                  } catch (e) {
+                    setState(() => _isRecordingVoice = false);
+                  }
+                },
+                onLongPressCancel: () async {
+                  _isPressingPtt = false;
+                  if (_isRecordingVoice) {
+                    try { await _audioRecorder.stop(); } catch(_) {}
+                    setState(() => _isRecordingVoice = false);
                   }
                 },
                 child: AnimatedContainer(
@@ -1155,29 +1178,53 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                 PremiumService.showPremiumRequired(context, 'Walkie-Talkie Modu');
                 return;
               }
+              _isPressingPtt = true;
               if (await _audioRecorder.hasPermission()) {
-                Vibration.vibrate(duration: 100, amplitude: 255);
+                try { Vibration.vibrate(duration: 100, amplitude: 255); } catch (_) {}
                 try { await _sfxPlayer.play(AssetSource('audio/beep.wav')); } catch (_) {}
                 await Future.delayed(const Duration(milliseconds: 200));
                 
+                if (!_isPressingPtt) return;
+                
                 final dir = await getTemporaryDirectory();
                 final path = '${dir.path}/wt_${DateTime.now().millisecondsSinceEpoch}.m4a';
-                await _audioRecorder.start(const RecordConfig(), path: path);
-                setState(() {
-                  _isRecordingVoice = true;
-                  _currentRecordingPath = path;
-                });
+                
+                try {
+                  await _audioRecorder.start(const RecordConfig(), path: path);
+                  if (_isPressingPtt) {
+                    setState(() {
+                      _isRecordingVoice = true;
+                      _currentRecordingPath = path;
+                    });
+                  } else {
+                    await _audioRecorder.stop();
+                  }
+                } catch(e) {
+                  debugPrint("PTT Start Error: $e");
+                }
               }
             },
             onLongPressEnd: (_) async {
+              _isPressingPtt = false;
               if (!_isPremiumUser || !_isRecordingVoice) return;
-              final path = await _audioRecorder.stop();
-              setState(() => _isRecordingVoice = false);
-              Vibration.vibrate(duration: 50, amplitude: 100);
-              try { await _sfxPlayer.play(AssetSource('audio/beep.wav')); } catch (_) {}
-              
-              if (path != null) {
-                _sendVoiceMessage(path);
+              try {
+                final path = await _audioRecorder.stop();
+                setState(() => _isRecordingVoice = false);
+                try { Vibration.vibrate(duration: 50, amplitude: 100); } catch (_) {}
+                try { await _sfxPlayer.play(AssetSource('audio/beep.wav')); } catch (_) {}
+                
+                if (path != null) {
+                  _sendVoiceMessage(path);
+                }
+              } catch (e) {
+                setState(() => _isRecordingVoice = false);
+              }
+            },
+            onLongPressCancel: () async {
+              _isPressingPtt = false;
+              if (_isRecordingVoice) {
+                try { await _audioRecorder.stop(); } catch(_) {}
+                setState(() => _isRecordingVoice = false);
               }
             },
             child: AnimatedContainer(
