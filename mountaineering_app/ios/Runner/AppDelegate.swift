@@ -49,10 +49,19 @@ import MessageUI
     
     self.flutterResult = result
     
-    if let rootVC = window?.rootViewController {
-      rootVC.present(composeVC, animated: true, completion: nil)
-    } else {
-      result(false)
+    DispatchQueue.main.async {
+      // Find the correct root view controller (iOS 13+ support)
+      let rootVC = UIApplication.shared.connectedScenes
+          .compactMap { $0 as? UIWindowScene }
+          .flatMap { $0.windows }
+          .first { $0.isKeyWindow }?.rootViewController
+          
+      if let rootVC = rootVC ?? self.window?.rootViewController {
+        rootVC.present(composeVC, animated: true, completion: nil)
+      } else {
+        self.flutterResult?(false)
+        self.flutterResult = nil
+      }
     }
   }
   
