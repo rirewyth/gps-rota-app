@@ -23,7 +23,13 @@ class BackgroundSmsService {
     try {
       final sanitizedTo = _sanitizePhoneNumber(to);
       if (Platform.isIOS) {
-        final uri = Uri.parse('sms:$sanitizedTo&body=${Uri.encodeComponent(message)}');
+        final uri = Uri(
+          scheme: 'sms',
+          path: sanitizedTo,
+          queryParameters: <String, String>{
+            'body': message,
+          },
+        );
         await launchUrl(uri);
         return true;
       } else {
@@ -155,7 +161,13 @@ class BackgroundSmsService {
 
       // --- Otomatik SMS Gönder ---
       if (Platform.isIOS) {
-        final uri = Uri.parse('sms:$telefon&body=${Uri.encodeComponent(fullSms)}');
+        final uri = Uri(
+          scheme: 'sms',
+          path: telefon,
+          queryParameters: <String, String>{
+            'body': fullSms,
+          },
+        );
         await launchUrl(uri);
       } else {
         final SmsSendStatusListener listener = (SendStatus status) {};

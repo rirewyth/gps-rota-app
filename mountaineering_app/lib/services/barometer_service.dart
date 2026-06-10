@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:sensors_plus/sensors_plus.dart';
 import '../storage_helper.dart';
 
@@ -18,6 +19,7 @@ class BarometerService {
 
   void startMonitoring() {
     _pressureSub?.cancel();
+    if (Platform.isIOS) return; // iOS'te Barometre donanımı olmayan cihazlarda (iPad vb.) direkt çöküyor
     try {
       _pressureSub = barometerEventStream().listen((BarometerEvent event) {
         _currentPressure = event.pressure;
