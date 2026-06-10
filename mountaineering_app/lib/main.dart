@@ -45,6 +45,10 @@ void main() async {
     WidgetsFlutterBinding.ensureInitialized();
     debugPrint("--- ROTA+ APP STARTUP SEQUENCE ---");
     
+    // RAM tasarrufu ve kasmayı engellemek için ImageCache limitlerini ayarlıyoruz
+    PaintingBinding.instance.imageCache.maximumSize = 150;
+    PaintingBinding.instance.imageCache.maximumSizeBytes = 60 * 1024 * 1024; // 60 MB limit
+    
     // Perform initializations in parallel with strict timeouts
     await Future.wait([
       CloudSyncService.initCloudServices().timeout(
