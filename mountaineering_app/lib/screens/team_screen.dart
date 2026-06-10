@@ -967,7 +967,15 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                     if (!_isPressingPtt) return;
                     
                     try {
-                      await _audioRecorder.start(const RecordConfig(), path: path);
+                      await _audioRecorder.start(
+                        const RecordConfig(
+                          encoder: AudioEncoder.aacLc,
+                          sampleRate: 44100,
+                          bitRate: 96000,
+                          numChannels: 1,
+                        ),
+                        path: path,
+                      );
                       if (_isPressingPtt) {
                         setState(() {
                           _isRecordingVoice = true;
@@ -1098,26 +1106,44 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
     }
     
     try {
-      await _sfxPlayer.play(AssetSource('audio/beep.wav'));
-      await Future.delayed(const Duration(milliseconds: 300));
-    } catch (_) {}
+      try {
+        await _sfxPlayer.play(AssetSource('audio/beep.wav'));
+        await Future.delayed(const Duration(milliseconds: 300));
+      } catch (_) {}
 
-    if (url.startsWith('base64:')) {
-      final bytes = base64Decode(url.substring(7));
-      await _audioPlayer.play(BytesSource(bytes));
-    } else {
-      await _audioPlayer.play(UrlSource(url));
-    }
-    
-    _audioPlayer.onPlayerComplete.first.then((_) async {
-      try { await _sfxPlayer.play(AssetSource('audio/beep.wav')); } catch (_) {}
+      if (url.startsWith('base64:')) {
+        // iOS BytesSource çalma güvenilir değil — geçici dosyaya yaz ve oradan çal
+        final bytes = base64Decode(url.substring(7));
+        final dir = await getTemporaryDirectory();
+        final tmpFile = File('${dir.path}/incoming_${DateTime.now().millisecondsSinceEpoch}.m4a');
+        await tmpFile.writeAsBytes(bytes);
+        await _audioPlayer.play(DeviceFileSource(tmpFile.path));
+        // Temizlik
+        _audioPlayer.onPlayerComplete.first.then((_) async {
+          try { await tmpFile.delete(); } catch (_) {}
+        });
+      } else {
+        await _audioPlayer.play(UrlSource(url));
+      }
+
+      // Çalma bitince göstergeyi sıfırla
+      await _audioPlayer.onPlayerComplete.first.timeout(
+        const Duration(seconds: 30),
+        onTimeout: () {},
+      );
+    } catch (_) {
+      // Hata olsa da gösterge takılı kalmasın
+    } finally {
+      try {
+        await _sfxPlayer.play(AssetSource('audio/beep.wav'));
+      } catch (_) {}
       if (mounted) {
         setState(() {
           _isReceivingVoice = false;
           _receivingVoiceSenderName = null;
         });
       }
-    });
+    }
   }
 
   Widget _buildWalkieTalkieTab() {
@@ -1208,7 +1234,15 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                 final path = '${dir.path}/wt_${DateTime.now().millisecondsSinceEpoch}.m4a';
                 
                 try {
-                  await _audioRecorder.start(const RecordConfig(), path: path);
+                await _audioRecorder.start(
+                  const RecordConfig(
+                    encoder: AudioEncoder.aacLc,
+                    sampleRate: 44100,
+                    bitRate: 96000,
+                    numChannels: 1,
+                  ),
+                  path: path,
+                );
                   if (_isPressingPtt) {
                     setState(() {
                       _isRecordingVoice = true;
