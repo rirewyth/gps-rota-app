@@ -18,19 +18,24 @@ class BackgroundSmsService {
   /// Boş başlatıcı (servis altyapısı için)
   static Future<void> initializeService() async {}
 
-  /// Direkt SMS gönderir — kullanıcı onayı gerekmez
+  /// Direkt SMS gönderir — iOS'te SMS uygulamasını açar, Android'de otomatik gönderir
   static Future<bool> sendSms(String to, String message) async {
     try {
       final sanitizedTo = _sanitizePhoneNumber(to);
       if (Platform.isIOS) {
+        // iOS: sms: URI şeması ile yerel SMS uygulamasını aç
         final uri = Uri(
           scheme: 'sms',
           path: sanitizedTo,
-          queryParameters: <String, String>{
-            'body': message,
-          },
+          queryParameters: <String, String>{'body': message},
         );
-        await launchUrl(uri);
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        } else {
+          // Fallback: smsTo şeması dene
+          final fallback = Uri.parse('sms:$sanitizedTo?body=${Uri.encodeComponent(message)}');
+          await launchUrl(fallback, mode: LaunchMode.externalApplication);
+        }
         return true;
       } else {
         final SmsSendStatusListener listener = (SendStatus status) {};
@@ -57,119 +62,82 @@ class BackgroundSmsService {
       }
       telefon = _sanitizePhoneNumber(telefon);
 
-      // 2. GPS konumu al
-      Position? konum;
-      try {
-        bool gpsAcik = await Geolocator.isLocationServiceEnabled();
-        if (gpsAcik) {
-          try {
-            konum = await Geolocator.getCurrentPosition(
-              locationSettings: const LocationSettings(
-                accuracy: LocationAccuracy.medium,
-                timeLimit: Duration(seconds: 3),
-              ),
-            );
-          } catch (_) {
-            konum = await Geolocator.getLastKnownPosition();
-          }
-
-          if (konum != null) {
-            await DatabaseHelper.instance.insertLocation(
-              konum.latitude,
-              konum.longitude,
-              konum.altitude,
-              DateTime.now().toIso8601String(),
-            );
-          }
-        }
-      } catch (_) {}
-
-      // 3. Aktif rotayı al
-      String rotaBilgisi = '';
-      String rotaKonumBilgisi = '';
-
-      try {
-        final aktifRota = await DatabaseHelper.instance.aktifRotaGetir();
-        if (aktifRota != null) {
-          final rotaIsmi = aktifRota['isim'] as String;
-          final noktalar = aktifRota['noktalar'] as List;
-          rotaBilgisi = 'ROTA:$rotaIsmi';
-
-          if (konum != null && noktalar.isNotEmpty) {
-            final yakin = DatabaseHelper.enYakinRotaNoktasi(
-              konum.latitude,
-              konum.longitude,
-              noktalar,
-            );
-            if (yakin != null) {
-              final nokta = yakin['index'] as int;
-              final toplam = yakin['toplam'] as int;
-              final yuzde = ((nokta + 1) / toplam * 100).round();
-              rotaKonumBilgisi = ' (%$yuzde)';
-            }
-          }
-        }
-      } catch (_) {}
-
-      // 4. Yapay Zeka Notu (log amacıyla kullanılır)
-      try {
-        final activeRoute = await DatabaseHelper.instance.aktifRotaGetir();
-        await AIAdvisorService.generateInsight(
-          lat: konum?.latitude ?? 0,
-          lng: konum?.longitude ?? 0,
-          speed: konum?.speed ?? 0,
-          activeRoute: activeRoute,
-        );
-      } catch (_) {}
-
-      // 5. Ek veriler
-      int batteryLevel = 0;
-      try {
-        final battery = Battery();
-        batteryLevel = await battery.batteryLevel;
-      } catch (_) {}
-
-      final kan = await StorageHelper.getBloodType();
-      String saglikBilgisi = '';
-      if (kan != null && kan != 'BİLİNMİYOR') saglikBilgisi += 'KAN:$kan ';
-
-      String konumMetni = konum != null
-          ? 'KONUM:${konum.latitude.toStringAsFixed(5)},${konum.longitude.toStringAsFixed(5)} R:${konum.altitude.toInt()}m'
-          : 'KONUM_ALINAMADI';
-
-      String gmaps = konum != null
-          ? 'https://maps.google.com/?q=${konum.latitude},${konum.longitude}'
-          : '';
+      // 2. Kullanıcının özel şablonu
+      String customSos = overrideMessage ?? (await StorageHelper.getSosMesaji() ?? 'ACİL YARDIM');
+      if (customPrefix != null) customSos = '$customPrefix $customSos';
 
       final now = DateTime.now();
       final timeStr = '${now.hour}:${now.minute.toString().padLeft(2, '0')}';
 
-      // Kullanıcının özel şablonu
-      String customSos = overrideMessage ?? (await StorageHelper.getSosMesaji() ?? 'ACİL YARDIM');
-      if (customPrefix != null) {
-        customSos = '$customPrefix $customSos';
+      // 3. GPS konumu — kısa timeout ile al, alamazsak son bilinen konumu kullan
+      Position? konum;
+      try {
+        konum = await Geolocator.getCurrentPosition(
+          locationSettings: const LocationSettings(
+            accuracy: LocationAccuracy.medium,
+            timeLimit: Duration(seconds: 4),
+          ),
+        ).timeout(const Duration(seconds: 5));
+      } catch (_) {
+        try { konum = await Geolocator.getLastKnownPosition(); } catch (_) {}
       }
 
-      // --- SMS METNİ ---
-      String otm = konum != null
-          ? 'https://opentopomap.org/#map=17/${konum.latitude}/${konum.longitude}'
+      String konumMetni = konum != null
+          ? 'KONUM:${konum.latitude.toStringAsFixed(5)},${konum.longitude.toStringAsFixed(5)}'
+          : 'KONUM_ALINAMADI';
+      String gmaps = konum != null
+          ? 'https://maps.google.com/?q=${konum.latitude},${konum.longitude}'
           : '';
 
-      String fullSms = '[ROTA+ SOS] $customSos | $timeStr | $konumMetni | GMaps: $gmaps | OTM: $otm | PIL:%$batteryLevel | $saglikBilgisi${rotaBilgisi.isNotEmpty ? "$rotaBilgisi$rotaKonumBilgisi" : ""}';
+      // 4. Pil seviyesi
+      int batteryLevel = 0;
+      try { batteryLevel = await Battery().batteryLevel.timeout(const Duration(seconds: 2)); } catch (_) {}
 
+      // 5. Kan grubu
+      final kan = await StorageHelper.getBloodType();
+      String saglikBilgisi = (kan != null && kan != 'BİLİNMİYOR') ? 'KAN:$kan ' : '';
+
+      // 6. Rota bilgisi — arka planda, SMS gönderimi bloke etmez
+      String rotaBilgisi = '';
+      try {
+        final aktifRota = await DatabaseHelper.instance.aktifRotaGetir()
+            .timeout(const Duration(seconds: 2));
+        if (aktifRota != null) rotaBilgisi = 'ROTA:${aktifRota['isim']}';
+      } catch (_) {}
+
+      // 7. SMS metnini oluştur
+      String fullSms = '[ROTA+ SOS] $customSos | $timeStr | $konumMetni${gmaps.isNotEmpty ? " | GMaps: $gmaps" : ""} | PIL:%$batteryLevel | $saglikBilgisi${rotaBilgisi.isNotEmpty ? rotaBilgisi : ""}';
       fullSms = _turkceKarakterleriCevir(fullSms).replaceAll(RegExp(r'\s+'), ' ').trim();
 
-      // --- Otomatik SMS Gönder ---
+      // 8. SMS Gönder
       if (Platform.isIOS) {
-        final uri = Uri(
-          scheme: 'sms',
-          path: telefon,
-          queryParameters: <String, String>{
-            'body': fullSms,
-          },
-        );
-        await launchUrl(uri);
+        // iOS: yerel SMS uygulamasını metin dolu halde aç — kullanıcı sadece Gönder'e basar
+        bool launched = false;
+        try {
+          final uri = Uri(
+            scheme: 'sms',
+            path: telefon,
+            queryParameters: <String, String>{'body': fullSms},
+          );
+          if (await canLaunchUrl(uri)) {
+            launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+          }
+        } catch (_) {}
+
+        if (!launched) {
+          try {
+            // Fallback URI formatı: sms:NUMARA?body=METIN
+            final encoded = Uri.encodeComponent(fullSms);
+            final fallback = Uri.parse('sms:$telefon?body=$encoded');
+            await launchUrl(fallback, mode: LaunchMode.externalApplication);
+            launched = true;
+          } catch (_) {}
+        }
+
+        // iOS'te SMS kutusu açıldığında başarılı say
+        return {'basarili': true, 'mesaj': fullSms, 'telefon': telefon};
       } else {
+        // Android: doğrudan otomatik gönder
         final SmsSendStatusListener listener = (SendStatus status) {};
         _telephony.sendSms(
           to: telefon,
@@ -177,16 +145,14 @@ class BackgroundSmsService {
           statusListener: listener,
           isMultipart: true,
         );
+
+        // DB kaydı sadece Android için (iOS arka plana düştüğü için kayıt yaptıramayabiliriz)
+        try {
+          await DatabaseHelper.instance.insertMessage('SOS Gonderildi:\n$fullSms', true, timeStr);
+        } catch (_) {}
+
+        return {'basarili': true, 'mesaj': fullSms, 'telefon': telefon};
       }
-
-      // 7. Mesajı veritabanına kaydet
-      await DatabaseHelper.instance.insertMessage(
-        'SOS Gonderildi:\n$fullSms',
-        true,
-        timeStr,
-      );
-
-      return {'basarili': true, 'mesaj': fullSms, 'telefon': telefon};
     } catch (e) {
       return {'basarili': false, 'hata': 'Hata: $e'};
     }
