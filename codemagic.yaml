@@ -24,6 +24,12 @@ workflows:
           cd mountaineering_app
           flutter create . --platforms ios
 
+      - name: Generate App Icons and Splash
+        script: |
+          cd mountaineering_app
+          flutter pub run flutter_launcher_icons
+          flutter pub run flutter_native_splash:create
+
       - name: Add Info.plist Keys
         script: |
           cd mountaineering_app/ios/Runner
@@ -31,7 +37,10 @@ workflows:
           plutil -insert NSLocationWhenInUseUsageDescription -string "Haritada konumunuzu görebilmek için izin gereklidir." Info.plist
           plutil -insert NSLocationAlwaysUsageDescription -string "Arka planda acil durum SOS takibi için konumunuz gereklidir." Info.plist
           plutil -insert NSLocationAlwaysAndWhenInUseUsageDescription -string "Arka planda acil durum SOS takibi için konumunuz gereklidir." Info.plist
-          plutil -insert NSMicrophoneUsageDescription -string "Sesli komutlar ve acil durum dinlemesi için mikrofona erişim gereklidir." Info.plist
+          plutil -replace NSMicrophoneUsageDescription -string "Telsiz özelliği için mikrofon erişimi gereklidir." Info.plist
+          plutil -insert NSUserTrackingUsageDescription -string "Size daha ilgi çekici ve kişiselleştirilmiş reklamlar gösterebilmek için bu izne ihtiyacımız var." Info.plist
+          plutil -insert SKAdNetworkItems -array Info.plist
+          plutil -insert SKAdNetworkItems.0 -xml "<dict><key>SKAdNetworkIdentifier</key><string>cstr6suwn9.skadnetwork</string></dict>" Info.plist
           plutil -insert NSCameraUsageDescription -string "Kamera ile fotoğraf çekmek için gereklidir." Info.plist
           plutil -insert NSPhotoLibraryUsageDescription -string "Profil fotoğrafı seçmek için gereklidir." Info.plist
           plutil -insert NSSpeechRecognitionUsageDescription -string "Sesli komutları metne çevirmek için gereklidir." Info.plist
@@ -42,6 +51,10 @@ workflows:
           plutil -insert NSBonjourServices -array Info.plist
           plutil -insert NSBonjourServices.0 -string "_mp-connection._tcp" Info.plist
           plutil -insert NSBonjourServices.1 -string "_dartobservatory._tcp" Info.plist
+          plutil -insert NSBonjourServices.2 -string "_rotameshp2p._tcp" Info.plist
+          plutil -insert NSBonjourServices.3 -string "_rotameshp2p._udp" Info.plist
+          plutil -insert NSBonjourServices.4 -string "_rotameshsos._tcp" Info.plist
+          plutil -insert NSBonjourServices.5 -string "_rotameshsos._udp" Info.plist
           plutil -insert UIBackgroundModes -array Info.plist
           plutil -insert UIBackgroundModes.0 -string "location" Info.plist
           plutil -insert UIBackgroundModes.1 -string "fetch" Info.plist
@@ -51,7 +64,7 @@ workflows:
         script: |
           cd mountaineering_app/ios
           ruby -i -e "lines = ARGF.readlines; lines.reject! { |l| l.match?(/platform :ios/) }; puts \"platform :ios, '15.0'\"; puts lines" Podfile
-          ruby -i -e "lines = ARGF.read; lines.gsub!(/flutter_additional_ios_build_settings\\(target\\)/, %Q{flutter_additional_ios_build_settings(target)\n      if target.name == 'permission_handler_apple'\n        target.build_configurations.each do |config|\n          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']\n          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] = [config.build_settings['GCC_PREPROCESSOR_DEFINITIONS']].flatten + ['PERMISSION_LOCATION=1', 'PERMISSION_NOTIFICATIONS=1', 'PERMISSION_CAMERA=1', 'PERMISSION_MICROPHONE=1', 'PERMISSION_PHOTOS=1']\n        end\n      end}); puts lines" Podfile
+          ruby -i -e "lines = ARGF.read; lines.gsub!(/flutter_additional_ios_build_settings\\(target\\)/, %Q{flutter_additional_ios_build_settings(target)\n      if target.name == 'permission_handler_apple'\n        target.build_configurations.each do |config|\n          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']\n          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] = [config.build_settings['GCC_PREPROCESSOR_DEFINITIONS']].flatten + ['PERMISSION_LOCATION=1', 'PERMISSION_NOTIFICATIONS=1', 'PERMISSION_CAMERA=1', 'PERMISSION_MICROPHONE=1', 'PERMISSION_PHOTOS=1', 'PERMISSION_APP_TRACKING_TRANSPARENCY=1']\n        end\n      end}); puts lines" Podfile
           ruby -i -e "puts ARGF.read.gsub(/IPHONEOS_DEPLOYMENT_TARGET = .*?;/, %{IPHONEOS_DEPLOYMENT_TARGET = 15.0;})" Runner.xcodeproj/project.pbxproj
           pod repo update
 

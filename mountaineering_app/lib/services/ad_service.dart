@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'premium_service.dart';
 
 class AdService {
@@ -55,6 +56,13 @@ class AdService {
   }
 
   Future<void> init() async {
+    if (Platform.isIOS) {
+      try {
+        await Permission.appTrackingTransparency.request();
+      } catch (e) {
+        debugPrint('ATT Request Error: $e');
+      }
+    }
     await MobileAds.instance.initialize();
     loadRewardedAd(); // Ön yükleme yap
   }

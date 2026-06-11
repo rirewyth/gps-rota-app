@@ -26,7 +26,7 @@ class _MeshNetworkScreenState extends State<MeshNetworkScreen> {
   static const Color kBackground = Color(0xFF0A0A0A);
   static const Color kGreen = Color(0xFF62FF4C);
 
-  static const String _serviceId = 'com.rotaplus.mesh';
+  static const String _serviceId = 'rotameshp2p';
 
   bool _isAdvertising = false;
   bool _isDiscovering = false;

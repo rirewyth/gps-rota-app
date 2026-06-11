@@ -443,7 +443,7 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
       }
       try {
         bool success = await Nearby().startAdvertising(
-          "SOS_DEPREM_YARDIM",
+          "rotameshsos",
           Strategy.P2P_CLUSTER,
           onConnectionInitiated: (id, info) {},
           onConnectionResult: (id, status) {},

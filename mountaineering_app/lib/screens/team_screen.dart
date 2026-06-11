@@ -596,6 +596,16 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
       }
       
       final fileSize = await file.length();
+      
+      debugPrint("================ TELSİZ KAYIT ================");
+      debugPrint("Dosya Yolu: $path");
+      debugPrint("Dosya Boyutu: $fileSize byte");
+      debugPrint("Codec: AAC (AudioEncoder.aacLc)");
+      debugPrint("Container: .m4a");
+      debugPrint("Sample Rate: 44100");
+      debugPrint("Channel Count: 1");
+      debugPrint("============================================");
+
       if (fileSize == 0) {
         throw Exception("Ses kaydedilemedi (Dosya boş/0 bayt). Lütfen mikrofon izinlerini kontrol edin.");
       }
@@ -1117,7 +1127,19 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
         final dir = await getTemporaryDirectory();
         final tmpFile = File('${dir.path}/incoming_${DateTime.now().millisecondsSinceEpoch}.m4a');
         await tmpFile.writeAsBytes(bytes);
-        await _audioPlayer.play(DeviceFileSource(tmpFile.path));
+        
+        final decodedSize = await tmpFile.length();
+        debugPrint("================ TELSİZ OYNATMA ================");
+        debugPrint("Çözülen Geçici Dosya Uzantısı: .m4a");
+        debugPrint("Çözülen Dosya Boyutu: $decodedSize byte");
+
+        try {
+          await _audioPlayer.play(DeviceFileSource(tmpFile.path));
+        } catch (e) {
+          debugPrint("AudioPlayers Oynatma Hatası: $e");
+        }
+        debugPrint("================================================");
+
         // Temizlik
         _audioPlayer.onPlayerComplete.first.then((_) async {
           try { await tmpFile.delete(); } catch (_) {}
