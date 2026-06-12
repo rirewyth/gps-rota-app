@@ -33,6 +33,7 @@ class _WeatherScreenState extends State<WeatherScreen> with TickerProviderStateM
   double _devicePressure = 0.0;
   bool _barometerEnabled = false;
   String _locationName = 'Konumum';
+  double? _searchAltitude;
   final TextEditingController _searchCtrl = TextEditingController();
   List<LocationResult> _searchResults = [];
   bool _isSearching = false;
@@ -74,9 +75,12 @@ class _WeatherScreenState extends State<WeatherScreen> with TickerProviderStateM
     await _fetchData();
   }
 
-  Future<void> _fetchData({double? lat, double? lng, String? name}) async {
+  Future<void> _fetchData({double? lat, double? lng, String? name, double? altitude}) async {
     setState(() { _loading = true; _errorMsg = ''; if (name != null) _locationName = name; });
     try {
+      if (altitude != null) {
+        _searchAltitude = altitude;
+      }
       if (lat == null || lng == null) {
         bool svc = await Geolocator.isLocationServiceEnabled();
         if (!svc) { setState(() { _loading = false; _errorMsg = 'GPS kapalı.'; }); return; }
@@ -96,16 +100,17 @@ class _WeatherScreenState extends State<WeatherScreen> with TickerProviderStateM
         }
         lat = _pos!.latitude;
         lng = _pos!.longitude;
+        _searchAltitude = _pos!.altitude;
         _locationName = 'Konumum';
       }
 
       if (_isPremium) {
-        _data = await WeatherService.getFullWeatherData(lat, lng, altitudeMeters: _pos?.altitude ?? 0);
+        _data = await WeatherService.getFullWeatherData(lat, lng, altitudeMeters: _searchAltitude ?? 0);
         if (_data == null) {
           _errorMsg = 'Hava durumu verileri alınamadı. İnternet bağlantınızı kontrol edip tekrar deneyin.';
         }
       } else {
-        final simple = await WeatherService.checkStormRisk(lat, lng);
+        final simple = await WeatherService.checkStormRisk(lat, lng, elevation: _searchAltitude);
         if (simple != null && !simple.isLoading) {
           _data = FullWeatherData(
             current: simple,
@@ -173,7 +178,7 @@ class _WeatherScreenState extends State<WeatherScreen> with TickerProviderStateM
                         subtitle: Text('${loc.admin1}, ${loc.country}', style: const TextStyle(color: Colors.white38, fontSize: 11)),
                         onTap: () {
                           Navigator.pop(context);
-                          _fetchData(lat: loc.lat, lng: loc.lng, name: loc.name);
+                          _fetchData(lat: loc.lat, lng: loc.lng, name: loc.name, altitude: loc.elevation);
                         },
                       );
                     },
@@ -322,9 +327,9 @@ class _WeatherScreenState extends State<WeatherScreen> with TickerProviderStateM
           _buildRiskIndex(r),
           const SizedBox(height: 16),
           _buildDetailGrid(w),
-          if (_pos != null) ...[
+          if (_searchAltitude != null && _searchAltitude! > 0) ...[
             const SizedBox(height: 16),
-            _buildAltitudeTempCard(w.temperature, _pos!.altitude),
+            _buildAltitudeTempCard(w.temperature, _searchAltitude!),
           ],
         ],
       ),
@@ -397,8 +402,8 @@ class _WeatherScreenState extends State<WeatherScreen> with TickerProviderStateM
                     Text('${w.temperature.toStringAsFixed(1)}°C',
                       style: GoogleFonts.outfit(color: Colors.white, fontSize: 42, fontWeight: FontWeight.w900)),
                     Text(label, style: TextStyle(color: alertColor, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1)),
-                    if (_pos != null)
-                      Text('${_pos!.altitude.toInt()} m irtifa', style: const TextStyle(color: Colors.white38, fontSize: 11)),
+                    if (_searchAltitude != null && _searchAltitude! > 0)
+                      Text('${_searchAltitude!.toInt()} m irtifa', style: const TextStyle(color: Colors.white38, fontSize: 11)),
                   ],
                 ),
               ),
@@ -805,7 +810,7 @@ class _WeatherScreenState extends State<WeatherScreen> with TickerProviderStateM
           subtitle: Text('Rakım: ${m['alt']} m', style: const TextStyle(color: Colors.white54)),
           trailing: const Icon(Icons.chevron_right, color: Colors.white38),
           onTap: () {
-            _fetchData(lat: m['lat'], lng: m['lng'], name: m['name']);
+            _fetchData(lat: m['lat'], lng: m['lng'], name: m['name'], altitude: (m['alt'] as num).toDouble());
             _tabController.animateTo(0);
           },
         );

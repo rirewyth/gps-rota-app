@@ -9,6 +9,7 @@ class LocationResult {
   final double lng;
   final String admin1;
   final String country;
+  final double elevation;
 
   LocationResult({
     required this.name,
@@ -16,6 +17,7 @@ class LocationResult {
     required this.lng,
     required this.admin1,
     required this.country,
+    this.elevation = 0.0,
   });
 }
 
@@ -164,9 +166,12 @@ class WeatherService {
   static const String loadingState = "YÜKLENİYOR...";
 
   // Existing simple method (still used by home screen)
-  static Future<dynamic> checkStormRisk(double lat, double lng) async {
+  static Future<dynamic> checkStormRisk(double lat, double lng, {double? elevation}) async {
     try {
-      final url = 'https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lng&current=temperature_2m,wind_speed_10m,wind_direction_10m,weather_code,snowfall,surface_pressure,pressure_msl,relative_humidity_2m,dew_point_2m,uv_index,cloud_cover,visibility,precipitation,precipitation_probability';
+      String url = 'https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lng&current=temperature_2m,wind_speed_10m,wind_direction_10m,weather_code,snowfall,surface_pressure,pressure_msl,relative_humidity_2m,dew_point_2m,uv_index,cloud_cover,visibility,precipitation,precipitation_probability';
+      if (elevation != null && elevation > 0) {
+        url += '&elevation=${elevation.toInt()}';
+      }
       final response = await _dio.get(url);
 
       if (response.statusCode == 200 && response.data != null) {
@@ -253,7 +258,7 @@ class WeatherService {
   // Premium full weather data with hourly + daily + mountain risk index
   static Future<FullWeatherData?> getFullWeatherData(double lat, double lng, {double altitudeMeters = 0}) async {
     try {
-      final url = Uri.https('api.open-meteo.com', '/v1/forecast', {
+      final Map<String, dynamic> params = {
         'latitude': '$lat',
         'longitude': '$lng',
         'current': 'temperature_2m,wind_speed_10m,wind_direction_10m,weather_code,snowfall,surface_pressure,pressure_msl,relative_humidity_2m,dew_point_2m,uv_index,cloud_cover,visibility,precipitation,precipitation_probability',
@@ -263,7 +268,11 @@ class WeatherService {
         'timezone': 'auto',
         'forecast_days': '7',
         'past_hours': '24',
-      }).toString();
+      };
+      if (altitudeMeters > 0) {
+        params['elevation'] = '${altitudeMeters.toInt()}';
+      }
+      final url = Uri.https('api.open-meteo.com', '/v1/forecast', params).toString();
 
       final response = await _dio.get(url);
 
@@ -273,7 +282,7 @@ class WeatherService {
 
       // ── Current ──────────────────────────────────────────────
       final cur = data['current'];
-      final WeatherAlertInfo currentAlert = await checkStormRisk(lat, lng) ??
+      final WeatherAlertInfo currentAlert = await checkStormRisk(lat, lng, elevation: altitudeMeters) ??
           WeatherAlertInfo(
             isHazardous: false,
             title: 'GÜVENLİ',
@@ -549,6 +558,7 @@ class WeatherService {
           lng: (r['longitude'] ?? 0.0).toDouble(),
           admin1: r['admin1'] ?? '',
           country: r['country'] ?? '',
+          elevation: (r['elevation'] ?? 0.0).toDouble(),
         )).toList();
       }
       return [];
