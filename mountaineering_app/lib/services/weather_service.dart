@@ -158,7 +158,7 @@ class FullWeatherData {
 }
 
 class WeatherService {
-  static final Dio _dio = Dio();
+  static final Dio _dio = Dio(BaseOptions(connectTimeout: const Duration(seconds: 10), receiveTimeout: const Duration(seconds: 10)));
   static const String stormRiskLow = "DÜŞÜK";
   static const String stormRiskHigh = "YÜKSEK";
   static const String loadingState = "YÜKLENİYOR...";

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../database_helper.dart';
 import '../storage_helper.dart';
@@ -256,6 +257,8 @@ class CloudSyncService {
     String source = '',
   }) async {
     if (!_isInitialized || _hasError || currentUser == null) return;
+    String finalSource = source.isNotEmpty ? source : 'planned';
+    if (finalSource == 'planned') return; // Planlanan rotaları profile düşürmemek için buluta eşitleme
     try {
       await FirebaseFirestore.instance.collection('users').doc(currentUser!.uid).collection('routes').add({
         'name': name,
@@ -267,7 +270,7 @@ class CloudSyncService {
         'elevation_gain': elevationGain,
         'max_altitude': maxAltitude,
         'steps': steps,
-        'source': source.isNotEmpty ? source : 'planned',
+        'source': finalSource,
         'pointCount': points.length,
         'timestamp': FieldValue.serverTimestamp(),
         // Eski Türkçe anahtarlar (uyumluluk için)
@@ -329,6 +332,46 @@ class CloudSyncService {
       return userCred;
     } catch (e) {
       log("Google SignIn Error: $e");
+      rethrow;
+    }
+  }
+
+  /// Apple ile Giriş yapar
+  static Future<UserCredential?> signInWithApple() async {
+    if (!_isInitialized || _hasError) {
+      throw Exception("Bulut servisleri bağlı değil.");
+    }
+
+    try {
+      final AuthorizationCredentialAppleID appleIdCredential =
+          await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      final OAuthProvider oAuthProvider = OAuthProvider('apple.com');
+      final AuthCredential credential = oAuthProvider.credential(
+        idToken: appleIdCredential.identityToken,
+        accessToken: appleIdCredential.authorizationCode,
+      );
+
+      final UserCredential userCred = await auth.signInWithCredential(credential);
+      
+      if (userCred.user != null) {
+        // Eğer Apple ile ilk defa giriş yapıyorsa isim boş gelebilir (Firebase bazen displayName'i güncellemez)
+        // Eğer appleIdCredential.givenName var ise Firebase displayName güncellenebilir, ancak syncUserProfileFromCloud
+        // içerisinde Firebase Auth üzerinden isim alınıyor. İsim yoksa Anonim yazılacak.
+        if (appleIdCredential.givenName != null && appleIdCredential.givenName!.isNotEmpty) {
+           await userCred.user!.updateDisplayName('${appleIdCredential.givenName} ${appleIdCredential.familyName ?? ''}'.trim());
+        }
+        await syncUserProfileFromCloud(userCred.user!.uid);
+      }
+      
+      return userCred;
+    } catch (e) {
+      log("Apple SignIn Error: $e");
       rethrow;
     }
   }

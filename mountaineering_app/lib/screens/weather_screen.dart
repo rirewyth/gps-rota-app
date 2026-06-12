@@ -40,7 +40,7 @@ class _WeatherScreenState extends State<WeatherScreen> with TickerProviderStateM
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     _init();
   }
 
@@ -85,7 +85,15 @@ class _WeatherScreenState extends State<WeatherScreen> with TickerProviderStateM
           setState(() { _loading = false; _errorMsg = 'Konum izni reddedildi.'; });
           return;
         }
-        _pos = await Geolocator.getCurrentPosition(locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium));
+        try {
+          _pos = await Geolocator.getCurrentPosition(locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium)).timeout(const Duration(seconds: 8));
+        } catch (e) {
+          _pos = await Geolocator.getLastKnownPosition();
+        }
+        if (_pos == null) {
+          setState(() { _loading = false; _errorMsg = 'Konum tespit edilemedi.'; });
+          return;
+        }
         lat = _pos!.latitude;
         lng = _pos!.longitude;
         _locationName = 'Konumum';
@@ -93,9 +101,12 @@ class _WeatherScreenState extends State<WeatherScreen> with TickerProviderStateM
 
       if (_isPremium) {
         _data = await WeatherService.getFullWeatherData(lat, lng, altitudeMeters: _pos?.altitude ?? 0);
+        if (_data == null) {
+          _errorMsg = 'Hava durumu verileri alınamadı. İnternet bağlantınızı kontrol edip tekrar deneyin.';
+        }
       } else {
         final simple = await WeatherService.checkStormRisk(lat, lng);
-        if (simple != null) {
+        if (simple != null && !simple.isLoading) {
           _data = FullWeatherData(
             current: simple,
             hourly: [],
@@ -103,6 +114,10 @@ class _WeatherScreenState extends State<WeatherScreen> with TickerProviderStateM
             risks: MountainRiskIndex(frostbiteRisk: 0, lightningRisk: 0, avalancheRisk: 0, windRisk: 0, overallRisk: 0, windChill: simple.temperature, overallLabel: 'Detay için Premium', overallColor: 'green'),
             advancedAlerts: [],
           );
+        } else if (simple != null && simple.isLoading) {
+          _errorMsg = simple.description;
+        } else {
+          _errorMsg = 'Hava durumu verileri alınamadı. İnternet bağlantınızı kontrol edip tekrar deneyin.';
         }
       }
     } catch (e) {
@@ -198,9 +213,10 @@ class _WeatherScreenState extends State<WeatherScreen> with TickerProviderStateM
           unselectedLabelColor: Colors.white38,
           labelStyle: const TextStyle(fontWeight: FontWeight.w900, fontSize: 10),
           tabs: const [
-            Tab(icon: Icon(Icons.cloud, size: 16), text: 'ANLİK'),
+            Tab(icon: Icon(Icons.cloud, size: 16), text: 'ANLIK'),
             Tab(icon: Icon(Icons.access_time, size: 16), text: 'SAATLİK'),
             Tab(icon: Icon(Icons.calendar_today, size: 16), text: '7 GÜN'),
+            Tab(icon: Icon(Icons.landscape, size: 16), text: 'DAĞLAR'),
           ],
         ) : null,
       ),
@@ -223,6 +239,7 @@ class _WeatherScreenState extends State<WeatherScreen> with TickerProviderStateM
                               _KeepAliveWrapper(child: _safeTabWrapper(() => _buildCurrentTab(), 'Anlık')),
                               _KeepAliveWrapper(child: _safeTabWrapper(() => _buildHourlyTab(), 'Saatlik')),
                               _KeepAliveWrapper(child: _safeTabWrapper(() => _buildDailyTab(), '7 Gün')),
+                              _KeepAliveWrapper(child: _safeTabWrapper(() => _buildMountainsTab(), 'Dağlar')),
                             ],
                           )
                       : _buildFreemiumView(),
@@ -755,6 +772,42 @@ class _WeatherScreenState extends State<WeatherScreen> with TickerProviderStateM
               ],
             ],
           ),
+        );
+      },
+    );
+  }
+
+  Widget _buildMountainsTab() {
+    final List<Map<String, dynamic>> mountains = [
+      {'name': 'Ağrı Dağı', 'lat': 39.7025, 'lng': 44.2990, 'alt': 5137},
+      {'name': 'Erciyes Dağı', 'lat': 38.5303, 'lng': 35.4475, 'alt': 3917},
+      {'name': 'Süphan Dağı', 'lat': 38.9250, 'lng': 42.8250, 'alt': 4058},
+      {'name': 'Kaçkar Dağı', 'lat': 40.8361, 'lng': 41.1611, 'alt': 3932},
+      {'name': 'Uludağ', 'lat': 40.0658, 'lng': 29.2158, 'alt': 2543},
+      {'name': 'Hasan Dağı', 'lat': 38.1256, 'lng': 34.1658, 'alt': 3268},
+      {'name': 'Demirkazık Dağı', 'lat': 37.7997, 'lng': 35.1558, 'alt': 3756},
+      {'name': 'Aladağlar', 'lat': 37.8183, 'lng': 35.1583, 'alt': 3756},
+      {'name': 'Ilgaz Dağı', 'lat': 41.0717, 'lng': 33.7258, 'alt': 2587},
+      {'name': 'Bozdağlar', 'lat': 38.3589, 'lng': 28.1189, 'alt': 2159},
+    ];
+
+    return ListView.separated(
+      padding: const EdgeInsets.all(16),
+      itemCount: mountains.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 8),
+      itemBuilder: (_, i) {
+        final m = mountains[i];
+        return ListTile(
+          tileColor: kCardBg,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: const BorderSide(color: Colors.white10)),
+          leading: const Icon(Icons.terrain, color: kOrange, size: 30),
+          title: Text(m['name'], style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          subtitle: Text('Rakım: ${m['alt']} m', style: const TextStyle(color: Colors.white54)),
+          trailing: const Icon(Icons.chevron_right, color: Colors.white38),
+          onTap: () {
+            _fetchData(lat: m['lat'], lng: m['lng'], name: m['name']);
+            _tabController.animateTo(0);
+          },
         );
       },
     );

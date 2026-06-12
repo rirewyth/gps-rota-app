@@ -167,6 +167,36 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void _appleLogin() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = '';
+    });
+
+    try {
+      final userCred = await CloudSyncService.signInWithApple();
+      if (!mounted) return;
+
+      if (userCred != null && userCred.user != null) {
+        // İlk giriş kontrolü — onboarding göster
+        final prefs = await SharedPreferences.getInstance();
+        final onboardingDone = prefs.getBool('onboarding_complete_v1') ?? false;
+        if (!onboardingDone && mounted) {
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const OnboardingScreen()));
+        } else if (mounted) {
+          Navigator.of(context).pushReplacementNamed('/home');
+        }
+      } else {
+        setState(() => _isLoading = false);
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'APPLE GİRİŞ HATASI: $e';
+      });
+    }
+  }
+
   void _showForgotPasswordDialog() {
     final emailCtrl = TextEditingController(text: _emailController.text);
     
@@ -395,6 +425,32 @@ class _LoginScreenState extends State<LoginScreen> {
                             Image.network('https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_\"G\"_logo.svg', width: 24, height: 24, errorBuilder: (c, e, s) => const Icon(Icons.g_mobiledata, color: Colors.black)),
                             const SizedBox(width: 12),
                             Text('GOOGLE İLE DEVAM ET', style: GoogleFonts.outfit(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 1)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 16),
+                  
+                  // Apple Login Button
+                  FadeInUp(
+                    delay: const Duration(milliseconds: 800),
+                    child: GestureDetector(
+                      onTap: _isLoading ? null : _appleLogin,
+                      child: Container(
+                        width: double.infinity,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.apple, color: Colors.black, size: 28),
+                            const SizedBox(width: 8),
+                            Text('APPLE İLE DEVAM ET', style: GoogleFonts.outfit(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 1)),
                           ],
                         ),
                       ),

@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../storage_helper.dart';
 import 'onboarding_screen.dart';
 import 'app_intro_screen.dart';
+import '../services/ad_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -17,6 +18,9 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AdService().init();
+    });
     _navigateToNext();
   }
 

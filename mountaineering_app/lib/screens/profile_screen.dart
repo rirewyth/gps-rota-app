@@ -21,7 +21,7 @@ import 'admin_panel_screen.dart';
 import '../services/ad_service.dart';
 import '../widgets/create_post_sheet.dart';
 
-const List<String> _kAdminEmails = ['sercanoral65@gmail.com', 'admin@rota.plus'];
+const List<String> _kAdminEmails = ['sercanoral65@gmail.com', 'admin@rota.plus', 'keser.bora@yandex.com'];
 
 class ProfileScreen extends StatefulWidget {
   final String? targetUserId;

@@ -15,6 +15,7 @@ class StepData {
   final List<OptionData> options;
   final IconData icon;
   final Color color;
+  final String? imagePath;
 
   StepData({
     required this.question,
@@ -22,6 +23,7 @@ class StepData {
     required this.options,
     this.icon = Icons.help_outline,
     this.color = const Color(0xFFFF6B00),
+    this.imagePath,
   });
 }
 
@@ -30,12 +32,14 @@ class OptionData {
   final String? nextStepKey;
   final bool isFinal;
   final String? finalAdvice;
+  final String? finalAdviceImage;
 
   OptionData({
     required this.label,
     this.nextStepKey,
     this.isFinal = false,
     this.finalAdvice,
+    this.finalAdviceImage,
   });
 }
 
@@ -73,6 +77,7 @@ class _FirstAidScreenState extends State<FirstAidScreen> {
       question: 'KANAMA TÜRÜNÜ TANIMLAYIN',
       icon: Icons.bloodtype,
       color: Colors.red,
+      imagePath: 'assets/guides/basi_noktalari_guide.jpg',
       options: [
         OptionData(label: 'NABIZ ATIŞI İLE UYUMLU FIŞKIRIR ŞEKİLDE', nextStepKey: 'bleeding_pressure'),
         OptionData(label: 'SIZINTI ŞEKLİNDE KOYU KIRMIZI RENKTE', nextStepKey: 'bleeding_pressure'),
@@ -121,8 +126,8 @@ class _FirstAidScreenState extends State<FirstAidScreen> {
       icon: Icons.ac_unit,
       color: Colors.lightBlue,
       options: [
-        OptionData(label: 'YÜZEYSEL', isFinal: true, finalAdvice: 'Bölgeyi kendi vücut ısınızla ısıtın. Sıcak su kullanmayın!'),
-        OptionData(label: 'DERİN (SİYAHLAŞMA)', isFinal: true, finalAdvice: 'Bölgeyi ısıtmaya ÇALIŞMAYIN! Tahliye sırasında tekrar donma riski varsa buzlu kalsın. Kuru bezle sarın.'),
+        OptionData(label: 'YÜZEYSEL', isFinal: true, finalAdvice: 'Paniğe kapılmayın, vücut ısınızı yükseltin. Üstünüze bir katman daha alın ve alabiliyorsanız yanınızdakilerden acil durum battaniyesi ile sizi örtmesini isteyin.'),
+        OptionData(label: 'MORARMA / DERİN (SİYAHLAŞMA)', isFinal: true, finalAdvice: 'Derhal 112 arayın ve acil yardım alın.'),
       ],
     ),
     'altitude': StepData(
@@ -130,7 +135,7 @@ class _FirstAidScreenState extends State<FirstAidScreen> {
       icon: Icons.terrain,
       color: Colors.amber,
       options: [
-        OptionData(label: 'İLKYARDIM PROTOKOLÜNÜ GÖSTER', isFinal: true, finalAdvice: 'ADH(Akut Dağ Hastalığı), HİBE(Yüksek İrtifa Beyin Ödemi) ve HİAO(Yüksek İrtifa Akciğer Ödemi) hastalıklarının tespiti durumunda Dağcılığın Aklimatizasyon kuralına uygun hareket edin.\n\nEkibinizden herhangi biri bu hastalıklardan birine yakalandı ise üyeyi yalnız bırakmayın. Tırmanış sırasında gerçekleşti ise kişiyi belirtiler azalana kadar dinlendirin, dinlenmesine rağmen süreç geçmiyor ise ana kamp alanına kadar yaralıya eşlik edin.\n\nHİAO ve HİBE görülmesi durumunda ana kamp alanında hastalığın geçmediği tespit edilirse 112\'yi arayınız, genellikle bu hastalıkların tedavisi irtifa kaybetmektir.'),
+        OptionData(label: 'İLKYARDIM PROTOKOLÜNÜ GÖSTER', isFinal: true, finalAdviceImage: 'assets/guides/altitude_guide.png', finalAdvice: 'ADH(Akut Dağ Hastalığı), HİBE(Yüksek İrtifa Beyin Ödemi) ve HİAO(Yüksek İrtifa Akciğer Ödemi) hastalıklarının tespiti durumunda Dağcılığın Aklimatizasyon kuralına uygun hareket edin.\n\nEkibinizden herhangi biri bu hastalıklardan birine yakalandı ise üyeyi yalnız bırakmayın. Tırmanış sırasında gerçekleşti ise kişiyi belirtiler azalana kadar dinlendirin, dinlenmesine rağmen süreç geçmiyor ise ana kamp alanına kadar yaralıya eşlik edin.\n\nHİAO ve HİBE görülmesi durumunda ana kamp alanında hastalığın geçmediği tespit edilirse 112\'yi arayınız, genellikle bu hastalıkların tedavisi irtifa kaybetmektir.'),
       ],
     ),
     'medical': StepData(
@@ -164,7 +169,7 @@ class _FirstAidScreenState extends State<FirstAidScreen> {
 
   void _onOptionSelected(OptionData option) {
     if (option.isFinal) {
-      _showResult(option.finalAdvice!);
+      _showResult(option.finalAdvice!, imagePath: option.finalAdviceImage);
     } else {
       setState(() {
         _history.add(_currentStepKey);
@@ -183,7 +188,7 @@ class _FirstAidScreenState extends State<FirstAidScreen> {
     }
   }
 
-  void _showResult(String advice) {
+  void _showResult(String advice, {String? imagePath}) {
     showModalBottomSheet(
       context: context,
       backgroundColor: kCardBg,
@@ -201,6 +206,13 @@ class _FirstAidScreenState extends State<FirstAidScreen> {
               style: GoogleFonts.shareTechMono(color: kGreen, fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 20),
+            if (imagePath != null) ...[
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.asset(imagePath, fit: BoxFit.contain, height: 200),
+              ),
+              const SizedBox(height: 20),
+            ],
             Text(
               advice,
               textAlign: TextAlign.center,
@@ -236,7 +248,7 @@ class _FirstAidScreenState extends State<FirstAidScreen> {
       appBar: AppBar(
         backgroundColor: kBackground,
         elevation: 0,
-        title: Text('TAKTİKSEL İLKYARDIM', style: GoogleFonts.shareTechMono(fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+        title: Text('TEMEL İLKYARDIM PROTOKOLLERİ', style: GoogleFonts.shareTechMono(fontWeight: FontWeight.bold, fontSize: 15, letterSpacing: 1.0)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: kOrange),
           onPressed: _goBack,
@@ -270,6 +282,13 @@ class _FirstAidScreenState extends State<FirstAidScreen> {
                       textAlign: TextAlign.center,
                       style: GoogleFonts.outfit(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900),
                     ),
+                    if (step.imagePath != null) ...[
+                      const SizedBox(height: 20),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.asset(step.imagePath!, fit: BoxFit.contain, height: 200),
+                      ),
+                    ],
                     if (step.instruction != null) ...[
                       const SizedBox(height: 12),
                       Text(

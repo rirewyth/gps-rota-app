@@ -676,32 +676,7 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
                     'total_distance': FieldValue.increment(_totalDistance),
                   }, SetOptions(merge: true));
 
-                  // Profil Rotalar sekmesi için Firestore'a kaydet
-                  final List<Map<String, dynamic>> coords = _routePoints.length > 150
-                      ? List.generate(150, (i) {
-                          final idx = (i * (_routePoints.length - 1) / 149).round();
-                          return {'lat': _routePoints[idx].latitude, 'lng': _routePoints[idx].longitude};
-                        })
-                      : _routePoints.map((p) => {'lat': p.latitude, 'lng': p.longitude}).toList();
-
-                  await FirebaseFirestore.instance
-                      .collection('users')
-                      .doc(user.uid)
-                      .collection('routes')
-                      .add({
-                    'name': nameCtrl.text,
-                    'from': 'Canlı Takip Başlangıcı',
-                    'to': 'Canlı Takip Bitişi',
-                    'distance': _totalDistance,
-                    'duration_seconds': _secondsElapsed,
-                    'elevation_gain': _elevationGain,
-                    'max_altitude': _maxAltitude,
-                    'steps': _steps,
-                    'coordinates': coords,
-                    'pointCount': _routePoints.length,
-                    'source': 'live_tracking',
-                    'timestamp': FieldValue.serverTimestamp(),
-                  });
+                  // Profil Rotalar sekmesi için Firestore'a CloudSyncService üzerinden zaten eklendi.
                 } catch (_) {}
               }
               

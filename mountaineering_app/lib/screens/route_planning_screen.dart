@@ -383,31 +383,8 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
               }
 
               try {
-                final user = FirebaseAuth.instance.currentUser;
-                if (user != null) {
-                  final List<Map<String, dynamic>> coords = _planNoktalar.length > 150
-                      ? List.generate(150, (i) {
-                          final idx = (i * (_planNoktalar.length - 1) / 149).round();
-                          return {'lat': _planNoktalar[idx].latitude, 'lng': _planNoktalar[idx].longitude};
-                        })
-                      : _planNoktalar.map((p) => {'lat': p.latitude, 'lng': p.longitude}).toList();
-
-                  await FirebaseFirestore.instance
-                      .collection('users').doc(user.uid).collection('routes').add({
-                    'name': isim,
-                    'from': bAdi,
-                    'to': bBiti,
-                    'distance': _toplamMesafe,
-                    'coordinates': coords,
-                    'pointCount': _planNoktalar.length,
-                    'elevation_gain': _elevationGain,
-                    'max_altitude': _maxElevation,
-                    'duration_seconds': 0,
-                    'steps': 0,
-                    'source': 'planned',
-                    'timestamp': FieldValue.serverTimestamp(),
-                  });
-                }
+                // Sadece profil istatistiği güncellenmesi gerekiyorsa buraya eklenebilir.
+                // Rota CloudSyncService üzerinden zaten Firestore'a eklendi.
               } catch (_) {} 
 
               if (!ctx.mounted) return;

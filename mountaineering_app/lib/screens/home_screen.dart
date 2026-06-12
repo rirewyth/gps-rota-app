@@ -2263,26 +2263,29 @@ class _HomeDashboardState extends State<HomeDashboard>
 
   Widget _buildWeatherSection() {
     if (_weatherAlert == null || _weatherAlert!.isLoading) {
-      return Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: kCardBg,
-          border: Border.all(color: Colors.white10),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          children: [
-            const SizedBox(
-              width: 20, height: 20,
-              child: CircularProgressIndicator(strokeWidth: 2, color: kOrange),
-            ),
-            const SizedBox(width: 16),
-            Text(
-              'HAVA DURUMU SENKRONİZE EDİLİYOR...',
-              style: GoogleFonts.shareTechMono(color: Colors.white38, fontSize: 11, fontWeight: FontWeight.bold),
-            ),
-          ],
+      return GestureDetector(
+        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WeatherScreen())),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: kCardBg,
+            border: Border.all(color: Colors.white10),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            children: [
+              const SizedBox(
+                width: 20, height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2, color: kOrange),
+              ),
+              const SizedBox(width: 16),
+              Text(
+                'HAVA DURUMU SENKRONİZE EDİLİYOR...',
+                style: GoogleFonts.shareTechMono(color: Colors.white38, fontSize: 11, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
         ),
       );
     }

@@ -100,9 +100,6 @@ void main() async {
     // Initialize Google Play Billing
     PremiumService.init();
 
-    // Initialize AdMob
-    AdService().init();
-
     // Initialize Background Service (Moved after core init, with separate error handling)
     _startBackgroundServices();
     
