@@ -49,6 +49,9 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
   bool _isRecordingVoice = false;
   bool _isPressingPtt = false;
   
+  final MapController _mapController = MapController();
+  bool _isFirstLocationFetch = true;
+  
   StreamSubscription<Position>? _syncStream;
   DateTime? _lastSyncTime;
   late Stream<Position> _radarLocationStream;
@@ -120,6 +123,14 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
       locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium, distanceFilter: 10),
     ).listen((pos) {
       if (!mounted) return;
+      
+      if (_isFirstLocationFetch) {
+        _isFirstLocationFetch = false;
+        try {
+          _mapController.move(LatLng(pos.latitude, pos.longitude), 14.0);
+        } catch (_) {}
+      }
+      
       final now = DateTime.now();
       if (_lastSyncTime == null || now.difference(_lastSyncTime!).inSeconds >= 30) {
         _lastSyncTime = now;
@@ -1561,6 +1572,7 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                   child: Stack(
                     children: [
                       FlutterMap(
+                        mapController: _mapController,
                         options: MapOptions(
                           initialCenter: center,
                           initialZoom: markers.length > 1 ? 5.0 : 12.0,

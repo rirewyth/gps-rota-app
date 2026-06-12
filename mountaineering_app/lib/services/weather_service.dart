@@ -178,7 +178,10 @@ class WeatherService {
         final current = response.data['current'];
         if (current == null) return null;
 
-        final double temp = (current['temperature_2m'] ?? 0.0).toDouble();
+        double temp = (current['temperature_2m'] ?? 0.0).toDouble();
+        if (elevation != null && elevation > 0) {
+          temp = temp - (elevation / 1000 * 6.5);
+        }
         final double wind = (current['wind_speed_10m'] ?? 0.0).toDouble();
         final double windDir = (current['wind_direction_10m'] ?? 0.0).toDouble();
         final int wCode = (current['weather_code'] ?? 0).toInt();
@@ -301,9 +304,13 @@ class WeatherService {
         for (int i = 0; i < times.length && hourlyList.length < 24; i++) {
           final dt = DateTime.parse(times[i]);
           if (dt.isBefore(now.subtract(const Duration(hours: 6)))) continue;
+          double hTemp = (hourlyData['temperature_2m'][i] ?? 0.0).toDouble();
+          if (altitudeMeters > 0) {
+            hTemp = hTemp - (altitudeMeters / 1000 * 6.5);
+          }
           hourlyList.add(HourlyWeather(
             time: dt,
-            temperature: (hourlyData['temperature_2m'][i] ?? 0.0).toDouble(),
+            temperature: hTemp,
             windSpeed: (hourlyData['wind_speed_10m'][i] ?? 0.0).toDouble(),
             weatherCode: (hourlyData['weather_code'][i] ?? 0).toInt(),
             precipitation: (hourlyData['precipitation'][i] ?? 0.0).toDouble(),
@@ -319,10 +326,17 @@ class WeatherService {
       if (dailyData != null) {
         final times = dailyData['time'] as List;
         for (int i = 0; i < times.length; i++) {
+          double dMin = (dailyData['temperature_2m_min'][i] ?? 0.0).toDouble();
+          double dMax = (dailyData['temperature_2m_max'][i] ?? 0.0).toDouble();
+          if (altitudeMeters > 0) {
+            final lapse = altitudeMeters / 1000 * 6.5;
+            dMin -= lapse;
+            dMax -= lapse;
+          }
           dailyList.add(DailyWeather(
             date: DateTime.parse(times[i]),
-            tempMin: (dailyData['temperature_2m_min'][i] ?? 0.0).toDouble(),
-            tempMax: (dailyData['temperature_2m_max'][i] ?? 0.0).toDouble(),
+            tempMin: dMin,
+            tempMax: dMax,
             weatherCode: (dailyData['weather_code'][i] ?? 0).toInt(),
             windSpeedMax: (dailyData['wind_speed_10m_max'][i] ?? 0.0).toDouble(),
             precipitationSum: (dailyData['precipitation_sum'][i] ?? 0.0).toDouble(),

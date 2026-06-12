@@ -53,7 +53,7 @@ class _WeatherScreenState extends State<WeatherScreen> with TickerProviderStateM
   }
 
   Future<void> _init() async {
-    _isPremium = await PremiumService.isPremium();
+    _isPremium = true; // Premium bypass
     _barometerEnabled = await StorageHelper.getBarometerEnabled();
     
     if (_barometerEnabled) {
@@ -83,25 +83,35 @@ class _WeatherScreenState extends State<WeatherScreen> with TickerProviderStateM
       }
       if (lat == null || lng == null) {
         bool svc = await Geolocator.isLocationServiceEnabled();
-        if (!svc) { setState(() { _loading = false; _errorMsg = 'GPS kapalı.'; }); return; }
-        var perm = await LocationPermissionHelper.checkAndRequestLocationPermission(context);
-        if (perm == LocationPermission.denied || perm == LocationPermission.deniedForever) {
-          setState(() { _loading = false; _errorMsg = 'Konum izni reddedildi.'; });
-          return;
+        var perm = await Geolocator.checkPermission();
+        if (perm == LocationPermission.denied) {
+          perm = await Geolocator.requestPermission();
         }
-        try {
-          _pos = await Geolocator.getCurrentPosition(locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium)).timeout(const Duration(seconds: 8));
-        } catch (e) {
-          _pos = await Geolocator.getLastKnownPosition();
+        
+        if (!svc || perm == LocationPermission.denied || perm == LocationPermission.deniedForever) {
+          // Default to a central location (e.g. Ankara or Istanbul) if no permission
+          lat = 41.0082;
+          lng = 28.9784;
+          _searchAltitude = 39.0;
+          _locationName = 'İstanbul (Varsayılan)';
+        } else {
+          try {
+            _pos = await Geolocator.getCurrentPosition(locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium)).timeout(const Duration(seconds: 8));
+          } catch (e) {
+            _pos = await Geolocator.getLastKnownPosition();
+          }
+          if (_pos == null) {
+            lat = 41.0082;
+            lng = 28.9784;
+            _searchAltitude = 39.0;
+            _locationName = 'İstanbul (Varsayılan)';
+          } else {
+            lat = _pos!.latitude;
+            lng = _pos!.longitude;
+            _searchAltitude = _pos!.altitude;
+            _locationName = 'Konumum';
+          }
         }
-        if (_pos == null) {
-          setState(() { _loading = false; _errorMsg = 'Konum tespit edilemedi.'; });
-          return;
-        }
-        lat = _pos!.latitude;
-        lng = _pos!.longitude;
-        _searchAltitude = _pos!.altitude;
-        _locationName = 'Konumum';
       }
 
       if (_isPremium) {
@@ -329,7 +339,10 @@ class _WeatherScreenState extends State<WeatherScreen> with TickerProviderStateM
           _buildDetailGrid(w),
           if (_searchAltitude != null && _searchAltitude! > 0) ...[
             const SizedBox(height: 16),
-            _buildAltitudeTempCard(w.temperature, _searchAltitude!),
+            Center(
+              child: Text('* Tüm veriler ${_searchAltitude!.toInt()} metre irtifaya göre hesaplanmıştır', 
+              style: const TextStyle(color: Colors.white38, fontSize: 10, fontStyle: FontStyle.italic)),
+            ),
           ],
         ],
       ),
@@ -610,47 +623,6 @@ class _WeatherScreenState extends State<WeatherScreen> with TickerProviderStateM
               Text(label, style: const TextStyle(color: Colors.white38, fontSize: 9, letterSpacing: 0.5)),
             ],
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAltitudeTempCard(double surfaceTemp, double altMeters) {
-    // Lapse rate: -6.5°C per 1000m
-    final adjustedTemp = surfaceTemp - (altMeters / 1000 * 6.5);
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: kCardBg,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.purpleAccent.withOpacity(0.3)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(children: [
-            const Icon(Icons.landscape, color: Colors.purpleAccent, size: 18),
-            const SizedBox(width: 8),
-            Text('İRTİFA SICAKLIK ANALİZİ', style: GoogleFonts.shareTechMono(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1)),
-          ]),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Column(children: [
-                const Text('Yüzey', style: TextStyle(color: Colors.white38, fontSize: 10)),
-                Text('${surfaceTemp.toStringAsFixed(1)}°C', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-              ]),
-              const Icon(Icons.arrow_forward, color: Colors.white24),
-              Column(children: [
-                Text('${altMeters.toInt()} m İrtifa', style: const TextStyle(color: Colors.purpleAccent, fontSize: 10)),
-                Text('${adjustedTemp.toStringAsFixed(1)}°C', style: const TextStyle(color: Colors.purpleAccent, fontSize: 18, fontWeight: FontWeight.bold)),
-              ]),
-            ],
-          ),
-          const SizedBox(height: 8),
-          const Text('* Her 1000m için ~6.5°C düşüş (kuru adiabatik)',
-            style: TextStyle(color: Colors.white24, fontSize: 9)),
         ],
       ),
     );

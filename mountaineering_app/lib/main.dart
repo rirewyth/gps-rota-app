@@ -40,6 +40,23 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   debugPrint("Handling a background message: ${message.messageId}");
 }
 
+void _handleFCMMessage(RemoteMessage message) {
+  final data = message.data;
+  final type = data['type'];
+  if (type == 'follow') {
+    final fromUserId = data['fromUserId'];
+    if (fromUserId != null) {
+      navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => ProfileScreen(targetUserId: fromUserId)));
+    }
+  } else if (type == 'team_message') {
+    navigatorKey.currentState?.pushReplacementNamed('/home');
+    navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const TeamScreen()));
+  } else if (type == 'sos') {
+    navigatorKey.currentState?.pushReplacementNamed('/home');
+    navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const LiveTrackingScreen()));
+  }
+}
+
 void main() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
@@ -93,6 +110,19 @@ void main() async {
           );
         }
       });
+      // Handle background/terminated clicks
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+        _handleFCMMessage(message);
+      });
+
+      messaging.getInitialMessage().then((RemoteMessage? message) {
+        if (message != null) {
+          Future.delayed(const Duration(seconds: 3), () {
+            _handleFCMMessage(message);
+          });
+        }
+      });
+
     } catch (e) {
       debugPrint("FCM Init Error: $e");
     }

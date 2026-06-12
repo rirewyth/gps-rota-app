@@ -232,17 +232,26 @@ class BackgroundMonitorService {
           
           // --- WEATHER CHECK ---
           try {
-            bool isPrem = await StorageHelper.isPremium();
-            if (isPrem) {
-              if (lastWeatherCheck == null || DateTime.now().difference(lastWeatherCheck!).inMinutes >= 30) {
-                lastWeatherCheck = DateTime.now();
-                final alert = await WeatherService.checkStormRisk(pos.latitude, pos.longitude);
-                if (alert != null && alert.isHazardous) {
+            if (lastWeatherCheck == null || DateTime.now().difference(lastWeatherCheck!).inMinutes >= 30) {
+              lastWeatherCheck = DateTime.now();
+              final fullData = await WeatherService.getFullWeatherData(pos.latitude, pos.longitude);
+              if (fullData != null) {
+                // Main hazard
+                if (fullData.current.isHazardous) {
                   debugPrint("BackgroundMonitor: CRITICAL WEATHER DETECTED! Showing notification.");
                   await _showGenericNotification(
                     flutterLocalNotificationsPlugin,
                     'AŞIRI HAVA DURUMU UYARISI',
-                    '${alert.title}: ${alert.description}',
+                    '${fullData.current.title}: ${fullData.current.description}',
+                  );
+                }
+                // Advanced alerts (Trend analysis: Snow, Frost, CB, etc.)
+                for (var alert in fullData.advancedAlerts) {
+                  debugPrint("BackgroundMonitor: ADVANCED WEATHER ALERT! ${alert.title}");
+                  await _showGenericNotification(
+                    flutterLocalNotificationsPlugin,
+                    'HAVA DURUMU: ${alert.title}',
+                    alert.message,
                   );
                 }
               }

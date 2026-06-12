@@ -457,6 +457,12 @@ class _HomeDashboardState extends State<HomeDashboard>
           ),
           actions: [
             TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('ŞİMDİLİK ATLA', style: TextStyle(color: Colors.white38)),
+            ),
+            TextButton(
               onPressed: () async {
                 Navigator.pop(context);
                 bool isIOS = Theme.of(context).platform == TargetPlatform.iOS;
@@ -470,11 +476,8 @@ class _HomeDashboardState extends State<HomeDashboard>
                   permsToRequest.add(Permission.sms);
                 }
                 
-                Map<Permission, PermissionStatus> statuses = await permsToRequest.request();
-                bool allGranted = statuses.values.every((status) => status.isGranted || status.isLimited);
-                if (!allGranted && mounted) {
-                  _showMandatoryPermissionsDialog();
-                }
+                await permsToRequest.request();
+                // Removed the blocking _showMandatoryPermissionsDialog entirely
               },
               child: const Text('KABUL ET', style: TextStyle(color: kGreen, fontWeight: FontWeight.bold)),
             ),
@@ -482,39 +485,6 @@ class _HomeDashboardState extends State<HomeDashboard>
         ),
       );
     });
-  }
-
-  void _showMandatoryPermissionsDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: kCardBg,
-        title: const Text('ZORUNLU İZİNLER EKSİK',
-            style: TextStyle(color: kOrange, fontWeight: FontWeight.bold)),
-        content: const Text(
-          'Uygulamanın çalışması için Konum ve Bildirim izinleri zorunludur. Lütfen ayarlardan tüm izinleri verin.',
-          style: TextStyle(color: Colors.white70),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () async {
-              await openAppSettings();
-            },
-            child: const Text('AYARLARI AÇ',
-                style: TextStyle(color: kOrange, fontWeight: FontWeight.bold)),
-          ),
-          TextButton(
-            onPressed: () {
-              _checkAndRequestPermissions();
-              Navigator.pop(context);
-            },
-            child: const Text('TEKRAR DENE',
-                style: TextStyle(color: kGreen)),
-          ),
-        ],
-      ),
-    );
   }
 
   void _startInactivityTimer() {
