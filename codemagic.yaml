@@ -33,32 +33,26 @@ workflows:
       - name: Add Info.plist Keys
         script: |
           cd mountaineering_app/ios/Runner
-          plutil -insert ITSAppUsesNonExemptEncryption -bool NO Info.plist
-          plutil -insert NSLocationWhenInUseUsageDescription -string "Haritada konumunuzu görebilmek için izin gereklidir." Info.plist
-          plutil -insert NSLocationAlwaysUsageDescription -string "Arka planda acil durum SOS takibi için konumunuz gereklidir." Info.plist
-          plutil -insert NSLocationAlwaysAndWhenInUseUsageDescription -string "Arka planda acil durum SOS takibi için konumunuz gereklidir." Info.plist
-          plutil -insert NSMicrophoneUsageDescription -string "Telsiz özelliği için mikrofon erişimi gereklidir." Info.plist
-          plutil -insert NSUserTrackingUsageDescription -string "Size daha ilgi çekici ve kişiselleştirilmiş reklamlar gösterebilmek için bu izne ihtiyacımız var." Info.plist
-          plutil -insert SKAdNetworkItems -array Info.plist
-          plutil -insert SKAdNetworkItems.0 -xml "<dict><key>SKAdNetworkIdentifier</key><string>cstr6suwn9.skadnetwork</string></dict>" Info.plist
-          plutil -insert NSCameraUsageDescription -string "Kamera ile fotoğraf çekmek için gereklidir." Info.plist
-          plutil -insert NSPhotoLibraryUsageDescription -string "Profil fotoğrafı seçmek için gereklidir." Info.plist
-          plutil -insert NSSpeechRecognitionUsageDescription -string "Sesli komutları metne çevirmek için gereklidir." Info.plist
-          plutil -insert NSBluetoothAlwaysUsageDescription -string "Yakındaki ekip arkadaşlarıyla çevrimdışı bağlantı kurmak için gereklidir." Info.plist
-          plutil -insert NSBluetoothPeripheralUsageDescription -string "Yakındaki ekip arkadaşlarıyla çevrimdışı bağlantı kurmak için gereklidir." Info.plist
-          plutil -insert NSMotionUsageDescription -string "Acil durum ve fırtına uyarısı için barometre / basınç verilerine erişim gereklidir." Info.plist
-          plutil -insert NSLocalNetworkUsageDescription -string "Çevrimdışı acil durum mesajlaşması (Mesh Network) için yerel ağ erişimi gereklidir." Info.plist
-          plutil -insert NSBonjourServices -array Info.plist
-          plutil -insert NSBonjourServices.0 -string "_mp-connection._tcp" Info.plist
-          plutil -insert NSBonjourServices.1 -string "_dartobservatory._tcp" Info.plist
-          plutil -insert NSBonjourServices.2 -string "_rotameshp2p._tcp" Info.plist
-          plutil -insert NSBonjourServices.3 -string "_rotameshp2p._udp" Info.plist
-          plutil -insert NSBonjourServices.4 -string "_rotameshsos._tcp" Info.plist
-          plutil -insert NSBonjourServices.5 -string "_rotameshsos._udp" Info.plist
-          plutil -insert UIBackgroundModes -array Info.plist
-          plutil -insert UIBackgroundModes.0 -string "location" Info.plist
-          plutil -insert UIBackgroundModes.1 -string "fetch" Info.plist
-          plutil -insert UIBackgroundModes.2 -string "remote-notification" Info.plist
+          # -replace yerine -insert kullanılırsa duplicate key hatası olur
+          # Zaten Info.plist'te olmayan keyler için ekle, olanlar için yok say
+          plutil -replace ITSAppUsesNonExemptEncryption -bool NO Info.plist 2>/dev/null || plutil -insert ITSAppUsesNonExemptEncryption -bool NO Info.plist
+          plutil -replace NSLocationWhenInUseUsageDescription -string "Haritada konumunuzu görebilmek için izin gereklidir." Info.plist 2>/dev/null || plutil -insert NSLocationWhenInUseUsageDescription -string "Haritada konumunuzu görebilmek için izin gereklidir." Info.plist
+          plutil -replace NSLocationAlwaysUsageDescription -string "Arka planda acil durum SOS takibi için konumunuz gereklidir." Info.plist 2>/dev/null || plutil -insert NSLocationAlwaysUsageDescription -string "Arka planda acil durum SOS takibi için konumunuz gereklidir." Info.plist
+          plutil -replace NSLocationAlwaysAndWhenInUseUsageDescription -string "Arka planda acil durum SOS takibi için konumunuz gereklidir." Info.plist 2>/dev/null || plutil -insert NSLocationAlwaysAndWhenInUseUsageDescription -string "Arka planda acil durum SOS takibi için konumunuz gereklidir." Info.plist
+          plutil -replace NSMicrophoneUsageDescription -string "Telsiz özelliği için mikrofon erişimi gereklidir." Info.plist 2>/dev/null || plutil -insert NSMicrophoneUsageDescription -string "Telsiz özelliği için mikrofon erişimi gereklidir." Info.plist
+          plutil -replace NSUserTrackingUsageDescription -string "Size daha ilgi çekici ve kişiselleştirilmiş reklamlar gösterebilmek için bu izne ihtiyacımız var." Info.plist 2>/dev/null || plutil -insert NSUserTrackingUsageDescription -string "Size daha ilgi çekici ve kişiselleştirilmiş reklamlar gösterebilmek için bu izne ihtiyacımız var." Info.plist
+          plutil -replace NSCameraUsageDescription -string "Kamera ile fotoğraf çekmek için gereklidir." Info.plist 2>/dev/null || plutil -insert NSCameraUsageDescription -string "Kamera ile fotoğraf çekmek için gereklidir." Info.plist
+          plutil -replace NSPhotoLibraryUsageDescription -string "Profil fotoğrafı seçmek için gereklidir." Info.plist 2>/dev/null || plutil -insert NSPhotoLibraryUsageDescription -string "Profil fotoğrafı seçmek için gereklidir." Info.plist
+          plutil -replace NSSpeechRecognitionUsageDescription -string "Sesli komutları metne çevirmek için gereklidir." Info.plist 2>/dev/null || plutil -insert NSSpeechRecognitionUsageDescription -string "Sesli komutları metne çevirmek için gereklidir." Info.plist
+          plutil -replace NSBluetoothAlwaysUsageDescription -string "Yakındaki ekip arkadaşlarıyla çevrimdışı bağlantı kurmak için gereklidir." Info.plist 2>/dev/null || plutil -insert NSBluetoothAlwaysUsageDescription -string "Yakındaki ekip arkadaşlarıyla çevrimdışı bağlantı kurmak için gereklidir." Info.plist
+          plutil -replace NSBluetoothPeripheralUsageDescription -string "Yakındaki ekip arkadaşlarıyla çevrimdışı bağlantı kurmak için gereklidir." Info.plist 2>/dev/null || plutil -insert NSBluetoothPeripheralUsageDescription -string "Yakındaki ekip arkadaşlarıyla çevrimdışı bağlantı kurmak için gereklidir." Info.plist
+          plutil -replace NSMotionUsageDescription -string "Acil durum ve fırtına uyarısı için barometre / basınç verilerine erişim gereklidir." Info.plist 2>/dev/null || plutil -insert NSMotionUsageDescription -string "Acil durum ve fırtına uyarısı için barometre / basınç verilerine erişim gereklidir." Info.plist
+          plutil -replace NSLocalNetworkUsageDescription -string "Çevrimdışı acil durum mesajlaşması (Mesh Network) için yerel ağ erişimi gereklidir." Info.plist 2>/dev/null || plutil -insert NSLocalNetworkUsageDescription -string "Çevrimdışı acil durum mesajlaşması (Mesh Network) için yerel ağ erişimi gereklidir." Info.plist
+          # SKAdNetworkItems sadece yoksa ekle
+          plutil -insert SKAdNetworkItems -array Info.plist 2>/dev/null || true
+          plutil -insert SKAdNetworkItems.0 -xml "<dict><key>SKAdNetworkIdentifier</key><string>cstr6suwn9.skadnetwork</string></dict>" Info.plist 2>/dev/null || true
+          # UIBackgroundModes zaten Info.plist'te var (location, fetch, processing, audio, remote-notification)
+          # NSBonjourServices zaten Info.plist'te var
 
       - name: Fix Podfile and Project Target (iOS 15.0)
         script: |
