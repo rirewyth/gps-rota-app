@@ -85,6 +85,10 @@ jobs:
           defaults write com.apple.dt.Xcode IDEBuildOperationMaxNumberOfConcurrentCompileTasks 2
           defaults write com.apple.dt.Xcode PBXNumberOfParallelBuildSubtasks 2
 
+      - name: Flutter iOS Release Build
+        working-directory: mountaineering_app
+        run: flutter build ios --release --no-codesign
+
 
       - name: Ruby Kurulumu
         uses: ruby/setup-ruby@v1
