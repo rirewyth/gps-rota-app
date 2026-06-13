@@ -4,7 +4,7 @@ workflows:
     instance_type: mac_mini_m1
     max_build_duration: 120
     integrations:
-      app_store_connect: "Cloud Build"
+      app_store_connect: "Codemagic API"
     environment:
       flutter: stable
       xcode: latest
