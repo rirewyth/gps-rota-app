@@ -1,6 +1,8 @@
 import UIKit
 import Flutter
 import MessageUI
+import flutter_local_notifications
+import flutter_background_service_ios
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate, MFMessageComposeViewControllerDelegate {
@@ -29,6 +31,19 @@ import MessageUI
         result(FlutterMethodNotImplemented)
       }
     })
+
+    SwiftFlutterBackgroundServicePlugin.taskIdentifier = "dev.flutter.background.refresh"
+    SwiftFlutterBackgroundServicePlugin.setPluginRegistrantCallback { registry in
+        GeneratedPluginRegistrant.register(with: registry)
+    }
+
+    FlutterLocalNotificationsPlugin.setPluginRegistrantCallback { registry in
+        GeneratedPluginRegistrant.register(with: registry)
+    }
+    
+    if #available(iOS 10.0, *) {
+      UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
+    }
 
     GeneratedPluginRegistrant.register(with: self)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
