@@ -16,6 +16,7 @@ workflows:
 
       - name: Fetch and Auto-Create iOS Signing Files
         script: |
+          keychain initialize
           app-store-connect fetch-signing-files "com.rotaplus.emniyetteyim" \
             --type IOS_APP_STORE \
             --create
