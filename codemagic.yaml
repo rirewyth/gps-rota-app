@@ -6,9 +6,6 @@ workflows:
     integrations:
       app_store_connect: "Cloud Build"
     environment:
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.rotaplus.emniyetteyim
       flutter: stable
       xcode: latest
       ruby: default
@@ -16,6 +13,12 @@ workflows:
       - name: Disable Swift Package Manager
         script: |
           flutter config --no-enable-swift-package-manager
+
+      - name: Fetch and Auto-Create iOS Signing Files
+        script: |
+          app-store-connect fetch-signing-files "com.rotaplus.emniyetteyim" \
+            --type IOS_APP_STORE \
+            --create
 
       - name: Get Flutter dependencies
         script: |
