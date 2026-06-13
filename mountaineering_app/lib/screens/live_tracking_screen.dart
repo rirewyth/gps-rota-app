@@ -252,18 +252,18 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
     
     _positionStream = Geolocator.getPositionStream(
       locationSettings: Platform.isIOS
-          ? const AppleSettings(
+          ? AppleSettings(
               accuracy: LocationAccuracy.bestForNavigation,
               distanceFilter: 5,
               pauseLocationUpdatesAutomatically: false,
               showBackgroundLocationIndicator: true,
               activityType: ActivityType.fitness,
             )
-          : const AndroidSettings(
+          : AndroidSettings(
               accuracy: LocationAccuracy.bestForNavigation,
               distanceFilter: 5,
-              intervalDuration: Duration(seconds: 5),
-              foregroundNotificationConfig: ForegroundNotificationConfig(
+              intervalDuration: const Duration(seconds: 5),
+              foregroundNotificationConfig: const ForegroundNotificationConfig(
                 notificationTitle: "Rota+ Canlı Takip",
                 notificationText: "Konumunuz arka planda kaydediliyor ve paylaşılıyor.",
                 notificationIcon: AndroidResource(name: 'ic_notification'),
