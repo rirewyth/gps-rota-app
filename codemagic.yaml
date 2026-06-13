@@ -4,8 +4,9 @@ workflows:
     instance_type: mac_mini_m1
     max_build_duration: 120
     environment:
-      groups:
-        - appstore
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.rotaplus.emniyetteyim
       flutter: stable
       xcode: latest
       ruby: default
@@ -33,8 +34,6 @@ workflows:
       - name: Add Info.plist Keys
         script: |
           cd mountaineering_app/ios/Runner
-          # -replace yerine -insert kullanılırsa duplicate key hatası olur
-          # Zaten Info.plist'te olmayan keyler için ekle, olanlar için yok say
           plutil -replace ITSAppUsesNonExemptEncryption -bool NO Info.plist 2>/dev/null || plutil -insert ITSAppUsesNonExemptEncryption -bool NO Info.plist
           plutil -replace NSLocationWhenInUseUsageDescription -string "Haritada konumunuzu görebilmek için izin gereklidir." Info.plist 2>/dev/null || plutil -insert NSLocationWhenInUseUsageDescription -string "Haritada konumunuzu görebilmek için izin gereklidir." Info.plist
           plutil -replace NSLocationAlwaysUsageDescription -string "Arka planda acil durum SOS takibi için konumunuz gereklidir." Info.plist 2>/dev/null || plutil -insert NSLocationAlwaysUsageDescription -string "Arka planda acil durum SOS takibi için konumunuz gereklidir." Info.plist
@@ -48,11 +47,8 @@ workflows:
           plutil -replace NSBluetoothPeripheralUsageDescription -string "Yakındaki ekip arkadaşlarıyla çevrimdışı bağlantı kurmak için gereklidir." Info.plist 2>/dev/null || plutil -insert NSBluetoothPeripheralUsageDescription -string "Yakındaki ekip arkadaşlarıyla çevrimdışı bağlantı kurmak için gereklidir." Info.plist
           plutil -replace NSMotionUsageDescription -string "Acil durum ve fırtına uyarısı için barometre / basınç verilerine erişim gereklidir." Info.plist 2>/dev/null || plutil -insert NSMotionUsageDescription -string "Acil durum ve fırtına uyarısı için barometre / basınç verilerine erişim gereklidir." Info.plist
           plutil -replace NSLocalNetworkUsageDescription -string "Çevrimdışı acil durum mesajlaşması (Mesh Network) için yerel ağ erişimi gereklidir." Info.plist 2>/dev/null || plutil -insert NSLocalNetworkUsageDescription -string "Çevrimdışı acil durum mesajlaşması (Mesh Network) için yerel ağ erişimi gereklidir." Info.plist
-          # SKAdNetworkItems sadece yoksa ekle
           plutil -insert SKAdNetworkItems -array Info.plist 2>/dev/null || true
           plutil -insert SKAdNetworkItems.0 -xml "<dict><key>SKAdNetworkIdentifier</key><string>cstr6suwn9.skadnetwork</string></dict>" Info.plist 2>/dev/null || true
-          # UIBackgroundModes zaten Info.plist'te var (location, fetch, processing, audio, remote-notification)
-          # NSBonjourServices zaten Info.plist'te var
 
       - name: Fix Podfile and Project Target (iOS 15.0)
         script: |
@@ -62,34 +58,24 @@ workflows:
           ruby -i -e "puts ARGF.read.gsub(/IPHONEOS_DEPLOYMENT_TARGET = .*?;/, %{IPHONEOS_DEPLOYMENT_TARGET = 15.0;})" Runner.xcodeproj/project.pbxproj
           pod repo update
 
-      - name: Bundle Identifier, Team and Entitlements
+      - name: Bundle Identifier and Team
         script: |
           cd mountaineering_app/ios
-          cat <<EOF > Runner/Runner.entitlements
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-          	<key>com.apple.developer.applesignin</key>
-          	<array>
-          		<string>Default</string>
-          	</array>
-          </dict>
-          </plist>
-          EOF
-          sed -i '' 's/PRODUCT_BUNDLE_IDENTIFIER = .*/PRODUCT_BUNDLE_IDENTIFIER = com.rotaplus.emniyetteyim; DEVELOPMENT_TEAM = TAH5CSWX56; CODE_SIGN_ENTITLEMENTS = Runner\/Runner.entitlements;/g' Runner.xcodeproj/project.pbxproj
+          sed -i '' 's/PRODUCT_BUNDLE_IDENTIFIER = .*/PRODUCT_BUNDLE_IDENTIFIER = com.rotaplus.emniyetteyim; DEVELOPMENT_TEAM = TAH5CSWX56;/g' Runner.xcodeproj/project.pbxproj
 
-      - name: Install Ruby Dependencies (Fastlane)
+      - name: Set up code signing settings on Xcode project
         script: |
-          cd mountaineering_app/ios
-          bundle install
+          xcode-project use-profiles
 
-      - name: Flutter Build iOS (Compile Dart & Install Pods)
+      - name: Flutter Build iOS
         script: |
           cd mountaineering_app
-          flutter build ios --release --no-codesign
-
-      - name: Build and Upload to TestFlight via Fastlane
-        script: |
-          cd mountaineering_app/ios
-          bundle exec fastlane beta
+          flutter build ipa --release --export-options-plist=/Users/builder/export_options.plist
+          
+    artifacts:
+      - mountaineering_app/build/ios/ipa/*.ipa
+      
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
