@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart' as fm;
 import 'package:latlong2/latlong.dart' as ll;
@@ -248,19 +249,26 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
     }
     
     _positionStream = Geolocator.getPositionStream(
-      locationSettings: AndroidSettings(
-        accuracy: LocationAccuracy.bestForNavigation,
-        distanceFilter: 5, // 5 metrede bir güncelle (Pil tasarrufu için ideal)
-        intervalDuration: const Duration(seconds: 5),
-        // Arka planda ölmemesi için kritik ayarlar
-        foregroundNotificationConfig: const ForegroundNotificationConfig(
-          notificationTitle: "Rota+ Canlı Takip",
-          notificationText: "Konumunuz arka planda kaydediliyor ve paylaşılıyor.",
-          notificationIcon: AndroidResource(name: 'ic_notification'),
-          enableWakeLock: true,
-          setOngoing: true, // Bildirimin kaydırılarak kapatılmasını engeller
-        ),
-      ),
+      locationSettings: Platform.isIOS
+          ? const AppleSettings(
+              accuracy: LocationAccuracy.bestForNavigation,
+              distanceFilter: 5,
+              pauseLocationUpdatesAutomatically: false,
+              showBackgroundLocationIndicator: true,
+              activityType: ActivityType.fitness,
+            )
+          : const AndroidSettings(
+              accuracy: LocationAccuracy.bestForNavigation,
+              distanceFilter: 5,
+              intervalDuration: Duration(seconds: 5),
+              foregroundNotificationConfig: ForegroundNotificationConfig(
+                notificationTitle: "Rota+ Canlı Takip",
+                notificationText: "Konumunuz arka planda kaydediliyor ve paylaşılıyor.",
+                notificationIcon: AndroidResource(name: 'ic_notification'),
+                enableWakeLock: true,
+                setOngoing: true,
+              ),
+            ),
     ).listen((pos) async {
       if (!mounted) return;
       

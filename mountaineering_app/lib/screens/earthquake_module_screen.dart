@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vibration/vibration.dart';
@@ -11,6 +12,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:math' as math;
 import 'package:nearby_connections/nearby_connections.dart';
+import 'package:path_provider/path_provider.dart';
 import '../services/morse_service.dart';
 import '../services/background_sms_service.dart';
 import 'package:mountaineering_app/services/earthquake_service.dart';
@@ -159,8 +161,16 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
       ));
       await _audioPlayer.setVolume(1.0);
       _audioPlayer.setReleaseMode(ReleaseMode.release);
-      Uint8List audioBytes = base64Decode(base64Beep);
-      await _audioPlayer.play(BytesSource(audioBytes));
+      final Uint8List audioBytes = base64Decode(base64Beep);
+      // iOS'ta BytesSource güvenilir değil — geçici dosyaya yaz
+      if (Platform.isIOS) {
+        final dir = await getTemporaryDirectory();
+        final tmpFile = File('${dir.path}/eq_alarm_${DateTime.now().millisecondsSinceEpoch}.wav');
+        await tmpFile.writeAsBytes(audioBytes);
+        await _audioPlayer.play(DeviceFileSource(tmpFile.path));
+      } else {
+        await _audioPlayer.play(BytesSource(audioBytes));
+      }
     } catch (e) {
       debugPrint("Emergency alarm play error: $e");
     }
@@ -330,8 +340,16 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
       ));
       await _audioPlayer.setVolume(1.0);
       _audioPlayer.setReleaseMode(ReleaseMode.loop);
-      Uint8List audioBytes = base64Decode(base64Beep);
-      await _audioPlayer.play(BytesSource(audioBytes));
+      final Uint8List audioBytes = base64Decode(base64Beep);
+      // iOS'ta BytesSource loop güvenilir değil — geçici dosyaya yaz ve DeviceFileSource kullan
+      if (Platform.isIOS) {
+        final dir = await getTemporaryDirectory();
+        final tmpFile = File('${dir.path}/sos_beep_${DateTime.now().millisecondsSinceEpoch}.wav');
+        await tmpFile.writeAsBytes(audioBytes);
+        await _audioPlayer.play(DeviceFileSource(tmpFile.path));
+      } else {
+        await _audioPlayer.play(BytesSource(audioBytes));
+      }
     } catch (e) {
       debugPrint("AudioPlayer Error: $e");
     }

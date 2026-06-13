@@ -58,6 +58,7 @@ class AdService {
   Future<void> init() async {
     if (Platform.isIOS) {
       try {
+        await Future.delayed(const Duration(milliseconds: 1500));
         await Permission.appTrackingTransparency.request();
       } catch (e) {
         debugPrint('ATT Request Error: $e');
