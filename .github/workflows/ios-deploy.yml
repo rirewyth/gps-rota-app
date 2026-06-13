@@ -9,6 +9,8 @@ on:
 jobs:
   deploy:
     runs-on: macos-latest
+    timeout-minutes: 120
+
     steps:
       - name: Kodları Al
         uses: actions/checkout@v4
@@ -23,10 +25,10 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Disable Swift Package Manager
+      - name: Swift Package Manager Devre Dışı Bırak
         run: flutter config --no-enable-swift-package-manager
 
-      - name: Flutter Dependencies
+      - name: Flutter Bağımlılıkları
         working-directory: ./mountaineering_app
         run: flutter pub get
 
@@ -34,43 +36,83 @@ jobs:
         working-directory: ./mountaineering_app
         run: flutter create . --platforms ios
 
-      - name: Podfile Platformunu Düzelt ve Pod Install
+      - name: Uygulama İkonu ve Splash Oluştur
+        working-directory: ./mountaineering_app
+        run: |
+          flutter pub run flutter_launcher_icons
+          flutter pub run flutter_native_splash:create
+
+      - name: Info.plist Anahtarlarını Ekle / Güncelle
+        working-directory: ./mountaineering_app/ios/Runner
+        run: |
+          plutil -replace ITSAppUsesNonExemptEncryption -bool NO Info.plist 2>/dev/null || plutil -insert ITSAppUsesNonExemptEncryption -bool NO Info.plist
+          plutil -replace NSLocationWhenInUseUsageDescription -string "Haritada konumunuzu görebilmek için izin gereklidir." Info.plist 2>/dev/null || plutil -insert NSLocationWhenInUseUsageDescription -string "Haritada konumunuzu görebilmek için izin gereklidir." Info.plist
+          plutil -replace NSLocationAlwaysUsageDescription -string "Arka planda acil durum SOS takibi için konumunuz gereklidir." Info.plist 2>/dev/null || plutil -insert NSLocationAlwaysUsageDescription -string "Arka planda acil durum SOS takibi için konumunuz gereklidir." Info.plist
+          plutil -replace NSLocationAlwaysAndWhenInUseUsageDescription -string "Arka planda acil durum SOS takibi için konumunuz gereklidir." Info.plist 2>/dev/null || plutil -insert NSLocationAlwaysAndWhenInUseUsageDescription -string "Arka planda acil durum SOS takibi için konumunuz gereklidir." Info.plist
+          plutil -replace NSMicrophoneUsageDescription -string "Telsiz özelliği için mikrofon erişimi gereklidir." Info.plist 2>/dev/null || plutil -insert NSMicrophoneUsageDescription -string "Telsiz özelliği için mikrofon erişimi gereklidir." Info.plist
+          plutil -replace NSUserTrackingUsageDescription -string "Size daha ilgi çekici reklamlar gösterebilmek için bu izne ihtiyacımız var." Info.plist 2>/dev/null || plutil -insert NSUserTrackingUsageDescription -string "Size daha ilgi çekici reklamlar gösterebilmek için bu izne ihtiyacımız var." Info.plist
+          plutil -replace NSCameraUsageDescription -string "Kamera ile fotoğraf çekmek için gereklidir." Info.plist 2>/dev/null || plutil -insert NSCameraUsageDescription -string "Kamera ile fotoğraf çekmek için gereklidir." Info.plist
+          plutil -replace NSPhotoLibraryUsageDescription -string "Profil fotoğrafı seçmek için gereklidir." Info.plist 2>/dev/null || plutil -insert NSPhotoLibraryUsageDescription -string "Profil fotoğrafı seçmek için gereklidir." Info.plist
+          plutil -replace NSSpeechRecognitionUsageDescription -string "Sesli komutları metne çevirmek için gereklidir." Info.plist 2>/dev/null || plutil -insert NSSpeechRecognitionUsageDescription -string "Sesli komutları metne çevirmek için gereklidir." Info.plist
+          plutil -replace NSBluetoothAlwaysUsageDescription -string "Yakındaki ekip arkadaşlarıyla çevrimdışı bağlantı için gereklidir." Info.plist 2>/dev/null || plutil -insert NSBluetoothAlwaysUsageDescription -string "Yakındaki ekip arkadaşlarıyla çevrimdışı bağlantı için gereklidir." Info.plist
+          plutil -replace NSBluetoothPeripheralUsageDescription -string "Yakındaki ekip arkadaşlarıyla çevrimdışı bağlantı için gereklidir." Info.plist 2>/dev/null || plutil -insert NSBluetoothPeripheralUsageDescription -string "Yakındaki ekip arkadaşlarıyla çevrimdışı bağlantı için gereklidir." Info.plist
+          plutil -replace NSMotionUsageDescription -string "Acil durum ve fırtına uyarısı için barometre verilerine erişim gereklidir." Info.plist 2>/dev/null || plutil -insert NSMotionUsageDescription -string "Acil durum ve fırtına uyarısı için barometre verilerine erişim gereklidir." Info.plist
+          plutil -replace NSLocalNetworkUsageDescription -string "Çevrimdışı acil durum mesajlaşması için yerel ağ erişimi gereklidir." Info.plist 2>/dev/null || plutil -insert NSLocalNetworkUsageDescription -string "Çevrimdışı acil durum mesajlaşması için yerel ağ erişimi gereklidir." Info.plist
+          plutil -insert SKAdNetworkItems -array Info.plist 2>/dev/null || true
+          plutil -insert SKAdNetworkItems.0 -xml "<dict><key>SKAdNetworkIdentifier</key><string>cstr6suwn9.skadnetwork</string></dict>" Info.plist 2>/dev/null || true
+
+      - name: Podfile iOS 15.0 ve permission_handler Düzelt
         working-directory: ./mountaineering_app/ios
         run: |
-          # Podfile içindeki tüm platform tanımlarını temizleyip en üste iOS 15.0 ekliyoruz
           ruby -i -e "lines = ARGF.readlines; lines.reject! { |l| l.match?(/platform :ios/) }; puts \"platform :ios, '15.0'\"; puts lines" Podfile
-          # Xcode projesi içindeki minimum versiyonu iOS 15.0 yapıyoruz
+          ruby -i -e "lines = ARGF.read; lines.gsub!(/flutter_additional_ios_build_settings\(target\)/, %Q{flutter_additional_ios_build_settings(target)\n      if target.name == 'permission_handler_apple'\n        target.build_configurations.each do |config|\n          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['\$(inherited)']\n          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] = [config.build_settings['GCC_PREPROCESSOR_DEFINITIONS']].flatten + ['PERMISSION_LOCATION=1', 'PERMISSION_NOTIFICATIONS=1', 'PERMISSION_CAMERA=1', 'PERMISSION_MICROPHONE=1', 'PERMISSION_PHOTOS=1', 'PERMISSION_APP_TRACKING_TRANSPARENCY=1', 'PERMISSION_SPEECH_RECOGNIZER=1', 'PERMISSION_BLUETOOTH=1']\n        end\n      end}); puts lines" Podfile
           ruby -i -e "puts ARGF.read.gsub(/IPHONEOS_DEPLOYMENT_TARGET = .*?;/, %{IPHONEOS_DEPLOYMENT_TARGET = 15.0;})" Runner.xcodeproj/project.pbxproj
           pod repo update
           pod install
 
-      - name: Bundle Identifier Ayarla
+      - name: Bundle Identifier, Team ID ve Entitlements Ayarla
         working-directory: ./mountaineering_app/ios
         run: |
-          sed -i '' 's/PRODUCT_BUNDLE_IDENTIFIER = .*/PRODUCT_BUNDLE_IDENTIFIER = com.rotaplus.emniyetteyim;/g' Runner.xcodeproj/project.pbxproj
+          # Runner.entitlements zaten repo'da var ama CI güvenliği için tekrar yaz
+          cat > Runner/Runner.entitlements << 'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>com.apple.developer.applesignin</key>
+            <array>
+              <string>Default</string>
+            </array>
+          </dict>
+          </plist>
+          EOF
+          sed -i '' 's/PRODUCT_BUNDLE_IDENTIFIER = .*/PRODUCT_BUNDLE_IDENTIFIER = com.rotaplus.emniyetteyim; DEVELOPMENT_TEAM = TAH5CSWX56; CODE_SIGN_ENTITLEMENTS = Runner\/Runner.entitlements;/g' Runner.xcodeproj/project.pbxproj
 
-      - name: Xcode Hafıza Sınırlandırması (Çökmeyi Önlemek İçin)
+      - name: Xcode Hafıza Sınırlandır (Çökmeyi Önle)
         run: |
           defaults write com.apple.dt.Xcode IDEBuildOperationMaxNumberOfConcurrentCompileTasks 2
           defaults write com.apple.dt.Xcode PBXNumberOfParallelBuildSubtasks 2
 
-      - name: Flutter Build iOS
+      - name: Flutter iOS Release Build
         working-directory: ./mountaineering_app
         run: flutter build ios --release --no-codesign
 
-      - name: Ruby ve Fastlane Kur
+      - name: Ruby Kurulumu
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.2'
 
-      - name: Fastlane Yükle
+      - name: Fastlane Bağımlılıklarını Yükle
         working-directory: ./mountaineering_app/ios
         run: bundle install
 
-      - name: App Store'a Derle ve Yükle
+      - name: TestFlight'a Yükle (Fastlane)
         working-directory: ./mountaineering_app/ios
         env:
           API_KEY_ID: ${{ secrets.API_KEY_ID }}
           API_ISSUER_ID: ${{ secrets.API_ISSUER_ID }}
           API_KEY_CONTENT: ${{ secrets.API_KEY_CONTENT }}
+          MATCH_KEYCHAIN_NAME: ${{ secrets.MATCH_KEYCHAIN_NAME }}
+          MATCH_KEYCHAIN_PASSWORD: ${{ secrets.MATCH_KEYCHAIN_PASSWORD }}
+          SIGH_NAME: ${{ secrets.SIGH_NAME }}
         run: bundle exec fastlane beta
