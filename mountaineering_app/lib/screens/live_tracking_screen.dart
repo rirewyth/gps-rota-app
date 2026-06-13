@@ -72,7 +72,9 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
   // New features
   bool _isPaused = false;
   DateTime? _lastSyncTime;
+  DateTime? _lastAnnotationUpdate; // Mapbox annotation throttle (iOS bellek tasarrufu)
   bool _isLocationLocked = true; // Konum kilidi
+  static const int _maxRoutePoints = 300; // Bellek sınırı (iOS için kritik)
 
   void _checkAltitudeWarnings(double altitude) {
     if (!_isPremiumUser) return; // AMS Uyarıları sadece Premium üyeler içindir
@@ -271,120 +273,144 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
             ),
     ).listen((pos) async {
       if (!mounted) return;
-      
-      // PROACTIVE SYNC (Always sync if last sync was > 30s ago or it's the first sync)
-      final now = DateTime.now();
-      if (_lastSyncTime == null || now.difference(_lastSyncTime!).inSeconds >= 30) {
-          _lastSyncTime = now;
-          final user = FirebaseAuth.instance.currentUser;
-          if (user != null) {
-            try {
-              final battery = await Battery().batteryLevel;
-              
-              // Sadece takip aktifken ize nokta ekle (Kullanıcının isteği: tam başlattığı yerden çizsin)
-              // Önemli: Firestore'dan eski veriyi çekmek yerine yerel _routePoints'i kullanalım
-              List trail = [];
-              if (_isTracking && !_isPaused) {
-                trail = _routePoints.map((p) => {
-                  'lat': p.latitude,
-                  'lng': p.longitude,
-                  'timestamp': DateTime.now().toIso8601String(),
-                }).toList();
-                
-                // Doküman boyutunu korumak için son 200 noktayı tut
-                if (trail.length > 200) trail = trail.sublist(trail.length - 200);
-              }
 
-              await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-                'last_lat': pos.latitude,
-                'last_lng': pos.longitude,
-                'last_elevation': pos.altitude.toInt(),
-                'battery_level': battery,
-                'signal_strength': 'GÜÇLÜ',
-                'last_seen': FieldValue.serverTimestamp(),
-                'is_recording': _isTracking,
-                'live_trail': trail,
-                if (_aktifRotaNoktalar.isNotEmpty) 
-                  'planned_route': _aktifRotaNoktalar.map((p) => {'lat': p.latitude, 'lng': p.longitude}).toList(),
-              }, SetOptions(merge: true));
-            } catch (_) {}
-          }
-      }
-
+      // ── 1. UI GÜNCELLEMESI (setState senkron, hızlı) ──────────────────────
       setState(() {
+        _currentPosition = pos;
+
         if (_isTracking && !_isPaused) {
           if (_lastRecordedPosition != null) {
             double dist = Geolocator.distanceBetween(
               _lastRecordedPosition!.latitude, _lastRecordedPosition!.longitude,
-              pos.latitude, pos.longitude
+              pos.latitude, pos.longitude,
             );
-            if (dist > 5) { // Sadece 5 metreden fazla hareket edildiyse kaydet
+            if (dist > 5) {
               _totalDistance += dist;
               _steps = (_totalDistance / 0.75).round();
-              
+
               double altDiff = pos.altitude - _lastRecordedPosition!.altitude;
               if (altDiff > 0) _elevationGain += altDiff;
               if (pos.altitude > _maxAltitude) _maxAltitude = pos.altitude;
-              
-              final latLng = ll.LatLng(pos.latitude, pos.longitude);
-              _routePoints.add(latLng);
+
+              _routePoints.add(ll.LatLng(pos.latitude, pos.longitude));
               _lastRecordedPosition = pos;
-            }
-          } else {
-             // İlk başlangıç noktası
-             _lastRecordedPosition = pos;
-             _routePoints.add(ll.LatLng(pos.latitude, pos.longitude));
-          }
-          
-          // Rota sapma uyarısı (Eğer aktif bir rota varsa)
-          if (_aktifRotaNoktalar.isNotEmpty) {
-            final noktalarList = _aktifRotaNoktalar.map((p) => {'lat': p.latitude, 'lng': p.longitude}).toList();
-            final nearest = DatabaseHelper.enYakinRotaNoktasi(pos.latitude, pos.longitude, noktalarList);
-            if (nearest != null) {
-              double distToRoute = Geolocator.distanceBetween(pos.latitude, pos.longitude, nearest['lat'], nearest['lng']);
-              if (distToRoute > 50) { // 50 metreden fazla sapma
-                final now = DateTime.now();
-                if (_lastOffRouteWarningTime == null || now.difference(_lastOffRouteWarningTime!).inSeconds > 60) {
-                  _lastOffRouteWarningTime = now;
-                  _showAltitudeWarning("ROTADAN SAPMA (${distToRoute.toInt()}m)", "Planlanan rotadan uzaklaştınız. Lütfen yönünüzü kontrol edin.");
-                  _speak("Dikkat! Rotadan saptınız. Planlanan rotadan uzaklaşıyorsunuz.");
-                }
+
+              // iOS bellek tasarrufu: liste sınırını aş arsa en eski noktaları at
+              if (_routePoints.length > _maxRoutePoints) {
+                _routePoints.removeRange(0, _routePoints.length - _maxRoutePoints);
               }
             }
+          } else {
+            _lastRecordedPosition = pos;
+            _routePoints.add(ll.LatLng(pos.latitude, pos.longitude));
           }
-          
-          // Check Altitude for Smart Warnings
-          _checkAltitudeWarnings(pos.altitude);
-          
-          // Broadcast live location to Admin Panel
-          CloudSyncService.syncLocation(
-            pos.latitude, 
-            pos.longitude, 
-            pos.altitude, 
-            DateTime.now().toIso8601String()
-          );
         }
-        _currentPosition = pos;
       });
-      // Haritayı güvenli şekilde taşı (Hem Mapbox hem FlutterMap için)
-      if (mounted) {
-        if (_isPremiumUser && _mapReady && _mapboxMap != null) {
-          try {
-            if (_isLocationLocked) {
-              _mapboxMap?.setCamera(mbx.CameraOptions(
-                center: mbx.Point(coordinates: mbx.Position(pos.longitude, pos.latitude)),
-                zoom: 16.0,
-              ));
+
+      // ── 2. ASYNC İŞLEMLER (setState dışında — iOS çakışmasını önler) ──────
+
+      // Rota sapma uyarısı
+      if (_isTracking && !_isPaused && _aktifRotaNoktalar.isNotEmpty) {
+        final noktalarList = _aktifRotaNoktalar
+            .map((p) => {'lat': p.latitude, 'lng': p.longitude})
+            .toList();
+        final nearest = DatabaseHelper.enYakinRotaNoktasi(
+            pos.latitude, pos.longitude, noktalarList);
+        if (nearest != null) {
+          double distToRoute = Geolocator.distanceBetween(
+              pos.latitude, pos.longitude, nearest['lat'], nearest['lng']);
+          if (distToRoute > 50) {
+            final warnNow = DateTime.now();
+            if (_lastOffRouteWarningTime == null ||
+                warnNow.difference(_lastOffRouteWarningTime!).inSeconds > 60) {
+              _lastOffRouteWarningTime = warnNow;
+              if (mounted) {
+                _showAltitudeWarning(
+                  "ROTADAN SAPMA (${distToRoute.toInt()}m)",
+                  "Planlanan rotadan uzaklaştınız. Lütfen yönünüzü kontrol edin.",
+                );
+              }
+              _speak("Dikkat! Rotadan saptınız. Planlanan rotadan uzaklaşıyorsunuz.");
             }
-            _updateMapboxAnnotations();
-          } catch (_) {}
-        } else if (!_isPremiumUser && _mapController != null) {
+          }
+        }
+      }
+
+      // İrtifa uyarısı
+      if (_isTracking && !_isPaused) {
+        _checkAltitudeWarnings(pos.altitude);
+        CloudSyncService.syncLocation(
+            pos.latitude, pos.longitude, pos.altitude, DateTime.now().toIso8601String());
+      }
+
+      // ── 3. FİRESTORE SYNC (30 saniyede bir — async, ayrı) ─────────────────
+      final now = DateTime.now();
+      if (_lastSyncTime == null || now.difference(_lastSyncTime!).inSeconds >= 30) {
+        _lastSyncTime = now;
+        final user = FirebaseAuth.instance.currentUser;
+        if (user != null) {
           try {
-            if (_isLocationLocked) {
-              _mapController?.move(ll.LatLng(pos.latitude, pos.longitude), 16.0);
+            final battery = await Battery().batteryLevel;
+            if (!mounted) return;
+
+            List trail = [];
+            if (_isTracking && !_isPaused) {
+              trail = _routePoints.map((p) => {
+                'lat': p.latitude,
+                'lng': p.longitude,
+                'timestamp': DateTime.now().toIso8601String(),
+              }).toList();
+              // Firestore'a gönderilecek max 200 nokta
+              if (trail.length > 200) trail = trail.sublist(trail.length - 200);
             }
+
+            await FirebaseFirestore.instance
+                .collection('users')
+                .doc(user.uid)
+                .set({
+              'last_lat': pos.latitude,
+              'last_lng': pos.longitude,
+              'last_elevation': pos.altitude.toInt(),
+              'battery_level': battery,
+              'signal_strength': 'GÜÇLÜ',
+              'last_seen': FieldValue.serverTimestamp(),
+              'is_recording': _isTracking,
+              'live_trail': trail,
+              if (_aktifRotaNoktalar.isNotEmpty)
+                'planned_route': _aktifRotaNoktalar
+                    .map((p) => {'lat': p.latitude, 'lng': p.longitude})
+                    .toList(),
+            }, SetOptions(merge: true));
           } catch (_) {}
         }
+      }
+
+      // ── 4. HARİTA GÜNCELLEME (throttle: 3 saniyede bir — GPU/CPU baskısı azaltır) ──
+      if (!mounted) return;
+      final mapNow = DateTime.now();
+      final shouldUpdateAnnotations = _lastAnnotationUpdate == null ||
+          mapNow.difference(_lastAnnotationUpdate!).inSeconds >= 3;
+
+      if (_isPremiumUser && _mapReady && _mapboxMap != null) {
+        try {
+          if (_isLocationLocked) {
+            _mapboxMap?.setCamera(mbx.CameraOptions(
+              center: mbx.Point(
+                  coordinates: mbx.Position(pos.longitude, pos.latitude)),
+              zoom: 16.0,
+            ));
+          }
+          if (shouldUpdateAnnotations) {
+            _lastAnnotationUpdate = mapNow;
+            _updateMapboxAnnotations();
+          }
+        } catch (_) {}
+      } else if (!_isPremiumUser && _mapController != null) {
+        try {
+          if (_isLocationLocked) {
+            _mapController?.move(ll.LatLng(pos.latitude, pos.longitude), 16.0);
+          }
+        } catch (_) {}
       }
     });
   }
