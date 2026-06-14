@@ -16,7 +16,7 @@ import 'package:vibration/vibration.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:audioplayers/audioplayers.dart';
+import 'package:just_audio/just_audio.dart';
 import 'dart:io';
 import '../services/premium_service.dart';
 import '../services/routing_service.dart';
@@ -1116,7 +1116,8 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
     
     try {
       try {
-        await _sfxPlayer.play(AssetSource('audio/beep.wav'));
+        await _sfxPlayer.setAsset('assets/audio/beep.wav');
+        _sfxPlayer.play();
         await Future.delayed(const Duration(milliseconds: 300));
       } catch (_) {}
 
@@ -1158,7 +1159,8 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
       // Hata olsa da gösterge takılı kalmasın
     } finally {
       try {
-        await _sfxPlayer.play(AssetSource('audio/beep.wav'));
+        await _sfxPlayer.setAsset('assets/audio/beep.wav');
+        _sfxPlayer.play();
       } catch (_) {}
       if (mounted) {
         setState(() {
@@ -1248,7 +1250,7 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
               _isPressingPtt = true;
               if (await _audioRecorder.hasPermission()) {
                 try { Vibration.vibrate(duration: 100, amplitude: 255); } catch (_) {}
-                try { await _sfxPlayer.play(AssetSource('audio/beep.wav')); } catch (_) {}
+                try { await _sfxPlayer.setAsset('assets/audio/beep.wav'); _sfxPlayer.play(); } catch (_) {}
                 await Future.delayed(const Duration(milliseconds: 200));
                 
                 if (!_isPressingPtt) return;
@@ -1286,7 +1288,7 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                 final path = await _audioRecorder.stop();
                 setState(() => _isRecordingVoice = false);
                 try { Vibration.vibrate(duration: 50, amplitude: 100); } catch (_) {}
-                try { await _sfxPlayer.play(AssetSource('audio/beep.wav')); } catch (_) {}
+                try { await _sfxPlayer.setAsset('assets/audio/beep.wav'); _sfxPlayer.play(); } catch (_) {}
                 
                 if (path != null) {
                   _sendVoiceMessage(path);

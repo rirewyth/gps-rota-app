@@ -16,7 +16,7 @@ import '../services/background_sms_service.dart';
 import '../database_helper.dart';
 import '../data/mountain_database.dart';
 import '../services/tactical_styles.dart';
-import 'package:audioplayers/audioplayers.dart';
+
 import '../services/morse_service.dart';
 import 'map_screen.dart';
 import 'survival_guide_screen.dart';
@@ -95,7 +95,7 @@ class _HomeDashboardState extends State<HomeDashboard>
   WeatherAlertInfo? _weatherAlert;
   bool _extremePowerSaving = false;
 
-  final AudioPlayer _audioPlayer = AudioPlayer();
+
   bool _isTorchOn = false;
   bool _isStrobeOn = false;
   bool _isSosFlashOn = false;
@@ -409,7 +409,7 @@ class _HomeDashboardState extends State<HomeDashboard>
     _weatherTimer?.cancel();
     _radarStream?.cancel();
     _strobeTimer?.cancel();
-    _audioPlayer.dispose();
+
     _safetyAlertsStream?.cancel();
     _presenceTimer?.cancel();
     _activeUserTimer?.cancel();
