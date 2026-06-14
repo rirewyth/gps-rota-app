@@ -113,6 +113,27 @@
         <string>_mp-connection._tcp</string>
         <string>_dartobservatory._tcp</string>
     </array>
+    
+    <!-- Fallback Permissions for permission_handler to prevent TestFlight TCC crashes -->
+    <key>NSContactsUsageDescription</key>
+    <string>Acil durumlarda kişi seçebilmeniz için rehber erişimi gereklidir.</string>
+    <key>NSCalendarsUsageDescription</key>
+    <string>Etkinlik planlamaları için takvim erişimi gereklidir.</string>
+    <key>NSAppleMusicUsageDescription</key>
+    <string>Medya kitaplığına erişim gereklidir.</string>
+    <key>NSRemindersUsageDescription</key>
+    <string>Hatırlatıcılar için erişim gereklidir.</string>
+    <key>NSFaceIDUsageDescription</key>
+    <string>Güvenli giriş için FaceID erişimi gereklidir.</string>
+    <key>NSSiriUsageDescription</key>
+    <string>Siri üzerinden komut verebilmeniz için gereklidir.</string>
+    <key>NSHealthShareUsageDescription</key>
+    <string>Sağlık verilerini okumak için gereklidir.</string>
+    <key>NSHealthUpdateUsageDescription</key>
+    <string>Sağlık verilerini güncellemek için gereklidir.</string>
+    <key>NSHomeKitUsageDescription</key>
+    <string>Akıllı cihaz entegrasyonu için gereklidir.</string>
+    
     <key>SKAdNetworkItems</key>
     <array>
       <dict>
