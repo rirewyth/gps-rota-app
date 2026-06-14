@@ -79,10 +79,10 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/icon/tactical_logo.jpg"
+  image_path: "assets/icon/tactical_logo.png"
 flutter_native_splash:
   color: "#0A0A0A"
-  image: "assets/icon/tactical_logo.jpg"
+  image: "assets/icon/tactical_logo.png"
   android: true
   ios: true
 
