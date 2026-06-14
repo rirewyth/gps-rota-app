@@ -33,13 +33,6 @@ import flutter_background_service_ios
     })
 
     SwiftFlutterBackgroundServicePlugin.taskIdentifier = "dev.flutter.background.refresh"
-    SwiftFlutterBackgroundServicePlugin.setPluginRegistrantCallback { registry in
-        GeneratedPluginRegistrant.register(with: registry)
-    }
-
-    FlutterLocalNotificationsPlugin.setPluginRegistrantCallback { registry in
-        GeneratedPluginRegistrant.register(with: registry)
-    }
     
     if #available(iOS 10.0, *) {
       UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
