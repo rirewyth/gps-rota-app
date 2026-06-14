@@ -120,7 +120,7 @@ class _PeakARScreenState extends State<PeakARScreen> {
 
   @override
   void dispose() {
-    _cameraController?.dispose();
+    // _cameraController?.dispose();
     _compassSub?.cancel();
     _accelSub?.cancel();
     super.dispose();

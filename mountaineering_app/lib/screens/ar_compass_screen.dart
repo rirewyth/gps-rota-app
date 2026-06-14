@@ -43,23 +43,7 @@ class _ArCompassScreenState extends State<ArCompassScreen>
   }
 
   Future<void> _initCamera() async {
-    try {
-      /*
-      final cameras = await availableCameras();
-      if (cameras.isEmpty) {
-        setState(() => _cameraError = true);
-        return;
-      }
-      _cameraController = CameraController(
-        cameras[0],
-        ResolutionPreset.medium,
-        enableAudio: false,
-      );
-      await _cameraController!.initialize();
-      if (mounted) setState(() => _cameraReady = true);
-      */
-      if (mounted) setState(() => _cameraError = true);
-    }
+    if (mounted) setState(() => _cameraError = true);
   }
 
   void _startCompass() {
