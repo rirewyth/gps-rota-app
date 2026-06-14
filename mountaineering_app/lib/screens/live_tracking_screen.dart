@@ -150,20 +150,7 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
         if (command == 'siren') {
           // SİREN ÇAL - Robust implementation
           try {
-            await _sirenPlayer.setAudioContext(AudioContext(
-              android: AudioContextAndroid(
-                usageType: AndroidUsageType.alarm,
-                contentType: AndroidContentType.sonification,
-                audioFocus: AndroidAudioFocus.gainTransient,
-              ),
-              iOS: AudioContextIOS(
-                category: AVAudioSessionCategory.playback,
-                options: {
-                  AVAudioSessionOptions.defaultToSpeaker,
-                  AVAudioSessionOptions.duckOthers,
-                },
-              ),
-            ));
+
             await _sirenPlayer.setLoopMode(LoopMode.one);
             await _sirenPlayer.setAsset('assets/audio/siren.mp3');
             _sirenPlayer.play();
