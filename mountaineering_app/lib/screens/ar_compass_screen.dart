@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
-import 'package:camera/camera.dart';
+// import 'package:camera/camera.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:geolocator/geolocator.dart';
 import '../services/premium_service.dart';
@@ -15,7 +15,7 @@ class ArCompassScreen extends StatefulWidget {
 
 class _ArCompassScreenState extends State<ArCompassScreen>
     with TickerProviderStateMixin {
-  CameraController? _cameraController;
+  // CameraController? _cameraController;
   double _heading = 0;
   double _lat = 0;
   double _lng = 0;
@@ -44,6 +44,7 @@ class _ArCompassScreenState extends State<ArCompassScreen>
 
   Future<void> _initCamera() async {
     try {
+      /*
       final cameras = await availableCameras();
       if (cameras.isEmpty) {
         setState(() => _cameraError = true);
@@ -56,7 +57,7 @@ class _ArCompassScreenState extends State<ArCompassScreen>
       );
       await _cameraController!.initialize();
       if (mounted) setState(() => _cameraReady = true);
-    } catch (e) {
+      */
       if (mounted) setState(() => _cameraError = true);
     }
   }
@@ -78,7 +79,7 @@ class _ArCompassScreenState extends State<ArCompassScreen>
 
   @override
   void dispose() {
-    _cameraController?.dispose();
+    // _cameraController?.dispose();
     _pulseController.dispose();
     super.dispose();
   }
@@ -102,26 +103,7 @@ class _ArCompassScreenState extends State<ArCompassScreen>
       body: Stack(
         children: [
           // Camera background
-          if (_cameraReady && _cameraController != null)
-            Positioned.fill(child: CameraPreview(_cameraController!))
-          else if (_cameraError)
-            Positioned.fill(
-              child: Container(
-                color: const Color(0xFF050510),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.no_photography, color: Colors.white24, size: 60),
-                      const SizedBox(height: 12),
-                      Text('SENSÖR MODU (Kamera Erişimi Yok)', style: GoogleFonts.shareTechMono(color: Colors.white38, fontSize: 12)),
-                    ],
-                  ),
-                ),
-              ),
-            )
-          else
-            const Positioned.fill(child: Center(child: CircularProgressIndicator(color: kOrange))),
+          Positioned.fill(child: Container(color: Colors.black)),
 
           // AR Dark overlay gradient
           Positioned.fill(

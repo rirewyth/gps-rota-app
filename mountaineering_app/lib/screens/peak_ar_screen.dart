@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:camera/camera.dart';
+// import 'package:camera/camera.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:sensors_plus/sensors_plus.dart';
@@ -18,8 +18,8 @@ class PeakARScreen extends StatefulWidget {
 }
 
 class _PeakARScreenState extends State<PeakARScreen> {
-  CameraController? _cameraController;
-  List<CameraDescription>? _cameras;
+  // CameraController? _cameraController;
+  // List<CameraDescription>? _cameras;
 
   // Sensör verileri
   double _heading = 0.0;
@@ -45,6 +45,7 @@ class _PeakARScreenState extends State<PeakARScreen> {
   Future<void> _initAll() async {
     // 1. Kamera Başlat
     try {
+      /*
       _cameras = await availableCameras();
       if (_cameras != null && _cameras!.isNotEmpty) {
         _cameraController = CameraController(
@@ -53,8 +54,9 @@ class _PeakARScreenState extends State<PeakARScreen> {
           enableAudio: false,
         );
         await _cameraController!.initialize();
-        if (mounted) setState(() {});
       }
+      */setState(() {});
+      
     } catch (e) {
       debugPrint("Kamera hatası: $e");
     }
@@ -134,22 +136,6 @@ class _PeakARScreenState extends State<PeakARScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_cameraController == null || !_cameraController!.value.isInitialized) {
-      return Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const CircularProgressIndicator(color: Colors.orange),
-              const SizedBox(height: 16),
-              Text('Kamera / Sensörler Başlatılıyor...', style: TextStyle(color: Colors.white70)),
-            ],
-          ),
-        ),
-      );
-    }
-
     final Size screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
@@ -160,7 +146,7 @@ class _PeakARScreenState extends State<PeakARScreen> {
           SizedBox(
             width: screenSize.width,
             height: screenSize.height,
-            child: CameraPreview(_cameraController!),
+            child: Container(color: Colors.black),
           ),
 
           // Nişangah (Merkez)
