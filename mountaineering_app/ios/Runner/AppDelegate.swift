@@ -12,6 +12,10 @@ import flutter_background_service_ios
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
     
+    // YENİ EKLENEN KOD: Swift 17 KERN_INVALID_ADDRESS (swift_getObjectType) hatasını önlemek için 
+    // flutter_background_service'in önbellekte kalan auto_start değerini zorla kapatıyoruz.
+    // Böylece main isolate ve background isolate aynı anda plugin kaydetmeye çalışıp Swift runtime'ı çökertmeyecek.
+    UserDefaults.standard.set(false, forKey: "auto_start")
     let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
     let smsChannel = FlutterMethodChannel(name: "com.rotaplus.emniyetteyim/sms",
                                           binaryMessenger: controller.binaryMessenger)
@@ -33,6 +37,9 @@ import flutter_background_service_ios
     })
 
     SwiftFlutterBackgroundServicePlugin.taskIdentifier = "dev.flutter.background.refresh"
+    SwiftFlutterBackgroundServicePlugin.setPluginRegistrantCallback { registry in
+        GeneratedPluginRegistrant.register(with: registry)
+    }
     
     GeneratedPluginRegistrant.register(with: self)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)

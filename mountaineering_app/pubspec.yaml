@@ -1,7 +1,7 @@
 name: mountaineering_app
 description: "Rota+: Doğa sporları, trekking ve ekip koordinasyon sistemi. Çevrimdışı haritalar ve güvenli konum paylaşımı."
 publish_to: 'none'
-version: 1.0.80+110
+version: 1.0.81+111
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
