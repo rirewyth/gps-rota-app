@@ -62,7 +62,7 @@ class BackgroundMonitorService {
         ],
       ),
       iosConfiguration: IosConfiguration(
-        autoStart: true,
+        autoStart: false,
         onForeground: onStart,
         onBackground: onIosBackground,
       ),
