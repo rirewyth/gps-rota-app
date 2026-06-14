@@ -79,24 +79,7 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _audioPlayer.setAudioContext(AudioContext(
-      iOS: AudioContextIOS(
-        category: AVAudioSessionCategory.playAndRecord,
-        options: {
-          AVAudioSessionOptions.defaultToSpeaker,
-          AVAudioSessionOptions.allowBluetooth,
-        },
-      ),
-    ));
-    _sfxPlayer.setAudioContext(AudioContext(
-      iOS: AudioContextIOS(
-        category: AVAudioSessionCategory.playAndRecord,
-        options: {
-          AVAudioSessionOptions.defaultToSpeaker,
-          AVAudioSessionOptions.allowBluetooth,
-        },
-      ),
-    ));
+
     _tabController = TabController(length: 4, vsync: this);
     _tabController.addListener(() {
       if (mounted) setState(() {});
@@ -563,9 +546,14 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
       onTap: () async {
         if (url.startsWith('base64:')) {
           final bytes = base64Decode(url.substring(7));
-          await _audioPlayer.play(BytesSource(bytes));
+          final dir = await getTemporaryDirectory();
+          final tmpFile = File('${dir.path}/team_voice_${DateTime.now().millisecondsSinceEpoch}.m4a');
+          await tmpFile.writeAsBytes(bytes);
+          await _audioPlayer.setFilePath(tmpFile.path);
+          _audioPlayer.play();
         } else {
-          await _audioPlayer.play(UrlSource(url));
+          await _audioPlayer.setUrl(url);
+          _audioPlayer.play();
         }
       },
       child: Row(
@@ -1145,24 +1133,26 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
         debugPrint("Çözülen Dosya Boyutu: $decodedSize byte");
 
         try {
-          await _audioPlayer.play(DeviceFileSource(tmpFile.path));
+          await _audioPlayer.setFilePath(tmpFile.path);
+          _audioPlayer.play();
         } catch (e) {
           debugPrint("AudioPlayers Oynatma Hatası: $e");
         }
         debugPrint("================================================");
 
         // Temizlik
-        _audioPlayer.onPlayerComplete.first.then((_) async {
+        _audioPlayer.playerStateStream.firstWhere((s) => s.processingState == ProcessingState.completed).then((_) async {
           try { await tmpFile.delete(); } catch (_) {}
         });
       } else {
-        await _audioPlayer.play(UrlSource(url));
+        await _audioPlayer.setUrl(url);
+        _audioPlayer.play();
       }
 
       // Çalma bitince göstergeyi sıfırla
-      await _audioPlayer.onPlayerComplete.first.timeout(
+      await _audioPlayer.playerStateStream.firstWhere((s) => s.processingState == ProcessingState.completed).timeout(
         const Duration(seconds: 30),
-        onTimeout: () {},
+        onTimeout: () => PlayerState(false, ProcessingState.completed),
       );
     } catch (_) {
       // Hata olsa da gösterge takılı kalmasın

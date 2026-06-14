@@ -241,7 +241,11 @@ class _MeshNetworkScreenState extends State<MeshNetworkScreen> {
     // Play the audio
     try {
       final bytes = base64Decode(audioBase64);
-      await _audioPlayer.play(BytesSource(bytes));
+      final dir = await getTemporaryDirectory();
+      final tmpFile = File('${dir.path}/mesh_voice_${DateTime.now().millisecondsSinceEpoch}.m4a');
+      await tmpFile.writeAsBytes(bytes);
+      await _audioPlayer.setFilePath(tmpFile.path);
+      _audioPlayer.play();
     } catch (e) {
       print('Voice play error: $e');
     }

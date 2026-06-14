@@ -1,7 +1,7 @@
 name: mountaineering_app
 description: "Rota+: Doğa sporları, trekking ve ekip koordinasyon sistemi. Çevrimdışı haritalar ve güvenli konum paylaşımı."
 publish_to: 'none'
-version: 1.0.78+105
+version: 1.0.79+106
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -41,7 +41,7 @@ dependencies:
   # Güvenlik ve Donanım
   crypto: ^3.0.3
   torch_light: ^1.1.0 # Flaş kontrolü
-  audioplayers: ^6.1.1 # Siren Sesi için
+  just_audio: ^0.9.36 # Siren Sesi için (audioplayers yerine)
   sensors_plus: ^6.1.1 # Su Terazisi ve Barometre için
   url_launcher: 6.2.5
   firebase_core: ^4.6.0

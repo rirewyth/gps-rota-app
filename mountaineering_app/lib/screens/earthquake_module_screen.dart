@@ -145,32 +145,14 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
 
   void _playEmergencyAlarm() async {
     try {
-      await _audioPlayer.setAudioContext(AudioContext(
-        android: AudioContextAndroid(
-          usageType: AndroidUsageType.alarm,
-          contentType: AndroidContentType.sonification,
-          audioFocus: AndroidAudioFocus.gainTransient,
-        ),
-        iOS: AudioContextIOS(
-          category: AVAudioSessionCategory.playback,
-          options: {
-            AVAudioSessionOptions.defaultToSpeaker,
-            AVAudioSessionOptions.duckOthers,
-          },
-        ),
-      ));
       await _audioPlayer.setVolume(1.0);
-      _audioPlayer.setReleaseMode(ReleaseMode.release);
+      await _audioPlayer.setLoopMode(LoopMode.off);
       final Uint8List audioBytes = base64Decode(base64Beep);
-      // iOS'ta BytesSource güvenilir değil — geçici dosyaya yaz
-      if (Platform.isIOS) {
-        final dir = await getTemporaryDirectory();
-        final tmpFile = File('${dir.path}/eq_alarm_${DateTime.now().millisecondsSinceEpoch}.wav');
-        await tmpFile.writeAsBytes(audioBytes);
-        await _audioPlayer.play(DeviceFileSource(tmpFile.path));
-      } else {
-        await _audioPlayer.play(BytesSource(audioBytes));
-      }
+      final dir = await getTemporaryDirectory();
+      final tmpFile = File('${dir.path}/eq_alarm_${DateTime.now().millisecondsSinceEpoch}.wav');
+      await tmpFile.writeAsBytes(audioBytes);
+      await _audioPlayer.setFilePath(tmpFile.path);
+      _audioPlayer.play();
     } catch (e) {
       debugPrint("Emergency alarm play error: $e");
     }
@@ -325,31 +307,14 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
   void _playSosCycle() async {
     if (!_isAcousticSosActive || !mounted) return;
     try {
-      await _audioPlayer.setAudioContext(AudioContext(
-        android: AudioContextAndroid(
-          usageType: AndroidUsageType.alarm,
-          contentType: AndroidContentType.sonification,
-          audioFocus: AndroidAudioFocus.gainTransient,
-        ),
-        iOS: AudioContextIOS(
-          category: AVAudioSessionCategory.playback,
-          options: {
-            AVAudioSessionOptions.defaultToSpeaker,
-          },
-        ),
-      ));
       await _audioPlayer.setVolume(1.0);
-      _audioPlayer.setReleaseMode(ReleaseMode.loop);
+      await _audioPlayer.setLoopMode(LoopMode.one);
       final Uint8List audioBytes = base64Decode(base64Beep);
-      // iOS'ta BytesSource loop güvenilir değil — geçici dosyaya yaz ve DeviceFileSource kullan
-      if (Platform.isIOS) {
-        final dir = await getTemporaryDirectory();
-        final tmpFile = File('${dir.path}/sos_beep_${DateTime.now().millisecondsSinceEpoch}.wav');
-        await tmpFile.writeAsBytes(audioBytes);
-        await _audioPlayer.play(DeviceFileSource(tmpFile.path));
-      } else {
-        await _audioPlayer.play(BytesSource(audioBytes));
-      }
+      final dir = await getTemporaryDirectory();
+      final tmpFile = File('${dir.path}/sos_beep_${DateTime.now().millisecondsSinceEpoch}.wav');
+      await tmpFile.writeAsBytes(audioBytes);
+      await _audioPlayer.setFilePath(tmpFile.path);
+      _audioPlayer.play();
     } catch (e) {
       debugPrint("AudioPlayer Error: $e");
     }

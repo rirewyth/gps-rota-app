@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:audioplayers/audioplayers.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:vibration/vibration.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -59,8 +59,9 @@ class _CriticalAlertScreenState extends State<CriticalAlertScreen> {
   }
 
   Future<void> _playAlarm() async {
-    await _audioPlayer.setReleaseMode(ReleaseMode.loop);
-    await _audioPlayer.play(AssetSource('audio/siren.mp3'));
+    await _audioPlayer.setLoopMode(LoopMode.one);
+    await _audioPlayer.setAsset('assets/audio/siren.mp3');
+    _audioPlayer.play();
     
     if (await Vibration.hasVibrator() ?? false) {
       Vibration.vibrate(pattern: [500, 500, 500, 500], repeat: 0);

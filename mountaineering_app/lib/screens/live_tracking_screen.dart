@@ -15,7 +15,7 @@ import '../services/premium_service.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'notification_screen.dart';
 import 'package:battery_plus/battery_plus.dart';
-import 'package:audioplayers/audioplayers.dart';
+import 'package:just_audio/just_audio.dart';
 
 import 'package:vibration/vibration.dart';
 
@@ -164,8 +164,9 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
                 },
               ),
             ));
-            await _sirenPlayer.setVolume(1.0);
-            await _sirenPlayer.play(AssetSource('audio/siren.mp3'));
+            await _sirenPlayer.setLoopMode(LoopMode.one);
+            await _sirenPlayer.setAsset('assets/audio/siren.mp3');
+            _sirenPlayer.play();
           } catch (e) {
             debugPrint("Siren play error: $e");
           }
