@@ -1,7 +1,7 @@
 name: mountaineering_app
 description: "Rota+: Doğa sporları, trekking ve ekip koordinasyon sistemi. Çevrimdışı haritalar ve güvenli konum paylaşımı."
 publish_to: 'none'
-version: 1.0.83+113
+version: 1.0.84+114
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -64,7 +64,7 @@ dependencies:
   in_app_purchase: ^3.2.0
   google_mobile_ads: ^5.2.0
   flutter_native_splash: ^2.4.0
-
+  flutter_background_service: ^5.0.5
   device_info_plus: ^11.0.0
   speech_to_text: ^7.3.0
   vibration: ^3.1.8

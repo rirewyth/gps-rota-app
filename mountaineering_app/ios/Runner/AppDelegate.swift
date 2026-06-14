@@ -2,6 +2,7 @@ import UIKit
 import Flutter
 import MessageUI
 import flutter_local_notifications
+import flutter_background_service_ios
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate, MFMessageComposeViewControllerDelegate {
@@ -10,6 +11,14 @@ import flutter_local_notifications
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
+    
+    // KRİTİK: flutter_background_service_ios'un iOS'ta ikinci bir Flutter motoru
+    // açmasını engelle. Bu olmadan SIGSEGV (swift_getObjectType) çökmesi yaşanır.
+    // Dart tarafında IosConfiguration(autoStart: false) olsa bile, eski bir build'de
+    // UserDefaults'a "auto_start = true" yazıldıysa ikinci motor açılabilir.
+    // Bu satır her açılışta bunu sıfırlar.
+    UserDefaults.standard.set(false, forKey: "auto_start")
+    UserDefaults.standard.synchronize()
     
     let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
     let smsChannel = FlutterMethodChannel(name: "com.rotaplus.emniyetteyim/sms",
@@ -51,7 +60,6 @@ import flutter_local_notifications
     self.flutterResult = result
     
     DispatchQueue.main.async {
-      // Find the correct root view controller (iOS 13+ support)
       let rootVC = UIApplication.shared.connectedScenes
           .compactMap { $0 as? UIWindowScene }
           .flatMap { $0.windows }
