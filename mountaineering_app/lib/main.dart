@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'storage_helper.dart';
 import 'services/cloud_sync_service.dart';
@@ -143,7 +144,8 @@ void main() async {
 
 Future<void> _startBackgroundServices() async {
   try {
-    // Add a longer delay to ensure main thread is completely free and UI is rendered
+    // iOS'ta flutter_background_service KULLANILMAZ (SIGSEGV çökme riski).
+    // Her iki platformda da kendi Timer tabanlı güvenli servisimiz çalışır.
     await Future.delayed(const Duration(seconds: 3));
     await BackgroundMonitorService.initializeService();
   } catch (e) {
