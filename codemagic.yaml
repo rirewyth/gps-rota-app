@@ -1,6 +1,6 @@
 workflows:
-  flutter-ios:
-    name: Flutter iOS Build (Signed)
+  build-ios:
+    name: Build iOS App
     working_directory: mountaineering_app
     instance_type: mac_mini_m2
     environment:
@@ -9,66 +9,17 @@ workflows:
       flutter: default
       xcode: latest
       cocoapods: default
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.rotaplus.emniyetteyim
     scripts:
-      - name: Initialize keychain
-        script: |
-          keychain initialize
-      - name: Add certificates
-        script: |
-          keychain add-certificates --certificate ios_distribution.p12 --certificate-password 123456
-      - name: Use profiles
-        script: |
-          xcode-project use-profiles --profile Rota_App_Store_Profile.mobileprovision
-      - name: Generate Export Options
-        script: |
-          cat <<EOF > $HOME/export_options.plist
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-              <key>method</key>
-              <string>app-store</string>
-              <key>provisioningProfiles</key>
-              <dict>
-                  <key>com.rotaplus.emniyetteyim</key>
-                  <string>Rota App Store Profile</string>
-              </dict>
-              <key>signingCertificate</key>
-              <string>Apple Distribution</string>
-              <key>signingStyle</key>
-              <string>manual</string>
-              <key>teamID</key>
-              <string>TAH5CSWX56</string>
-          </dict>
-          </plist>
-          EOF
       - name: Get Flutter packages
-        script: |
-          flutter packages pub get
-      - name: Build iOS App
-        script: |
-          flutter build ios --release --no-codesign
-      - name: Archive
-        script: |
-          xcodebuild -workspace ios/Runner.xcworkspace \
-                     -scheme Runner \
-                     -configuration Release \
-                     -archivePath $HOME/Runner.xcarchive \
-                     archive \
-                     ENABLE_USER_SCRIPT_SANDBOXING=NO \
-                     OTHER_CODE_SIGN_FLAGS="--keychain $CM_KEYCHAIN_PATH"
-      - name: Export IPA
-        script: |
-          mkdir -p build/ios/ipa
-          xcodebuild -exportArchive \
-                     -archivePath $HOME/Runner.xcarchive \
-                     -exportPath build/ios/ipa \
-                     -exportOptionsPlist $HOME/export_options.plist
+        script: flutter packages pub get
+      - name: Build iOS IPA
+        script: flutter build ipa --release
     artifacts:
       - build/ios/ipa/*.ipa
     publishing:
-      app_store_connect:
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        submit_to_testflight: false
+      email:
+        recipients:
+          - admin@rotaplus.com
