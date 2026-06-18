@@ -4,6 +4,8 @@ workflows:
     working_directory: mountaineering_app
     instance_type: mac_mini_m2
     environment:
+      groups:
+        - ios_credentials
       flutter: default
       xcode: latest
       cocoapods: default
@@ -26,5 +28,7 @@ workflows:
     publishing:
       app_store_connect:
         auth:
-          integration: AppleDeveloperPortal
+          issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+          key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+          private_key: $APP_STORE_CONNECT_PRIVATE_KEY
         submit_to_testflight: false
