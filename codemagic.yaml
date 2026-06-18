@@ -4,6 +4,8 @@ workflows:
     working_directory: mountaineering_app
     instance_type: mac_mini_m2
     environment:
+      groups:
+        - ios_credentials
       flutter: default
       xcode: latest
       cocoapods: default
