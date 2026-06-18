@@ -23,7 +23,7 @@ workflows:
       - name: Install Profile
         script: |
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          UUID=$(grep -aA1 UUID Rota_App_Store_Profile.mobileprovision | grep -o "[-A-Z0-9]\{36\}")
+          UUID="2fccb0e0-05ed-442b-a0b4-19e6a2ae015b"
           PROFILE_PATH=~/Library/MobileDevice/Provisioning\ Profiles/$UUID.mobileprovision
           cp Rota_App_Store_Profile.mobileprovision "$PROFILE_PATH"
           xcode-project use-profiles --profile "$PROFILE_PATH"
