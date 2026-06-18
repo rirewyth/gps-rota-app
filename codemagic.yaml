@@ -1,12 +1,15 @@
 workflows:
   flutter-ios:
-    name: Flutter iOS Build
+    name: Flutter iOS Build (Signed)
     working_directory: mountaineering_app
     instance_type: mac_mini_m2
     environment:
       flutter: default
       xcode: latest
       cocoapods: default
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.rotaplus.emniyetteyim
     scripts:
       - name: Get Flutter packages
         script: |
@@ -15,8 +18,13 @@ workflows:
         script: |
           cd ios
           pod install
-      - name: Build iOS unsigned
+      - name: Build iOS IPA
         script: |
-          flutter build ios --release --no-codesign
+          flutter build ipa --release
     artifacts:
-      - build/ios/iphoneos/*.app
+      - build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        auth:
+          integration: AppleDeveloperPortal
+        submit_to_testflight: false
