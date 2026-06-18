@@ -4,8 +4,6 @@ workflows:
     working_directory: mountaineering_app
     instance_type: mac_mini_m2
     environment:
-      groups:
-        - ios_credentials
       flutter: default
       xcode: latest
       cocoapods: default
@@ -25,3 +23,8 @@ workflows:
           flutter build ipa --release
     artifacts:
       - build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        auth:
+          integration: AppleDeveloperPortal
+        submit_to_testflight: false
