@@ -10,21 +10,15 @@ workflows:
       xcode: latest
       cocoapods: default
     scripts:
-      - name: Install Apple Certificate
+      - name: Initialize keychain
         script: |
-          KEYCHAIN_PATH=$HOME/Library/Keychains/login.keychain-db
-          if ! security import ios_distribution.p12 -k $KEYCHAIN_PATH -P 123456 -T /usr/bin/codesign; then
-            echo "Import failed with 123456, trying empty password..."
-            security import ios_distribution.p12 -k $KEYCHAIN_PATH -P "" -T /usr/bin/codesign
-          fi
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "" $KEYCHAIN_PATH
-      - name: Install Provisioning Profile
+          keychain initialize
+      - name: Add certificates
         script: |
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          UUID=$(grep -aA1 UUID Rota_App_Store_Profile.mobileprovision | grep -o "[-A-Z0-9]\{36\}")
-          PROFILE_PATH=~/Library/MobileDevice/Provisioning\ Profiles/$UUID.mobileprovision
-          cp Rota_App_Store_Profile.mobileprovision "$PROFILE_PATH"
-          xcode-project use-profiles --profile "$PROFILE_PATH"
+          keychain add-certificates --certificate ios_distribution.p12 --certificate-password 123456
+      - name: Use profiles
+        script: |
+          xcode-project use-profiles --profile Rota_App_Store_Profile.mobileprovision
       - name: Generate Export Options
         script: |
           cat <<EOF > $HOME/export_options.plist
