@@ -13,7 +13,10 @@ workflows:
       - name: Install Apple Certificate
         script: |
           KEYCHAIN_PATH=$HOME/Library/Keychains/login.keychain-db
-          security import ios_distribution.p12 -k $KEYCHAIN_PATH -P 123456 -T /usr/bin/codesign
+          if ! security import ios_distribution.p12 -k $KEYCHAIN_PATH -P 123456 -T /usr/bin/codesign; then
+            echo "Import failed with 123456, trying empty password..."
+            security import ios_distribution.p12 -k $KEYCHAIN_PATH -P "" -T /usr/bin/codesign
+          fi
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k builder $KEYCHAIN_PATH
       - name: Install Provisioning Profile
         script: |
