@@ -9,10 +9,21 @@ workflows:
       flutter: default
       xcode: latest
       cocoapods: default
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.rotaplus.emniyetteyim
     scripts:
+      - name: Initialize keychain
+        script: |
+          keychain initialize
+      - name: Fetch and create signing files
+        script: |
+          app-store-connect fetch-signing-files "com.rotaplus.emniyetteyim" \
+            --type IOS_APP_STORE \
+            --create
+      - name: Add certificates to keychain
+        script: |
+          keychain add-certificates
+      - name: Set up code signing settings on Xcode project
+        script: |
+          xcode-project use-profiles
       - name: Get Flutter packages
         script: |
           flutter packages pub get
@@ -22,12 +33,6 @@ workflows:
           pod install
       - name: Build iOS IPA
         script: |
-          flutter build ipa --release
+          flutter build ipa --release --export-options-plist=/Users/builder/export_options.plist
     artifacts:
       - build/ios/ipa/*.ipa
-    publishing:
-      app_store_connect:
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        submit_to_testflight: false
