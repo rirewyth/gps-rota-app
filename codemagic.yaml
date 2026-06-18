@@ -22,9 +22,14 @@ workflows:
       - name: Get Flutter packages
         script: |
           flutter packages pub get
-      - name: Build iOS IPA
+      - name: Build iOS App
         script: |
-          flutter build ipa --release
+          flutter build ios --release --no-codesign
+      - name: Package and Sign IPA
+        script: |
+          xcode-project build-ipa \
+            --workspace ios/Runner.xcworkspace \
+            --scheme Runner
     artifacts:
       - build/ios/ipa/*.ipa
     publishing:
