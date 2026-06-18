@@ -23,7 +23,7 @@ workflows:
       - name: Install Profile
         script: |
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          UUID="2fccb0e0-05ed-442b-a0b4-19e6a2ae015b"
+          UUID=$(grep -aA1 UUID Rota_App_Store_Profile.mobileprovision | grep -o "[-A-Z0-9]\{36\}")
           PROFILE_PATH=~/Library/MobileDevice/Provisioning\ Profiles/$UUID.mobileprovision
           cp Rota_App_Store_Profile.mobileprovision "$PROFILE_PATH"
           xcode-project use-profiles --profile "$PROFILE_PATH"
@@ -56,3 +56,8 @@ workflows:
         script: flutter build ipa --release --export-options-plist=$HOME/export_options.plist
     artifacts:
       - build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        auth:
+          integration: apple_developer_portal
+        submit_to_testflight: true
