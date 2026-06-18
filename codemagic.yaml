@@ -17,7 +17,7 @@ workflows:
             echo "Import failed with 123456, trying empty password..."
             security import ios_distribution.p12 -k $KEYCHAIN_PATH -P "" -T /usr/bin/codesign
           fi
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k builder $KEYCHAIN_PATH
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "" $KEYCHAIN_PATH
       - name: Install Provisioning Profile
         script: |
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
