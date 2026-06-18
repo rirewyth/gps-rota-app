@@ -4,22 +4,55 @@ workflows:
     working_directory: mountaineering_app
     instance_type: mac_mini_m2
     environment:
-      groups:
-        - ios_credentials
       flutter: default
       xcode: latest
       cocoapods: default
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.rotaplus.emniyetteyim
     scripts:
+      - name: Install Certificates
+        script: |
+          KEYCHAIN_PATH=$HOME/Library/Keychains/login.keychain-db
+          security unlock-keychain -p "" $KEYCHAIN_PATH
+          
+          curl -sL -o wwdr3.cer https://www.apple.com/certificateauthority/AppleWWDRCAG3.cer
+          security import wwdr3.cer -k $KEYCHAIN_PATH -T /usr/bin/codesign
+          curl -sL -o wwdr1.cer https://www.apple.com/certificateauthority/AppleWWDRCA.cer
+          security import wwdr1.cer -k $KEYCHAIN_PATH -T /usr/bin/codesign
+          
+          security import ios_distribution.p12 -k $KEYCHAIN_PATH -P 123456 -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "" $KEYCHAIN_PATH
+      - name: Install Profile
+        script: |
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          UUID=$(grep -aA1 UUID Rota_App_Store_Profile.mobileprovision | grep -o "[-A-Z0-9]\{36\}")
+          PROFILE_PATH=~/Library/MobileDevice/Provisioning\ Profiles/$UUID.mobileprovision
+          cp Rota_App_Store_Profile.mobileprovision "$PROFILE_PATH"
+          xcode-project use-profiles --profile "$PROFILE_PATH"
+      - name: Generate Export Options
+        script: |
+          cat <<EOF > $HOME/export_options.plist
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>app-store</string>
+              <key>provisioningProfiles</key>
+              <dict>
+                  <key>com.rotaplus.emniyetteyim</key>
+                  <string>Rota App Store Profile</string>
+              </dict>
+              <key>signingCertificate</key>
+              <string>Apple Distribution</string>
+              <key>signingStyle</key>
+              <string>manual</string>
+              <key>teamID</key>
+              <string>TAH5CSWX56</string>
+          </dict>
+          </plist>
+          EOF
       - name: Get Flutter packages
         script: flutter packages pub get
       - name: Build iOS IPA
-        script: flutter build ipa --release
+        script: flutter build ipa --release --export-options-plist=$HOME/export_options.plist
     artifacts:
       - build/ios/ipa/*.ipa
-    publishing:
-      email:
-        recipients:
-          - admin@rotaplus.com
