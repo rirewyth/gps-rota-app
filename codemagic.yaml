@@ -22,7 +22,9 @@ workflows:
         script: |
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           UUID=$(grep -aA1 UUID Rota_App_Store_Profile.mobileprovision | grep -o "[-A-Z0-9]\{36\}")
-          cp Rota_App_Store_Profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/$UUID.mobileprovision
+          PROFILE_PATH=~/Library/MobileDevice/Provisioning\ Profiles/$UUID.mobileprovision
+          cp Rota_App_Store_Profile.mobileprovision "$PROFILE_PATH"
+          xcode-project use-profiles --profile "$PROFILE_PATH"
       - name: Generate Export Options
         script: |
           cat <<EOF > $HOME/export_options.plist
