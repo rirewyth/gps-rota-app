@@ -3,6 +3,8 @@ workflows:
     name: Build iOS App
     working_directory: mountaineering_app
     instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: ROTA
     environment:
       flutter: default
       xcode: latest
