@@ -1,25 +1,22 @@
 workflows:
-  flutter-android:
-    name: Flutter Android Build
+  flutter-ios:
+    name: Flutter iOS Build
     working_directory: mountaineering_app
+    instance_type: mac_mini_m2
     environment:
       flutter: default
+      xcode: latest
+      cocoapods: default
     scripts:
-      - name: Set up local.properties
-        script: |
-          echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/mountaineering_app/android/local.properties"
       - name: Get Flutter packages
         script: |
-          cd mountaineering_app
-          flutter pub get
-      - name: Build Android App Bundle
+          flutter packages pub get
+      - name: Pod install
         script: |
-          cd mountaineering_app
-          flutter build appbundle --release
-      - name: Build APK
+          cd ios
+          pod install
+      - name: Build iOS unsigned
         script: |
-          cd mountaineering_app
-          flutter build apk --release
+          flutter build ios --release --no-codesign
     artifacts:
-      - mountaineering_app/build/app/outputs/bundle/release/app-release.aab
-      - mountaineering_app/build/app/outputs/flutter-apk/app-release.apk
+      - build/ios/iphoneos/*.app
