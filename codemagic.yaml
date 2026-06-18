@@ -15,10 +15,10 @@ workflows:
           keychain initialize
       - name: Add certificates to keychain
         script: |
-          keychain add-certificates
+          keychain add-certificates --certificate ios_distribution.p12 --certificate-password 123456
       - name: Set up code signing settings on Xcode project
         script: |
-          xcode-project use-profiles
+          xcode-project use-profiles --profile Rota_App_Store_Profile.mobileprovision
       - name: Get Flutter packages
         script: |
           flutter packages pub get
