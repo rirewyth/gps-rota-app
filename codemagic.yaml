@@ -10,27 +10,45 @@ workflows:
       xcode: latest
       cocoapods: default
     scripts:
-      - name: Initialize keychain
+      - name: Install Apple Certificate
         script: |
-          keychain initialize
-      - name: Add certificates to keychain
+          KEYCHAIN_PATH=$HOME/Library/Keychains/login.keychain-db
+          security import ios_distribution.p12 -k $KEYCHAIN_PATH -P 123456 -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k builder $KEYCHAIN_PATH
+      - name: Install Provisioning Profile
         script: |
-          keychain add-certificates --certificate ios_distribution.p12 --certificate-password 123456
-      - name: Set up code signing settings on Xcode project
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          UUID=$(grep -aA1 UUID Rota_App_Store_Profile.mobileprovision | grep -o "[-A-Z0-9]\{36\}")
+          cp Rota_App_Store_Profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/$UUID.mobileprovision
+      - name: Generate Export Options
         script: |
-          xcode-project use-profiles --profile Rota_App_Store_Profile.mobileprovision
+          cat <<EOF > $HOME/export_options.plist
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>app-store</string>
+              <key>provisioningProfiles</key>
+              <dict>
+                  <key>com.rotaplus.emniyetteyim</key>
+                  <string>Rota App Store Profile</string>
+              </dict>
+              <key>signingCertificate</key>
+              <string>Apple Distribution</string>
+              <key>signingStyle</key>
+              <string>manual</string>
+              <key>teamID</key>
+              <string>TAH5CSWX56</string>
+          </dict>
+          </plist>
+          EOF
       - name: Get Flutter packages
         script: |
           flutter packages pub get
-      - name: Build iOS App
+      - name: Build iOS IPA
         script: |
-          flutter build ios --release --no-codesign
-      - name: Package and Sign IPA
-        script: |
-          xcode-project build-ipa \
-            --workspace ios/Runner.xcworkspace \
-            --scheme Runner \
-            --archive-flags="ENABLE_USER_SCRIPT_SANDBOXING=NO"
+          flutter build ipa --release --export-options-plist=$HOME/export_options.plist
     artifacts:
       - build/ios/ipa/*.ipa
     publishing:
