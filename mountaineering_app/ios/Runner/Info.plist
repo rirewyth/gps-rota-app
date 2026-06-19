@@ -1,145 +1,137 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>$(DEVELOPMENT_LANGUAGE)</string>
-	<key>CFBundleDisplayName</key>
-	<string>Acil Durum App</string>
-	<key>CFBundleExecutable</key>
-	<string>$(EXECUTABLE_NAME)</string>
-	<key>CFBundleIdentifier</key>
-	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleName</key>
-	<string>mountaineering_app</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleShortVersionString</key>
-	<string>$(FLUTTER_BUILD_NAME)</string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
-	<key>CFBundleVersion</key>
-	<string>$(FLUTTER_BUILD_NUMBER)</string>
-	<key>LSRequiresIPhoneOS</key>
-	<true/>
-	<key>LSApplicationQueriesSchemes</key>
-	<array>
-		<string>sms</string>
-		<string>tel</string>
-	</array>
-	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
-	<key>UIMainStoryboardFile</key>
-	<string>Main</string>
-	<key>UISupportedInterfaceOrientations</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>UISupportedInterfaceOrientations~ipad</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>UIViewControllerBasedStatusBarAppearance</key>
-	<false/>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
-
-    <!-- Konum İzinleri -->
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>Tırmanış rotanızı takip etmek için konuma ihtiyacımız var.</string>
-    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>Arka planda rotanızı kaydetmek ve acil durumlarda kullanmak için bu izin şarttır.</string>
-    
-    <!-- Arka Plan Modları -->
-    <key>UIBackgroundModes</key>
-    <array>
-        <string>location</string>
-        <string>fetch</string>
-        <string>processing</string>
-        <string>audio</string>
-        <string>remote-notification</string>
-    </array>
-    
-    <key>BGTaskSchedulerPermittedIdentifiers</key>
-    <array>
-        <string>dev.flutter.background.refresh</string>
-    </array>
-
-    <!-- AdMob App ID (Real) -->
-    <key>GADApplicationIdentifier</key>
-    <string>ca-app-pub-3676572486266282~5769840223</string>
-
-    <key>MBXAccessToken</key>
-    <string>pk.eyJ1Ijoic2VyY2Fub3JhbGwiLCJhIjoiY21vdGxneTR1MDZkNjJ1czl5OG4xZGRtNSJ9.aZd3CyiISCcxlcR0hXkhhQ</string>
-
-    <!-- Required Privacy Keys -->
-    <key>NSMicrophoneUsageDescription</key>
-    <string>Telsiz özelliği için mikrofon erişimi gereklidir.</string>
-    <key>NSUserTrackingUsageDescription</key>
-    <string>Size daha ilgi çekici ve kişiselleştirilmiş reklamlar gösterebilmek için bu izne ihtiyacımız var.</string>
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>Profil fotoğrafı ve acil durum görselleri seçebilmek için galeri erişimine ihtiyaç vardır.</string>
-    <key>NSCameraUsageDescription</key>
-    <string>Anlık acil durum fotoğrafları çekebilmek için kamera erişimine ihtiyaç vardır.</string>
-    <key>NSSpeechRecognitionUsageDescription</key>
-    <string>Acil durumlarda sesli komutlarınızı algılamak için ses tanıma iznine ihtiyaç vardır.</string>
-    <key>NSMotionUsageDescription</key>
-    <string>Acil durum ve fırtına uyarısı için barometre / basınç verilerine erişim gereklidir.</string>
-    
-    <!-- Background Location Fallback for older iOS versions -->
-    <key>NSLocationAlwaysUsageDescription</key>
-    <string>Arka planda rotanızı kaydetmek ve acil durumlarda kullanmak için bu izin şarttır.</string>
-
-    <!-- Bluetooth and P2P Mesh Network Permissions -->
-    <key>NSBluetoothAlwaysUsageDescription</key>
-    <string>Çevrimdışı acil durum mesajlaşması (Mesh Network) için Bluetooth erişimi gereklidir.</string>
-    <key>NSBluetoothPeripheralUsageDescription</key>
-    <string>Çevrimdışı acil durum mesajlaşması (Mesh Network) için Bluetooth erişimi gereklidir.</string>
-    <key>NSLocalNetworkUsageDescription</key>
-    <string>Çevrimdışı acil durum mesajlaşması (Mesh Network) için yerel ağ erişimi gereklidir.</string>
-    <key>NSBonjourServices</key>
-    <array>
-        <string>_mp-connection._tcp</string>
-        <string>_dartobservatory._tcp</string>
-    </array>
-    
-    <!-- Fallback Permissions for permission_handler to prevent TestFlight TCC crashes -->
-    <key>NSContactsUsageDescription</key>
-    <string>Acil durumlarda kişi seçebilmeniz için rehber erişimi gereklidir.</string>
-    <key>NSCalendarsUsageDescription</key>
-    <string>Etkinlik planlamaları için takvim erişimi gereklidir.</string>
-    <key>NSAppleMusicUsageDescription</key>
-    <string>Medya kitaplığına erişim gereklidir.</string>
-    <key>NSRemindersUsageDescription</key>
-    <string>Hatırlatıcılar için erişim gereklidir.</string>
-    <key>NSFaceIDUsageDescription</key>
-    <string>Güvenli giriş için FaceID erişimi gereklidir.</string>
-    <key>NSSiriUsageDescription</key>
-    <string>Siri üzerinden komut verebilmeniz için gereklidir.</string>
-    <key>NSHealthShareUsageDescription</key>
-    <string>Sağlık verilerini okumak için gereklidir.</string>
-    <key>NSHealthUpdateUsageDescription</key>
-    <string>Sağlık verilerini güncellemek için gereklidir.</string>
-    <key>NSHomeKitUsageDescription</key>
-    <string>Akıllı cihaz entegrasyonu için gereklidir.</string>
-    
-    <key>SKAdNetworkItems</key>
-    <array>
-      <dict>
-        <key>SKAdNetworkIdentifier</key>
-        <string>cstr6suwn9.skadnetwork</string>
-      </dict>
-    </array>
-</dict>
+	<dict>
+		<key>ITSAppUsesNonExemptEncryption</key>
+		<false/>
+		<key>CFBundleDevelopmentRegion</key>
+		<string>$(DEVELOPMENT_LANGUAGE)</string>
+		<key>CFBundleDisplayName</key>
+		<string>Acil Durum App</string>
+		<key>CFBundleExecutable</key>
+		<string>$(EXECUTABLE_NAME)</string>
+		<key>CFBundleIdentifier</key>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+		<key>CFBundleInfoDictionaryVersion</key>
+		<string>6.0</string>
+		<key>CFBundleName</key>
+		<string>mountaineering_app</string>
+		<key>CFBundlePackageType</key>
+		<string>APPL</string>
+		<key>CFBundleShortVersionString</key>
+		<string>$(FLUTTER_BUILD_NAME)</string>
+		<key>CFBundleSignature</key>
+		<string>????</string>
+		<key>CFBundleVersion</key>
+		<string>$(FLUTTER_BUILD_NUMBER)</string>
+		<key>LSRequiresIPhoneOS</key>
+		<true/>
+		<key>LSApplicationQueriesSchemes</key>
+		<array>
+			<string>sms</string>
+			<string>tel</string>
+		</array>
+		<key>UILaunchStoryboardName</key>
+		<string>LaunchScreen</string>
+		<key>UIMainStoryboardFile</key>
+		<string>Main</string>
+		<key>UISupportedInterfaceOrientations</key>
+		<array>
+			<string>UIInterfaceOrientationPortrait</string>
+			<string>UIInterfaceOrientationLandscapeLeft</string>
+			<string>UIInterfaceOrientationLandscapeRight</string>
+		</array>
+		<key>UISupportedInterfaceOrientations~ipad</key>
+		<array>
+			<string>UIInterfaceOrientationPortrait</string>
+			<string>UIInterfaceOrientationPortraitUpsideDown</string>
+			<string>UIInterfaceOrientationLandscapeLeft</string>
+			<string>UIInterfaceOrientationLandscapeRight</string>
+		</array>
+		<key>UIViewControllerBasedStatusBarAppearance</key>
+		<false/>
+		<key>CADisableMinimumFrameDurationOnPhone</key>
+		<true/>
+		<key>UIApplicationSupportsIndirectInputEvents</key>
+		<true/>
+		<!-- Konum İzinleri -->
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>Tırmanış rotanızı takip etmek için konuma ihtiyacımız var.</string>
+		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+		<string>Arka planda rotanızı kaydetmek ve acil durumlarda kullanmak için bu izin şarttır.</string>
+		<!-- Arka Plan Modları -->
+		<key>UIBackgroundModes</key>
+		<array>
+			<string>location</string>
+			<string>fetch</string>
+			<string>processing</string>
+			<string>audio</string>
+			<string>remote-notification</string>
+		</array>
+		<key>BGTaskSchedulerPermittedIdentifiers</key>
+		<array>
+			<string>dev.flutter.background.refresh</string>
+		</array>
+		<!-- AdMob App ID (Real) -->
+		<key>GADApplicationIdentifier</key>
+		<string>ca-app-pub-3676572486266282~5769840223</string>
+		<key>MBXAccessToken</key>
+		<string>pk.eyJ1Ijoic2VyY2Fub3JhbGwiLCJhIjoiY21vdGxneTR1MDZkNjJ1czl5OG4xZGRtNSJ9.aZd3CyiISCcxlcR0hXkhhQ</string>
+		<!-- Required Privacy Keys -->
+		<key>NSMicrophoneUsageDescription</key>
+		<string>Telsiz özelliği için mikrofon erişimi gereklidir.</string>
+		<key>NSUserTrackingUsageDescription</key>
+		<string>Size daha ilgi çekici ve kişiselleştirilmiş reklamlar gösterebilmek için bu izne ihtiyacımız var.</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>Profil fotoğrafı ve acil durum görselleri seçebilmek için galeri erişimine ihtiyaç vardır.</string>
+		<key>NSCameraUsageDescription</key>
+		<string>Anlık acil durum fotoğrafları çekebilmek için kamera erişimine ihtiyaç vardır.</string>
+		<key>NSSpeechRecognitionUsageDescription</key>
+		<string>Acil durumlarda sesli komutlarınızı algılamak için ses tanıma iznine ihtiyaç vardır.</string>
+		<key>NSMotionUsageDescription</key>
+		<string>Acil durum ve fırtına uyarısı için barometre / basınç verilerine erişim gereklidir.</string>
+		<!-- Background Location Fallback for older iOS versions -->
+		<key>NSLocationAlwaysUsageDescription</key>
+		<string>Arka planda rotanızı kaydetmek ve acil durumlarda kullanmak için bu izin şarttır.</string>
+		<!-- Bluetooth and P2P Mesh Network Permissions -->
+		<key>NSBluetoothAlwaysUsageDescription</key>
+		<string>Çevrimdışı acil durum mesajlaşması (Mesh Network) için Bluetooth erişimi gereklidir.</string>
+		<key>NSBluetoothPeripheralUsageDescription</key>
+		<string>Çevrimdışı acil durum mesajlaşması (Mesh Network) için Bluetooth erişimi gereklidir.</string>
+		<key>NSLocalNetworkUsageDescription</key>
+		<string>Çevrimdışı acil durum mesajlaşması (Mesh Network) için yerel ağ erişimi gereklidir.</string>
+		<key>NSBonjourServices</key>
+		<array>
+			<string>_mp-connection._tcp</string>
+			<string>_dartobservatory._tcp</string>
+		</array>
+		<!-- Fallback Permissions for permission_handler to prevent TestFlight TCC crashes -->
+		<key>NSContactsUsageDescription</key>
+		<string>Acil durumlarda kişi seçebilmeniz için rehber erişimi gereklidir.</string>
+		<key>NSCalendarsUsageDescription</key>
+		<string>Etkinlik planlamaları için takvim erişimi gereklidir.</string>
+		<key>NSAppleMusicUsageDescription</key>
+		<string>Medya kitaplığına erişim gereklidir.</string>
+		<key>NSRemindersUsageDescription</key>
+		<string>Hatırlatıcılar için erişim gereklidir.</string>
+		<key>NSFaceIDUsageDescription</key>
+		<string>Güvenli giriş için FaceID erişimi gereklidir.</string>
+		<key>NSSiriUsageDescription</key>
+		<string>Siri üzerinden komut verebilmeniz için gereklidir.</string>
+		<key>NSHealthShareUsageDescription</key>
+		<string>Sağlık verilerini okumak için gereklidir.</string>
+		<key>NSHealthUpdateUsageDescription</key>
+		<string>Sağlık verilerini güncellemek için gereklidir.</string>
+		<key>NSHomeKitUsageDescription</key>
+		<string>Akıllı cihaz entegrasyonu için gereklidir.</string>
+		<key>SKAdNetworkItems</key>
+		<array>
+			<dict>
+				<key>SKAdNetworkIdentifier</key>
+				<string>cstr6suwn9.skadnetwork</string>
+			</dict>
+		</array>
+		<key>UIStatusBarHidden</key>
+		<false/>
+	</dict>
 </plist>

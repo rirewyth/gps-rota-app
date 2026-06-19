@@ -235,13 +235,13 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
       _speech.stop();
     } else {
       var status = await Permission.microphone.request();
-      var speechStatus = await Permission.speech.request();
-      if (status != PermissionStatus.granted || speechStatus != PermissionStatus.granted) {
+      if (!status.isGranted) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mikrofon ve Ses Tanıma izni gerekli!')));
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mikrofon izni gerekli!')));
         }
         return;
       }
+
 
       bool available = await _speech.initialize(
         onStatus: (status) {

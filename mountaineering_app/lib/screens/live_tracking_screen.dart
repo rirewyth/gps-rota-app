@@ -246,6 +246,7 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
               pauseLocationUpdatesAutomatically: false,
               showBackgroundLocationIndicator: true,
               activityType: ActivityType.fitness,
+              allowBackgroundLocationUpdates: true,
             )
           : AndroidSettings(
               accuracy: LocationAccuracy.bestForNavigation,

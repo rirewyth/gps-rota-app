@@ -613,16 +613,24 @@ class _HomeDashboardState extends State<HomeDashboard>
   void _startGps({bool lowPower = false}) {
     _positionStream?.cancel();
     _positionStream = Geolocator.getPositionStream(
-      locationSettings: AndroidSettings(
-        accuracy: lowPower
-            ? LocationAccuracy.medium
-            : LocationAccuracy.bestForNavigation,
-        distanceFilter: lowPower ? 50 : 5,      // Reduce frequency in low power
-        intervalDuration: Duration(seconds: lowPower ? 30 : 5),
-        foregroundNotificationConfig: const ForegroundNotificationConfig(
-          notificationTitle: "Rota+ Güvenlik Takibi",
-          notificationText: "Radar ve Güvenlik servisleri arka planda çalışıyor.",
-          notificationIcon: AndroidResource(name: 'ic_notification'),
+      locationSettings: Platform.isIOS
+          ? AppleSettings(
+              accuracy: lowPower
+                  ? LocationAccuracy.medium
+                  : LocationAccuracy.bestForNavigation,
+              distanceFilter: lowPower ? 50 : 5,
+              allowBackgroundLocationUpdates: true,
+            )
+          : AndroidSettings(
+              accuracy: lowPower
+                  ? LocationAccuracy.medium
+                  : LocationAccuracy.bestForNavigation,
+              distanceFilter: lowPower ? 50 : 5,      // Reduce frequency in low power
+              intervalDuration: Duration(seconds: lowPower ? 30 : 5),
+              foregroundNotificationConfig: const ForegroundNotificationConfig(
+                notificationTitle: "Rota+ Güvenlik Takibi",
+                notificationText: "Radar ve Güvenlik servisleri arka planda çalışıyor.",
+                notificationIcon: AndroidResource(name: 'ic_notification'),
           enableWakeLock: true,
         ),
       ),

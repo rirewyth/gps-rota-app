@@ -88,7 +88,12 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
     _loadTeam();
     _startLocationSync();
     _radarLocationStream = Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(accuracy: LocationAccuracy.bestForNavigation),
+      locationSettings: Platform.isIOS
+          ? AppleSettings(
+              accuracy: LocationAccuracy.bestForNavigation,
+              allowBackgroundLocationUpdates: true,
+            )
+          : const LocationSettings(accuracy: LocationAccuracy.bestForNavigation),
     ).asBroadcastStream();
     _pulseController = AnimationController(
       vsync: this,
@@ -103,7 +108,13 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
     if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) return;
 
     _syncStream = Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium, distanceFilter: 10),
+      locationSettings: Platform.isIOS
+          ? AppleSettings(
+              accuracy: LocationAccuracy.medium,
+              distanceFilter: 10,
+              allowBackgroundLocationUpdates: true,
+            )
+          : const LocationSettings(accuracy: LocationAccuracy.medium, distanceFilter: 10),
     ).listen((pos) {
       if (!mounted) return;
       
@@ -1507,38 +1518,78 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
           if (lat != null && lng != null) {
             markers.add(Marker(
               point: LatLng(lat, lng),
-              width: 50,
-              height: 50,
+              width: 100,
+              height: 80,
               child: GestureDetector(
                 onTap: () {
                   showDialog(context: context, builder: (_) => Dialog(
                     backgroundColor: kTCard,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: const BorderSide(color: Colors.yellow, width: 2)),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         if (evData['image'] != null && evData['image'].toString().startsWith('base64:'))
-                          Image.memory(base64Decode(evData['image'].toString().substring(7)))
+                          ClipRRect(borderRadius: const BorderRadius.vertical(top: Radius.circular(14)), child: Image.memory(base64Decode(evData['image'].toString().substring(7))))
                         else if (evData['image'] != null && evData['image'].toString().isNotEmpty)
-                          Image.network(evData['image'].toString()),
+                          ClipRRect(borderRadius: const BorderRadius.vertical(top: Radius.circular(14)), child: Image.network(evData['image'].toString())),
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text('Gönderen: ${evData['senderName']}\nBULGU / DELİL', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            children: [
+                              const Text('📸 BULGU / DELİL', style: TextStyle(color: Colors.yellow, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+                              const SizedBox(height: 8),
+                              Text('Gönderen: ${evData['senderName']}', style: const TextStyle(color: Colors.white70, fontSize: 14)),
+                            ],
+                          ),
                         ),
                         if (evData['senderId'] == _myUid || _myRole == 'leader')
-                          TextButton(
-                            onPressed: () {
-                              FirebaseFirestore.instance.collection('teams').doc(_teamId).collection('messages').doc(evDoc.id).delete();
-                              Navigator.pop(context);
-                            }, 
-                            child: const Text('Sil', style: TextStyle(color: Colors.red))
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(backgroundColor: Colors.red.withOpacity(0.8), foregroundColor: Colors.white),
+                              onPressed: () {
+                                FirebaseFirestore.instance.collection('teams').doc(_teamId).collection('messages').doc(evDoc.id).delete();
+                                Navigator.pop(context);
+                              },
+                              icon: const Icon(Icons.delete, size: 18),
+                              label: const Text('Delili Sil'),
+                            ),
                           )
                       ]
                     )
                   ));
                 },
-                child: Container(
-                  decoration: BoxDecoration(color: Colors.black87, shape: BoxShape.circle, border: Border.all(color: Colors.yellow, width: 2)),
-                  child: const Icon(Icons.camera_alt, color: Colors.yellow, size: 24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.yellow.shade800,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.black, width: 2),
+                        boxShadow: [
+                          BoxShadow(color: Colors.yellow.withOpacity(0.6), blurRadius: 10, spreadRadius: 3),
+                        ],
+                      ),
+                      child: const Icon(Icons.saved_search, color: Colors.black, size: 22),
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.8),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: Colors.yellow.shade800, width: 1.5),
+                      ),
+                      child: Text(
+                        'DELİL: ${evData['senderName']?.split(' ')[0] ?? ''}',
+                        style: const TextStyle(color: Colors.yellow, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
               )
             ));

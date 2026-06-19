@@ -189,7 +189,6 @@ class _SurvivalGuideScreenState extends State<SurvivalGuideScreen> {
                   title: 'İLKYARDIMDA BASI NOKTALARI',
                   subtitle: 'KANAMAYI DURDURMAK İÇİN KAS SİSTEMİ UYGULAMASI',
                   color: Colors.redAccent,
-                  imagePath: 'assets/guides/basi_noktalari_guide.jpg',
                   sections: [
                     _buildManualSection('NASIL UYGULANIR?', '• Doğrudan kanayan bölgeye veya en yakın bası noktasına bası yapın.\n• 5-10 dakika süreyle kesintisiz basın.\n• Mümkünse yaralı bölgeyi kalp seviyesinin üzerinde tutun.\n• Kanama durana kadar basıya devam edin.\n\nÖNEMLİ: Bası noktaları kemik üzerine değil, kas dokusu üzerine yapılır. Kanama durmuyorsa tıbbi yardım isteyin.', Icons.front_hand),
                     _buildManualSection('TEMEL BASI NOKTALARI', '1. Şakak (Temporal)\n2. Çene Altı (Fasiyal)\n3. Köprücük Üstü (Subklaviyan)\n4. Kolun Üst Kısmı (Brachial)\n5. Ön Kol (Radiyal)\n6. Kasık (Femoral)\n7. Diz Arkası (Popliteal)\n8. Ensenin Yanı (Karotid Sinüs)\n9. Koltuk Altı (Aksiller)\n10. El Bileği İçi (Ulnar)\n11. Topuk Üstü (Posterior Tibial)', Icons.accessibility_new),
