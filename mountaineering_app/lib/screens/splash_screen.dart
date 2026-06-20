@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import '../storage_helper.dart';
 import 'onboarding_screen.dart';
 import 'app_intro_screen.dart';
@@ -18,7 +20,14 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (Platform.isIOS) {
+        try {
+          await AppTrackingTransparency.requestTrackingAuthorization();
+        } catch (e) {
+          debugPrint('ATT Error: $e');
+        }
+      }
       AdService().init();
     });
     _navigateToNext();

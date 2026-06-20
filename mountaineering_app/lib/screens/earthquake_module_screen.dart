@@ -234,10 +234,20 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
       setState(() => _isAiDetectorActive = false);
       _speech.stop();
     } else {
-      var status = await Permission.microphone.request();
-      if (!status.isGranted) {
+      var micStatus = await Permission.microphone.request();
+      var speechStatus = await Permission.speech.request();
+      
+      if (!micStatus.isGranted || !speechStatus.isGranted) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mikrofon izni gerekli!')));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Mikrofon ve Ses Tanıma izni gerekli!'),
+              action: SnackBarAction(
+                label: 'AYARLAR',
+                onPressed: () => openAppSettings(),
+              ),
+            )
+          );
         }
         return;
       }

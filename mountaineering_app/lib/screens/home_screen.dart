@@ -472,6 +472,7 @@ class _HomeDashboardState extends State<HomeDashboard>
                   Permission.location,
                   Permission.notification,
                   Permission.microphone,
+                  Permission.speech,
                 ];
                 if (!isIOS) {
                   permsToRequest.add(Permission.sms);
