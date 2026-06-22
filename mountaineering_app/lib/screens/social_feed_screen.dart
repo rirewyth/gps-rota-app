@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 import 'dart:ui' as ui;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -42,6 +43,58 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
 
   User? get _currentUser => FirebaseAuth.instance.currentUser;
   bool get _isAdmin => _currentUser?.email == adminEmail;
+
+  List<String> _blockedUsers = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBlockedUsers();
+  }
+
+  Future<void> _loadBlockedUsers() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _blockedUsers = prefs.getStringList('blocked_users_list') ?? [];
+    });
+  }
+
+  Future<void> _blockUser(String userIdToBlock) async {
+    if (_blockedUsers.contains(userIdToBlock)) return;
+    setState(() {
+      _blockedUsers.add(userIdToBlock);
+    });
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('blocked_users_list', _blockedUsers);
+    
+    // Notify developer (per App Store requirement)
+    if (_currentUser != null) {
+      FirebaseFirestore.instance.collection('reports').add({
+        'type': 'block_user',
+        'reporter': _currentUser!.uid,
+        'blocked_user': userIdToBlock,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+    }
+    
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Kullanıcı engellendi. Gönderileri artık görünmeyecek.'), backgroundColor: Colors.orange));
+    }
+  }
+
+  Future<void> _reportPost(String postId, String reportedUserId) async {
+    if (_currentUser == null) return;
+    await FirebaseFirestore.instance.collection('reports').add({
+      'type': 'report_post',
+      'reporter': _currentUser!.uid,
+      'reported_user': reportedUserId,
+      'post_id': postId,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('İçerik şikayet edildi. 24 saat içinde incelenecektir.'), backgroundColor: Colors.green));
+    }
+  }
 
   Future<void> _pickImage() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 50, maxWidth: 800);
@@ -966,7 +1019,12 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
           );
         }
 
-        final posts = snapshot.data!.docs;
+        final docs = snapshot.data!.docs;
+        final posts = docs.where((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          final uid = data['userId'] as String? ?? '';
+          return !_blockedUsers.contains(uid);
+        }).toList();
         
         // Premium değilse aralara reklam yerleştir
         final List<dynamic> feedItems = [];
@@ -1117,6 +1175,10 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                                     await FirebaseFirestore.instance.collection('posts').doc(docId).delete();
                                   } else if (value == 'edit') {
                                     _showEditPostDialog(docId, desc);
+                                  } else if (value == 'report') {
+                                    _reportPost(docId, userId);
+                                  } else if (value == 'block') {
+                                    _blockUser(userId);
                                   } else if (value == 'ban' && _isAdmin) {
                                     _banUser(userId, user);
                                   } else if (value == 'admin_delete' && _isAdmin) {
@@ -1136,6 +1198,16 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                                     const PopupMenuItem(
                                       value: 'ban',
                                       child: Row(children: [Icon(Icons.block, color: Colors.orange, size: 16), SizedBox(width: 8), Text('Admin: Yasakla', style: TextStyle(color: Colors.orange))]),
+                                    ),
+                                  ],
+                                  if (_currentUser != null && !isMyPost) ...[
+                                    const PopupMenuItem(
+                                      value: 'report',
+                                      child: Row(children: [Icon(Icons.flag, color: Colors.orange, size: 16), SizedBox(width: 8), Text('Şikayet Et', style: TextStyle(color: Colors.orange))]),
+                                    ),
+                                    const PopupMenuItem(
+                                      value: 'block',
+                                      child: Row(children: [Icon(Icons.block, color: Colors.red, size: 16), SizedBox(width: 8), Text('Kullanıcıyı Engelle', style: TextStyle(color: Colors.red))]),
                                     ),
                                   ],
                                 ],

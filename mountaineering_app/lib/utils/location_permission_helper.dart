@@ -75,7 +75,7 @@ class LocationPermissionHelper {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text("KABUL ET", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+            child: const Text("Devam Et", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
           ),
         ],
       ),

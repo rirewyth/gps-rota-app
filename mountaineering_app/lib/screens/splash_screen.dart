@@ -20,17 +20,23 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (Platform.isIOS) {
-        try {
-          await AppTrackingTransparency.requestTrackingAuthorization();
-        } catch (e) {
-          debugPrint('ATT Error: $e');
-        }
+    _initAndNavigate();
+  }
+
+  Future<void> _initAndNavigate() async {
+    // 1. Önce ATT iste (sadece iOS)
+    if (Platform.isIOS) {
+      try {
+        final status = await AppTrackingTransparency.requestTrackingAuthorization();
+        debugPrint('ATT Status: $status');
+      } catch (e) {
+        debugPrint('ATT Error: $e');
       }
-      AdService().init();
-    });
-    _navigateToNext();
+    }
+    // 2. Ardından AdService başlat
+    AdService().init();
+    // 3. Son olarak navigasyona devam et
+    await _navigateToNext();
   }
 
   Future<void> _navigateToNext() async {

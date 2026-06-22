@@ -118,10 +118,6 @@
 		<string>Güvenli giriş için FaceID erişimi gereklidir.</string>
 		<key>NSSiriUsageDescription</key>
 		<string>Siri üzerinden komut verebilmeniz için gereklidir.</string>
-		<key>NSHealthShareUsageDescription</key>
-		<string>Sağlık verilerini okumak için gereklidir.</string>
-		<key>NSHealthUpdateUsageDescription</key>
-		<string>Sağlık verilerini güncellemek için gereklidir.</string>
 		<key>NSHomeKitUsageDescription</key>
 		<string>Akıllı cihaz entegrasyonu için gereklidir.</string>
 		<key>SKAdNetworkItems</key>

@@ -481,7 +481,7 @@ class _HomeDashboardState extends State<HomeDashboard>
                 await permsToRequest.request();
                 // Removed the blocking _showMandatoryPermissionsDialog entirely
               },
-              child: const Text('KABUL ET', style: TextStyle(color: kGreen, fontWeight: FontWeight.bold)),
+              child: const Text('Devam Et', style: TextStyle(color: kGreen, fontWeight: FontWeight.bold)),
             ),
           ],
         ),

@@ -344,7 +344,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                         Navigator.push(context, MaterialPageRoute(builder: (_) => const LegalScreen(type: LegalType.privacy)));
                                       },
                                   ),
-                                  const TextSpan(text: '’nı okudum, taktiksel operasyon ve dağcılık risklerini kabul ediyorum.'),
+                                  const TextSpan(text: '’nı okudum, uygunsuz içerik ve tacizkar davranışlara tolerans gösterilmediğini, taktiksel operasyon risklerini kabul ediyorum.'),
                                 ],
                               ),
                             ),

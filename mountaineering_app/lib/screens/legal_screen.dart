@@ -64,10 +64,10 @@ Uygulama üzerinden sunulan içerikler ve yazılım Rota+'ya aittir. Ticari olma
 4. Sorumluluk Sınırlandırması
 Uygulamanın kullanımından kaynaklanabilecek fiziksel yaralanma, mal kaybı veya diğer zararlardan Rota+ geliştiricileri ve ortakları sorumlu tutulamaz. Verilerin (konum, mesaj vb.) iletilememesi durumunda doğabilecek aksaklıklardan Rota+ sorumlu değildir.
 
-5. Kullanıcı Yükümlülükleri
-Kullanıcı, uygulamayı yasalara uygun ve etik çerçevede kullanacağını taahhüt eder. Diğer kullanıcıları taciz etmek veya sistemi manipüle etmek yasaktır.
+6. Kullanıcı İçeriği ve Uygunsuz Davranışlara Sıfır Tolerans (UGC)
+Kullanıcı, uygulamayı yasalara uygun ve etik çerçevede kullanacağını taahhüt eder. Uygulama içerisinde (sosyal akış, yorumlar, mesajlaşma vb.) paylaşılan tüm içeriklerden kullanıcı sorumludur. Küfürlü, hakaret içeren, şiddete veya nefrete teşvik eden, müstehcen veya herhangi bir şekilde rahatsız edici (objectionable content) içeriklerin paylaşılmasına KESİNLİKLE TOLERANS GÖSTERİLMEYECEKTİR. Diğer kullanıcıları taciz etmek veya sistemi manipüle etmek yasaktır. Uygunsuz içerik paylaşan veya tacizkar davranışlarda bulunan kullanıcılar (abusive users) kalıcı olarak sistemden uzaklaştırılacak ve paylaştıkları içerikler 24 saat içinde silinecektir.
 
-6. Değişiklikler
+7. Değişiklikler
 Rota+, bu kullanım koşullarını dilediği zaman güncelleme hakkını saklı tutar. Değişiklikler uygulama üzerinden bildirilecektir.
 ''';
 
