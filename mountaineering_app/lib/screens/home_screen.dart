@@ -458,12 +458,6 @@ class _HomeDashboardState extends State<HomeDashboard>
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('ŞİMDİLİK ATLA', style: TextStyle(color: Colors.white38)),
-            ),
-            TextButton(
               onPressed: () async {
                 Navigator.pop(context);
                 bool isIOS = Theme.of(context).platform == TargetPlatform.iOS;
