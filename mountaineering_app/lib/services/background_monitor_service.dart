@@ -99,7 +99,7 @@ class BackgroundMonitorService {
       _taskTag,
       frequency: const Duration(minutes: 15),
       constraints: Constraints(networkType: NetworkType.connected),
-      existingWorkPolicy: ExistingWorkPolicy.keep,
+      existingWorkPolicy: ExistingPeriodicWorkPolicy.keep,
     );
     debugPrint('BackgroundMonitorService: Android Workmanager başlatıldı.');
   }
