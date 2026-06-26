@@ -65,10 +65,6 @@ class LocationPermissionHelper {
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text("REDDET", style: TextStyle(color: Colors.white38, fontWeight: FontWeight.bold)),
-          ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFFF6B00),

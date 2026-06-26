@@ -24,6 +24,9 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _initAndNavigate() async {
+    // Biraz bekle, ekran çizilsin (ATT'nin çıkması için gerekiyor)
+    await Future.delayed(const Duration(milliseconds: 1000));
+    
     // 1. Önce ATT iste (sadece iOS)
     if (Platform.isIOS) {
       try {
