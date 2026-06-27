@@ -1211,8 +1211,6 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                                   ],
                                 ],
                               )
-                            else
-                              const SizedBox(width: 40),
                           ],
                         );
                       }),
