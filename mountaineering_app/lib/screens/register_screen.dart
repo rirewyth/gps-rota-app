@@ -168,7 +168,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         shape: BoxShape.circle,
                         border: Border.all(color: kOrange.withOpacity(0.3), width: 1.5),
                       ),
-                      child: ClipOval(child: Image.asset('assets/icon/tactical_logo.jpg', fit: BoxFit.cover)),
+                      child: ClipOval(child: Image.asset('assets/icon/tactical_logo.png', fit: BoxFit.cover)),
                     ),
                     const SizedBox(width: 15),
                     Column(

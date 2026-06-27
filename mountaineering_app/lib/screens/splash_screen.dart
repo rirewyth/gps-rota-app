@@ -140,7 +140,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       ),
                       child: ClipOval(
                         child: Image.asset(
-                          'assets/icon/tactical_logo.jpg',
+                          'assets/icon/tactical_logo.png',
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) =>
                               const Icon(Icons.shield, size: 100, color: kBlue),

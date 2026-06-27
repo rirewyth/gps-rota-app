@@ -54,7 +54,7 @@ class AboutScreen extends StatelessWidget {
                       BoxShadow(color: kOrange.withOpacity(0.1), blurRadius: 20, spreadRadius: 5)
                     ],
                   ),
-                  child: ClipOval(child: Image.asset('assets/icon/tactical_logo.jpg', fit: BoxFit.cover)),
+                  child: ClipOval(child: Image.asset('assets/icon/tactical_logo.png', fit: BoxFit.cover)),
                 ),
                 const SizedBox(height: 20),
                 Text('ROTA+', style: GoogleFonts.outfit(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900, letterSpacing: 4)),
