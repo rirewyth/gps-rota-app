@@ -7,6 +7,9 @@ import 'package:permission_handler/permission_handler.dart';
 import '../storage_helper.dart';
 import '../database_helper.dart';
 import '../utils/app_state.dart';
+import 'personal_info_screen.dart';
+import 'affiliation_screen.dart';
+import 'blocked_users_screen.dart';
 import 'login_screen.dart';
 import 'premium_screen.dart';
 import '../services/premium_service.dart';
@@ -565,6 +568,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         _buildMenuTile(Icons.badge_outlined, AppState.tr('KİŞİSEL BİLGİLER'), _showPersonalInfoDialog),
                         _buildDivider(),
                         _buildMenuTile(Icons.flag_outlined, AppState.tr('KURUM / KURULUŞ BİLGİSİ'), _showAffiliationDialog),
+                        _buildDivider(),
+                        _buildMenuTile(Icons.block, AppState.tr('ENGELLENEN KULLANICILAR'), () {
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => const BlockedUsersScreen()));
+                        }),
                       ],
                     ),
                   ),

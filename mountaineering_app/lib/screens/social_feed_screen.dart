@@ -54,9 +54,32 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
 
   Future<void> _loadBlockedUsers() async {
     final prefs = await SharedPreferences.getInstance();
+    
+    // İlk olarak lokalden yükle (hızlı açılış için)
     setState(() {
       _blockedUsers = prefs.getStringList('blocked_users_list') ?? [];
     });
+
+    // Sonra Firestore'dan güncel listeyi alıp eşitle (Cihazlar arası senkronizasyon)
+    if (_currentUser != null) {
+      try {
+        final doc = await FirebaseFirestore.instance.collection('users').doc(_currentUser!.uid).get();
+        if (doc.exists) {
+          final data = doc.data() as Map<String, dynamic>;
+          if (data.containsKey('blocked_users')) {
+            final firestoreBlocked = List<String>.from(data['blocked_users'] ?? []);
+            if (firestoreBlocked.length != _blockedUsers.length || !firestoreBlocked.every((e) => _blockedUsers.contains(e))) {
+              setState(() {
+                _blockedUsers = firestoreBlocked;
+              });
+              await prefs.setStringList('blocked_users_list', firestoreBlocked);
+            }
+          }
+        }
+      } catch (e) {
+        debugPrint('Blocked users fetch error: $e');
+      }
+    }
   }
 
   Future<void> _blockUser(String userIdToBlock) async {
@@ -67,14 +90,20 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setStringList('blocked_users_list', _blockedUsers);
     
-    // Notify developer (per App Store requirement)
+    // Notify developer and update local array (per App Store requirement)
     if (_currentUser != null) {
+      // 1. Şikayet raporu oluştur
       FirebaseFirestore.instance.collection('reports').add({
         'type': 'block_user',
         'reporter': _currentUser!.uid,
         'blocked_user': userIdToBlock,
         'timestamp': FieldValue.serverTimestamp(),
       });
+      
+      // 2. Kendi kullanıcı belgeme 'blocked_users' dizisine ekle (DM engeli vb. için kalıcı)
+      FirebaseFirestore.instance.collection('users').doc(_currentUser!.uid).set({
+        'blocked_users': FieldValue.arrayUnion([userIdToBlock])
+      }, SetOptions(merge: true));
     }
     
     if (mounted) {

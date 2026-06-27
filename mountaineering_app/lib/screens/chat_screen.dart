@@ -24,6 +24,12 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   String _myUserName = 'Ben';
   String _myUserPic = '';
   bool _chatIdReady = false;
+  bool _iBlockedThem = false;
+  bool _theyBlockedMe = false;
+  bool get _isBlocked => _iBlockedThem || _theyBlockedMe;
+
+  StreamSubscription? _myDocSub;
+  StreamSubscription? _theirDocSub;
 
   static const Color kOrange = Color(0xFFFF6B00);
 
@@ -32,10 +38,34 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _setChatId();
+    _listenToBlockStatus();
+  }
+
+  void _listenToBlockStatus() {
+    final myUid = FirebaseAuth.instance.currentUser?.uid;
+    if (myUid == null) return;
+
+    _myDocSub = FirebaseFirestore.instance.collection('users').doc(myUid).snapshots().listen((doc) {
+      if (doc.exists) {
+        final data = doc.data() as Map<String, dynamic>;
+        final myBlocked = List<String>.from(data['blocked_users'] ?? []);
+        if (mounted) setState(() => _iBlockedThem = myBlocked.contains(widget.targetUserId));
+      }
+    });
+
+    _theirDocSub = FirebaseFirestore.instance.collection('users').doc(widget.targetUserId).snapshots().listen((doc) {
+      if (doc.exists) {
+        final data = doc.data() as Map<String, dynamic>;
+        final theirBlocked = List<String>.from(data['blocked_users'] ?? []);
+        if (mounted) setState(() => _theyBlockedMe = theirBlocked.contains(myUid));
+      }
+    });
   }
 
   @override
   void dispose() {
+    _myDocSub?.cancel();
+    _theirDocSub?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     _setOnlineStatus(false);
     _msgController.dispose();
@@ -372,30 +402,43 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                     },
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  decoration: const BoxDecoration(color: Colors.black, border: Border(top: BorderSide(color: Colors.white10))),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(color: const Color(0xFF1E1E1E), borderRadius: BorderRadius.circular(24), border: Border.all(color: Colors.white12)),
-                          child: TextField(
-                            controller: _msgController,
-                            style: const TextStyle(color: Colors.white),
-                            maxLines: 4, minLines: 1,
-                            decoration: const InputDecoration(hintText: 'Mesaj yaz...', hintStyle: TextStyle(color: Colors.white38), border: InputBorder.none, contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10)),
-                          ),
+                _isBlocked
+                    ? Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: const BoxDecoration(color: Colors.black, border: Border(top: BorderSide(color: Colors.white10))),
+                        child: Text(
+                          _iBlockedThem 
+                              ? 'Kullanıcının engellemesini kaldırmadan mesaj gönderemezsiniz.' 
+                              : 'Bu kişiyle mesajlaşılamaz.',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: Colors.white54, fontSize: 13),
+                        ),
+                      )
+                    : Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        decoration: const BoxDecoration(color: Colors.black, border: Border(top: BorderSide(color: Colors.white10))),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                decoration: BoxDecoration(color: const Color(0xFF1E1E1E), borderRadius: BorderRadius.circular(24), border: Border.all(color: Colors.white12)),
+                                child: TextField(
+                                  controller: _msgController,
+                                  style: const TextStyle(color: Colors.white),
+                                  maxLines: 4, minLines: 1,
+                                  decoration: const InputDecoration(hintText: 'Mesaj yaz...', hintStyle: TextStyle(color: Colors.white38), border: InputBorder.none, contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10)),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            GestureDetector(
+                              onTap: _sendMessage,
+                              child: Container(width: 44, height: 44, decoration: const BoxDecoration(color: kOrange, shape: BoxShape.circle), child: const Icon(Icons.send, color: Colors.black, size: 20)),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      GestureDetector(
-                        onTap: _sendMessage,
-                        child: Container(width: 44, height: 44, decoration: const BoxDecoration(color: kOrange, shape: BoxShape.circle), child: const Icon(Icons.send, color: Colors.black, size: 20)),
-                      ),
-                    ],
-                  ),
-                ),
               ],
             ),
     );
