@@ -7,8 +7,6 @@ import 'package:permission_handler/permission_handler.dart';
 import '../storage_helper.dart';
 import '../database_helper.dart';
 import '../utils/app_state.dart';
-import 'personal_info_screen.dart';
-import 'affiliation_screen.dart';
 import 'blocked_users_screen.dart';
 import 'login_screen.dart';
 import 'premium_screen.dart';
