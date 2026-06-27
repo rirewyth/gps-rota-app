@@ -46,7 +46,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 6, vsync: this);
+    _tabController = TabController(length: 7, vsync: this);
     _loadAll();
   }
 
@@ -199,6 +199,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                       Tab(icon: Icon(Icons.verified_user, size: 18), text: 'BAŞVURULAR'),
                       Tab(icon: Icon(Icons.bar_chart, size: 18), text: 'İSTATİSTİK'),
                       Tab(icon: Icon(Icons.campaign, size: 18), text: 'DUYURULAR'),
+                      Tab(icon: Icon(Icons.report, size: 18), text: 'ŞİKAYETLER'),
                     ],
                   ),
                 ),
@@ -213,6 +214,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                       _buildGuideAppsTab(),
                       _buildStatsTab(),
                       _buildAnnouncementsTab(),
+                      _buildReportsTab(),
                     ],
                   ),
                 ),
@@ -1130,5 +1132,91 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
       backgroundColor: error ? Colors.red.shade900 : const Color(0xFF1E1E1E),
       duration: const Duration(seconds: 2),
     ));
+  }
+  Widget _buildReportsTab() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collection('reports').orderBy('timestamp', descending: true).snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator(color: kOrange));
+        }
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return const Center(child: Text("Henüz şikayet yok.", style: TextStyle(color: Colors.white54, fontSize: 16)));
+        }
+
+        final reports = snapshot.data!.docs;
+
+        return ListView.builder(
+          padding: const EdgeInsets.all(12),
+          itemCount: reports.length,
+          itemBuilder: (context, index) {
+            final doc = reports[index];
+            final data = doc.data() as Map<String, dynamic>;
+            final type = data['type'] ?? 'unknown';
+            final reporter = data['reporter'] ?? '';
+            
+            bool isPostReport = type == 'report_post';
+            
+            return Card(
+              color: kCardBg,
+              margin: const EdgeInsets.only(bottom: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(isPostReport ? Icons.article : Icons.person_off, color: isPostReport ? Colors.orange : Colors.red, size: 20),
+                        const SizedBox(width: 8),
+                        Text(isPostReport ? 'GÖNDERİ ŞİKAYETİ' : 'KULLANICI ENGELLEME', style: TextStyle(color: isPostReport ? Colors.orange : Colors.red, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    const Divider(color: Colors.white10, height: 24),
+                    Text('Şikayet Eden UID: $reporter', style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                    const SizedBox(height: 4),
+                    if (isPostReport) ...[
+                      Text('Şikayet Edilen Post ID: ${data['post_id']}', style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                      Text('Şikayet Edilen UID: ${data['reported_user']}', style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                    ] else ...[
+                      Text('Engellenen UID: ${data['blocked_user'] ?? data['reported_user'] ?? ''}', style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                    ],
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () async {
+                            await FirebaseFirestore.instance.collection('reports').doc(doc.id).delete();
+                            _showSnack('Rapor silindi/kapatıldı.');
+                          },
+                          child: const Text('RAPORU SİL', style: TextStyle(color: Colors.white54)),
+                        ),
+                        const SizedBox(width: 8),
+                        if (isPostReport)
+                          ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(backgroundColor: Colors.red.shade900),
+                            onPressed: () async {
+                              final postId = data['post_id'];
+                              if (postId != null) {
+                                await FirebaseFirestore.instance.collection('posts').doc(postId).delete();
+                              }
+                              await FirebaseFirestore.instance.collection('reports').doc(doc.id).delete();
+                              _showSnack('Gönderi ve rapor silindi!');
+                            },
+                            icon: const Icon(Icons.delete, size: 16, color: Colors.white),
+                            label: const Text('GÖNDERİYİ SİL', style: TextStyle(color: Colors.white)),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 }
