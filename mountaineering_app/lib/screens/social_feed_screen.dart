@@ -1167,7 +1167,6 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                                 ),
                               ),
                             ),
-                            if (isMyPost || _isAdmin)
                               PopupMenuButton<String>(
                                 icon: const Icon(Icons.more_vert, color: Colors.white54),
                                 onSelected: (value) async {
