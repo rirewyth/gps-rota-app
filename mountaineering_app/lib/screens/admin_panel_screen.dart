@@ -1135,16 +1135,26 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
   }
   Widget _buildReportsTab() {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('reports').orderBy('timestamp', descending: true).snapshots(),
+      stream: FirebaseFirestore.instance.collection('reports').snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator(color: kOrange));
+        }
+        if (snapshot.hasError) {
+          return Center(child: Text("Hata oluştu: ${snapshot.error}", style: const TextStyle(color: Colors.red)));
         }
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
           return const Center(child: Text("Henüz şikayet yok.", style: TextStyle(color: Colors.white54, fontSize: 16)));
         }
 
-        final reports = snapshot.data!.docs;
+        // Tarihe göre manuel sıralama (Index hatasını önlemek için)
+        final reports = snapshot.data!.docs.toList();
+        reports.sort((a, b) {
+          final t1 = (a.data() as Map<String, dynamic>)['timestamp'] as Timestamp?;
+          final t2 = (b.data() as Map<String, dynamic>)['timestamp'] as Timestamp?;
+          if (t1 == null || t2 == null) return 0;
+          return t2.compareTo(t1); // descending
+        });
 
         return ListView.builder(
           padding: const EdgeInsets.all(12),
