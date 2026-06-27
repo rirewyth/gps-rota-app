@@ -130,10 +130,6 @@ class PremiumService {
   static const List<String> _kAdminEmails = ['sercanoral65@gmail.com', 'admin@rota.plus', 'keser.bora@yandex.com'];
 
   static Future<bool> isPremium() async {
-    // TEMPORARY BYPASS FOR APP STORE APPROVAL (ONLY iOS):
-    // Apple'ın paywall'u görüp red vermemesi için iOS cihazlarda şimdilik herkesi Premium sayıyoruz.
-    // Android'de satın almalar çalıştığı için Android normal işleyişine devam eder.
-    if (Platform.isIOS) return true; 
 
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
