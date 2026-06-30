@@ -695,7 +695,8 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                     const SizedBox(width: 8),
                     Expanded(
                       child: _buildActionButton(AppState.tr('PAYLAŞ'), Icons.share_outlined, kCardBg, Colors.white, () {
-                        Share.share('Rota+ Trekking uygulamasının üyesiyim! #RotaPlus');
+                        final box = context.findRenderObject() as RenderBox?;
+                        Share.share('Rota+ Trekking uygulamasının üyesiyim! #RotaPlus', sharePositionOrigin: box != null ? box.localToGlobal(Offset.zero) & box.size : null);
                       }),
                     ),
                   ],

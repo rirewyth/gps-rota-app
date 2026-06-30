@@ -293,7 +293,7 @@ class NotificationScreen extends StatelessWidget {
                       currentBatch.set(notifRef, {
                         'type': 'admin',
                         'fromUserId': 'admin',
-                        'fromUserName': 'Acil Durum App Yönetim',
+                        'fromUserName': 'Rota Plus Emniyetteyim Yönetim',
                         'fromUserPic': '',
                         'text': msg,
                         'isRead': false,

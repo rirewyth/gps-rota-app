@@ -40,7 +40,7 @@ android {
         multiDexEnabled = true
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-        manifestPlaceholders["appName"] = "Acil Durum App"
+        manifestPlaceholders["appName"] = "Rota Plus Emniyetteyim"
     }
 
     signingConfigs {

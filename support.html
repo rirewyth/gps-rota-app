@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bize Ulaşın | Rota+</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & BASE ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0A0C0F;
+  --bg2:#0E1115;
+  --bg3:#131820;
+  --surface:#161C25;
+  --surface2:#1C2430;
+  --border:#1E2D3D;
+  --border2:#243344;
+  --red:#FF3B1C;
+  --orange:#FF8C00;
+  --green:#22FF7A;
+  --text:#E8EDF2;
+  --text2:#8FA3B8;
+  --text3:#4A6078;
+  --font-display:'Barlow Condensed',sans-serif;
+  --font-body:'Barlow',sans-serif;
+  --font-mono:'Share Tech Mono',monospace;
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  line-height:1.6;
+  overflow-x:hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+a{color:inherit;text-decoration:none}
+
+/* ── NAV ── */
+#nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  border-bottom:1px solid var(--border);
+  background:rgba(10,12,15,.92);
+  backdrop-filter:blur(16px);
+}
+.nav-wrap{
+  max-width:1140px;margin:0 auto;padding:0 24px;
+  display:flex;align-items:center;height:64px;gap:32px;
+}
+.logo{
+  font-family:var(--font-display);font-size:1.7rem;font-weight:900;
+  letter-spacing:.05em;color:#fff;
+  flex-shrink:0;
+}
+.logo span{color:var(--red)}
+.nav-links{display:flex;gap:28px;margin-left:auto}
+.nav-links a{
+  font-family:var(--font-mono);font-size:.75rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--text2);
+  transition:color .2s;
+}
+.nav-links a:hover{color:var(--text)}
+.nav-btn{
+  font-family:var(--font-mono);font-size:.75rem;letter-spacing:.12em;
+  text-transform:uppercase;
+  padding:8px 18px;
+  background:var(--red);color:#fff;
+  border:1px solid var(--red);
+  transition:all .2s;
+}
+.nav-btn:hover{background:transparent;color:var(--red)}
+
+/* ── CONTACT SECTION ── */
+#contact{
+  margin-top: 100px;
+  flex: 1;
+  padding: 40px 24px 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+#contact::before{
+  content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,59,28,.05) 0%,transparent 70%);
+  pointer-events:none;
+}
+
+.contact-header {
+  max-width: 600px;
+  width: 100%;
+  text-align: left;
+  margin-bottom: 30px;
+  position: relative;
+  z-index: 1;
+}
+
+.contact-header .sub-title {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  color: var(--text3);
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.contact-header h1 {
+  font-family: var(--font-display);
+  font-size: 4rem;
+  font-weight: 900;
+  line-height: 1.05;
+  margin-bottom: 20px;
+  color: #fff;
+}
+
+.contact-header p {
+  color: var(--text2);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.contact-container {
+  max-width: 600px;
+  width: 100%;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 40px;
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+  }
+  .contact-container {
+    padding: 30px 20px;
+  }
+  .contact-header h1 {
+    font-size: 3rem;
+  }
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-group label {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  border-radius: 4px;
+  transition: border-color 0.2s;
+}
+
+.form-control::placeholder {
+  color: var(--text3);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--orange);
+  background: var(--bg);
+}
+
+textarea.form-control {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.submit-btn {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 16px 32px;
+  background: var(--red);
+  color: #fff;
+  border: 1px solid var(--red);
+  cursor: pointer;
+  width: 100%;
+  border-radius: 4px;
+  transition: all 0.2s;
+  font-weight: bold;
+}
+
+.submit-btn:hover {
+  background: transparent;
+  color: var(--red);
+}
+
+.status-message {
+  margin-top: 16px;
+  padding: 12px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  border: 1px solid transparent;
+  display: none;
+  border-radius: 4px;
+}
+
+.status-success {
+  border-color: rgba(34,255,122,.3);
+  background: rgba(34,255,122,.05);
+  color: var(--green);
+  display: block;
+}
+
+.status-error {
+  border-color: rgba(255,59,28,.3);
+  background: rgba(255,59,28,.05);
+  color: var(--red);
+  display: block;
+}
+
+/* ── FOOTER ── */
+footer{
+  background:var(--bg);
+  border-top:1px solid var(--border);
+  padding:40px 0;
+  margin-top: auto;
+}
+.ft-wrap{
+  max-width:1140px;margin:0 auto;padding:0 24px;
+  display:flex;align-items:center;gap:24px;flex-wrap:wrap;
+}
+.ft-logo{font-family:var(--font-display);font-size:1.3rem;font-weight:900;letter-spacing:.05em;text-transform:uppercase}
+.ft-logo span{color:var(--red)}
+footer p{font-size:.8rem;color:var(--text3);margin-left:auto}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <div class="nav-wrap">
+    <div class="logo">ROTA<span>+</span></div>
+    <div class="nav-links">
+      <a href="index.html#features">Özellikler</a>
+      <a href="index.html#sos">SOS Sistemi</a>
+      <a href="index.html#protocols">Protokoller</a>
+      <a href="privacy.html" target="_blank">Gizlilik</a>
+      <a href="support.html" style="color:var(--text)">Bize Ulaşın</a>
+    </div>
+    <a href="index.html#download" class="nav-btn">İndir</a>
+  </div>
+</nav>
+
+<section id="contact">
+  <div class="contact-header">
+    <span class="sub-title">İletişim ve Destek</span>
+    <h1>Bize<br>Ulaşın</h1>
+    <p>Her türlü sorunuz, teknik destek talebiniz, ve geri bildiriminiz için aşağıdaki formu doldurarak bize ulaşabilirsiniz. Talebiniz doğrudan ekibimize iletilecektir.</p>
+  </div>
+  
+  <div class="contact-container">
+    <div class="contact-form">
+      <!-- Formspree.io üzerinden form altyapısı -->
+      <form id="contactForm" action="https://formspree.io/f/xbjnopoy" method="POST">
+        <div class="form-group">
+          <label for="name">Adınız Soyadınız</label>
+          <input type="text" id="name" name="name" class="form-control" placeholder="Örn: Ahmet Yılmaz" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="email">E-posta Adresiniz</label>
+          <input type="email" id="email" name="email" class="form-control" placeholder="Örn: ornek@email.com" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="subject">Konu</label>
+          <input type="text" id="subject" name="subject" class="form-control" placeholder="Destek talebinizin konusu nedir?" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="message">Mesajınız</label>
+          <textarea id="message" name="message" class="form-control" placeholder="Lütfen detayları buraya yazınız..." required></textarea>
+        </div>
+        
+        <button type="submit" class="submit-btn" id="submitBtn">Gönder [TX]</button>
+        <div id="statusMessage" class="status-message"></div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="ft-wrap">
+    <div class="ft-logo">ROTA<span>+</span></div>
+    <p>&copy; 2026 Rota+ Technologies. Tüm hakları saklıdır.</p>
+  </div>
+</footer>
+
+<script>
+  const form = document.getElementById('contactForm');
+  const statusMessage = document.getElementById('statusMessage');
+  const submitBtn = document.getElementById('submitBtn');
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    submitBtn.innerText = 'Gönderiliyor...';
+    submitBtn.disabled = true;
+
+    const data = new FormData(form);
+    
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        body: data,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        statusMessage.innerText = 'Mesajınız başarıyla iletildi. En kısa sürede dönüş yapacağız.';
+        statusMessage.className = 'status-message status-success';
+        form.reset();
+      } else {
+        statusMessage.innerText = 'Gönderim sırasında bir hata oluştu. Lütfen tekrar deneyin.';
+        statusMessage.className = 'status-message status-error';
+      }
+    } catch (error) {
+      statusMessage.innerText = 'Bağlantı hatası. Lütfen internetinizi kontrol edip tekrar deneyin.';
+      statusMessage.className = 'status-message status-error';
+    } finally {
+      submitBtn.innerText = 'Gönder [TX]';
+      submitBtn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>

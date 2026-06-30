@@ -335,7 +335,7 @@ class _MainAppScreenState extends State<MainAppScreen> {
     const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       'acildurum_notifications',
       'Acil Durum Bildirimleri',
-      channelDescription: 'Acil Durum App – SOS ve Ekip Bildirimleri',
+      channelDescription: 'Rota Plus Emniyetteyim – SOS ve Ekip Bildirimleri',
       importance: Importance.max,
       priority: Priority.high,
       ticker: 'ticker',
