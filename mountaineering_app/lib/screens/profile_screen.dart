@@ -694,10 +694,27 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                     ),
                     const SizedBox(width: 8),
                     Expanded(
-                      child: _buildActionButton(AppState.tr('PAYLAŞ'), Icons.share_outlined, kCardBg, Colors.white, () {
-                        final box = context.findRenderObject() as RenderBox?;
-                        Share.share('Rota+ Trekking uygulamasının üyesiyim! #RotaPlus', sharePositionOrigin: box != null ? box.localToGlobal(Offset.zero) & box.size : null);
-                      }),
+                      child: Builder(
+                        builder: (buttonCtx) {
+                          return _buildActionButton(AppState.tr('PAYLAŞ'), Icons.share_outlined, kCardBg, Colors.white, () {
+                            debugPrint('Share Button Pressed...');
+                            final box = buttonCtx.findRenderObject() as RenderBox?;
+                            final textToShare = 'Rota+ Trekking uygulamasının üyesiyim! #RotaPlus';
+                            if (textToShare.trim().isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Paylaşılacak içerik boş!')));
+                              return;
+                            }
+                            Share.share(
+                              textToShare, 
+                              sharePositionOrigin: box != null ? box.localToGlobal(Offset.zero) & box.size : null
+                            ).then((result) {
+                              debugPrint('Share result: ${result.status}');
+                            }).catchError((e) {
+                              debugPrint('Share error: $e');
+                            });
+                          });
+                        }
+                      ),
                     ),
                   ],
                 ),

@@ -85,22 +85,54 @@ class PremiumService {
 
   static String lastError = '';
 
-  static Future<List<ProductDetails>> fetchProducts() async {
+  static Future<List<ProductDetails>> fetchProducts({int maxRetries = 3}) async {
     lastError = '';
-    final bool available = await _iap.isAvailable();
+    debugPrint('StoreKit: Fetching products...');
+    
+    bool available = await _iap.isAvailable();
+    int availableRetries = 0;
+    while (!available && availableRetries < 5) {
+      debugPrint('StoreKit: Not available immediately, waiting 1s (Attempt ${availableRetries + 1})...');
+      await Future.delayed(const Duration(milliseconds: 1000));
+      available = await _iap.isAvailable();
+      availableRetries++;
+    }
+
     List<ProductDetails> products = [];
 
     if (available) {
-      final ProductDetailsResponse response = await _iap.queryProductDetails(_productIds);
-      if (response.error != null) {
-        lastError = response.error!.message;
-      }
-      if (response.productDetails.isNotEmpty) {
-        products = response.productDetails;
-      } else if (response.error == null) {
-        lastError = 'Ürün ID\'leri (rota_premium_6m, rota_premium_12m) ${Platform.isAndroid ? "Google Play" : "App Store"}\'de bulunamadı veya aktif değil.';
+      debugPrint('StoreKit: Available. Querying products: $_productIds');
+      
+      for (int i = 0; i < maxRetries; i++) {
+        final ProductDetailsResponse response = await _iap.queryProductDetails(_productIds);
+        
+        if (response.error != null) {
+          debugPrint('StoreKit: Error on query -> ${response.error!.message}');
+          lastError = response.error!.message;
+        }
+        
+        if (response.notFoundIDs.isNotEmpty) {
+          debugPrint('StoreKit: Invalid Product IDs found: ${response.notFoundIDs}');
+        }
+
+        if (response.productDetails.isNotEmpty) {
+          debugPrint('StoreKit: Successfully loaded ${response.productDetails.length} products.');
+          products = response.productDetails;
+          lastError = ''; // clear error
+          break; // Success
+        } else {
+          debugPrint('StoreKit: No products returned on attempt ${i + 1}.');
+          if (response.error == null) {
+            lastError = 'Ürün ID\'leri (rota_premium_6m, rota_premium_12m) ${Platform.isAndroid ? "Google Play" : "App Store"}\'de bulunamadı veya aktif değil.';
+          }
+          if (i < maxRetries - 1) {
+            debugPrint('StoreKit: Retrying in 2.5 seconds...');
+            await Future.delayed(const Duration(milliseconds: 2500));
+          }
+        }
       }
     } else {
+      debugPrint('StoreKit: Not available.');
       lastError = '${Platform.isAndroid ? "Google Play" : "App Store"} ödeme sistemi bu cihazda kullanılamıyor (Hesap açık değil veya desteklenmiyor).';
     }
 

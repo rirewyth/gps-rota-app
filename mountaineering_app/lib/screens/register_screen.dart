@@ -103,6 +103,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         }, SetOptions(merge: true));
 
         if (!mounted) return;
+        
+        await StorageHelper.setSosActive(false);
+
         // Yeni kullanıcı — her zaman onboarding'e yönlendir
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(

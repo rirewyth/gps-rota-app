@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROTA+ KRİZ YÖNETİM MERKEZİ (NEXUS V3)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<style>
+/* ── RESET & BASE ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg: #05070a; --bg-panel: #0a0d14; --bg-panel-light: #121824;
+  --border: #1a2333; --border-light: #25334a;
+  --accent: #00E5FF; --accent-glow: rgba(0, 229, 255, 0.4);
+  --alert-red: #FF2A2A; --alert-glow: rgba(255, 42, 42, 0.6);
+  --warn-orange: #FF8C00; --safe-green: #00FF66;
+  --text-main: #E8EDF2; --text-muted: #6B829E;
+  --font-hud: 'Share Tech Mono', monospace;
+  --font-display: 'Barlow Condensed', sans-serif;
+}
+html, body { height: 100vh; width: 100vw; background: var(--bg); color: var(--text-main); font-family: var(--font-hud); overflow: hidden; font-size: 14px; }
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border-light)}
+
+/* ── CRT SCANLINE EFFECT ── */
+body::after {
+  content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  z-index: 99999; background-size: 100% 4px, 6px 100%; pointer-events: none; opacity: 0.6;
+}
+
+/* ── GRID LAYOUT ── */
+.app-container { display: grid; grid-template-columns: 350px 1fr 380px; grid-template-rows: 60px 1fr 180px; grid-template-areas: "header header header" "left map right" "left log right"; height: 100%; width: 100%; gap: 1px; background: var(--border); }
+
+/* ── HEADER ── */
+.header { grid-area: header; background: var(--bg-panel); display: flex; justify-content: space-between; align-items: center; padding: 0 24px; border-bottom: 1px solid var(--accent); box-shadow: 0 0 15px var(--accent-glow); z-index: 20; }
+.brand { font-family: var(--font-display); font-size: 24px; font-weight: 900; letter-spacing: 2px; display: flex; align-items: center; gap: 12px; }
+.brand span { color: var(--alert-red); }
+.sys-status { display: flex; gap: 24px; align-items: center; }
+.status-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); text-transform: uppercase; }
+.led { width: 8px; height: 8px; border-radius: 50%; transition: 0.3s; }
+.led.green { background: var(--safe-green); box-shadow: 0 0 8px var(--safe-green); }
+.led.yellow { background: var(--warn-orange); box-shadow: 0 0 8px var(--warn-orange); }
+.led.red { background: var(--alert-red); box-shadow: 0 0 8px var(--alert-red); }
+
+/* ── LEFT PANEL (INCIDENTS & TEAMS) ── */
+.panel-left { grid-area: left; background: var(--bg-panel); display: flex; flex-direction: column; z-index: 10; overflow: hidden; }
+.panel-section { display: flex; flex-direction: column; flex: 1; overflow: hidden; border-bottom: 1px solid var(--border-light); }
+.panel-title { padding: 12px 16px; background: var(--bg-panel-light); border-bottom: 1px solid var(--border-light); font-family: var(--font-display); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); display: flex; justify-content: space-between; position: sticky; top: 0; z-index: 5;}
+.panel-title.red { color: var(--alert-red); }
+.list-container { flex: 1; overflow-y: auto; }
+.incident-card { padding: 12px 16px; border-bottom: 1px solid var(--border-light); cursor: pointer; transition: 0.2s; position: relative;}
+.incident-card:hover { background: rgba(255,255,255,0.02); }
+.incident-card.active { background: rgba(0, 229, 255, 0.05); border-left: 3px solid var(--accent); }
+.incident-card.critical { background: rgba(255, 42, 42, 0.05); border-left: 3px solid var(--alert-red); }
+.incident-header { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 11px; color: var(--text-muted); }
+.incident-type { font-weight: bold; color: #fff; font-size: 14px; text-transform: uppercase; display: flex; align-items: center;}
+.incident-type.fire { color: var(--warn-orange); }
+.incident-type.quake { color: var(--alert-red); }
+.incident-type.team { color: var(--safe-green); }
+.incident-meta { font-size: 10px; margin-top: 6px; display: flex; justify-content: space-between; color: var(--text-muted); }
+
+/* ── CENTER MAP ── */
+.map-area { grid-area: map; position: relative; background: var(--bg); overflow: hidden; }
+#map { width: 100%; height: 100%; }
+.map-overlay-hud { position: absolute; top: 16px; left: 16px; right: 16px; pointer-events: none; z-index: 1000; display: flex; justify-content: space-between; }
+.hud-box { background: rgba(10, 13, 20, 0.85); border: 1px solid var(--accent); padding: 12px 16px; backdrop-filter: blur(4px); color: var(--accent); transition: 0.3s; }
+.hud-title { font-size: 10px; opacity: 0.8; margin-bottom: 4px; }
+.hud-val { font-size: 20px; font-weight: bold; }
+
+/* ── FILTER CONTROLS ── */
+.filter-panel { position: absolute; bottom: 24px; right: 24px; z-index: 1000; background: rgba(10, 13, 20, 0.9); border: 1px solid var(--border-light); padding: 12px; display: flex; gap: 12px; border-radius: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); backdrop-filter: blur(4px);}
+.filter-lbl { display: flex; align-items: center; gap: 6px; font-size: 11px; cursor: pointer; color: var(--text-main); font-weight: bold; text-transform: uppercase; }
+.filter-lbl input { accent-color: var(--accent); width: 14px; height: 14px; cursor: pointer; }
+
+/* ── RIGHT PANEL (DISPATCH & DETAILS) ── */
+.panel-right { grid-area: right; background: var(--bg-panel); display: flex; flex-direction: column; z-index: 10; }
+.details-content { flex: 1; overflow-y: auto; padding: 16px; }
+.data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+.data-box { background: var(--bg-panel-light); padding: 12px; border: 1px solid var(--border-light); }
+.data-box .lbl { font-size: 10px; color: var(--text-muted); margin-bottom: 4px; }
+.data-box .val { font-size: 14px; font-weight: bold; color: #fff; }
+
+.section-lbl { font-size: 12px; color: var(--accent); border-bottom: 1px solid var(--border-light); padding-bottom: 4px; margin-bottom: 12px; margin-top: 24px; }
+.btn { width: 100%; padding: 12px; background: rgba(0, 229, 255, 0.1); border: 1px solid var(--accent); color: var(--accent); font-family: var(--font-hud); font-size: 14px; text-transform: uppercase; cursor: pointer; transition: 0.2s; margin-bottom: 12px; font-weight: bold; letter-spacing: 1px;}
+.btn:hover { background: var(--accent); color: var(--bg); box-shadow: 0 0 15px var(--accent-glow); }
+.btn.danger { border-color: var(--alert-red); color: var(--alert-red); background: rgba(255, 42, 42, 0.1); }
+.btn.danger:hover { background: var(--alert-red); color: #fff; box-shadow: 0 0 15px var(--alert-glow); }
+
+/* ── BOTTOM LOG PANEL ── */
+.panel-log { grid-area: log; background: var(--bg-panel); border-top: 1px solid var(--border-light); display: flex; flex-direction: column; }
+.log-header { padding: 4px 16px; background: var(--bg-panel-light); font-size: 10px; color: var(--text-muted); border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between;}
+.log-content { flex: 1; padding: 8px 16px; overflow-y: auto; font-size: 12px; line-height: 1.8; }
+.log-line { margin-bottom: 4px; }
+.log-time { color: var(--text-muted); margin-right: 8px; }
+.log-src { color: var(--accent); margin-right: 8px; }
+.log-msg { color: #fff; }
+.log-line.warn .log-msg { color: var(--warn-orange); }
+.log-line.alert .log-msg { color: var(--alert-red); font-weight: bold; }
+.log-line.safe .log-msg { color: var(--safe-green); }
+
+/* ALARM & TOAST UI */
+.alert-overlay { position: absolute; top:0; left:0; right:0; bottom:0; pointer-events: none; z-index: 9999; box-shadow: inset 0 0 0px rgba(255, 42, 42, 0); transition: 0.3s; }
+.alert-overlay.active { animation: strobe 1s infinite alternate; }
+@keyframes strobe { 0% { box-shadow: inset 0 0 0px rgba(255, 42, 42, 0); } 100% { box-shadow: inset 0 0 150px rgba(255, 42, 42, 0.8); } }
+
+.toast-container { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; display: flex; flex-direction: column; gap: 10px; pointer-events: none;}
+.toast { background: rgba(255, 42, 42, 0.9); border: 2px solid #fff; color: #fff; padding: 16px 24px; font-size: 16px; font-weight: bold; text-transform: uppercase; box-shadow: 0 0 20px rgba(255, 42, 42, 1); animation: slideDown 0.5s ease-out; display: flex; align-items: center; gap: 12px;}
+@keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.badge-new { background: var(--alert-red); color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-left: 8px; animation: blink 1s infinite; letter-spacing: 1px;}
+@keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+/* CUSTOM SVG MAP ICONS */
+.blip-svg { width: 32px; height: 32px; display: flex; justify-content: center; align-items: center; }
+.blip-svg.fire { animation: firePulse 0.5s infinite alternate; }
+.blip-svg.quake { animation: pulseQuake 0.2s infinite alternate; }
+.blip-svg.team { animation: hoverTeam 2s infinite ease-in-out; }
+@keyframes firePulse { 0% { transform: scale(1); filter: drop-shadow(0 0 10px #FF8C00); } 100% { transform: scale(1.2); filter: drop-shadow(0 0 20px #FF2A2A); } }
+@keyframes pulseQuake { 0% { transform: translate(-2px, 2px); } 100% { transform: translate(2px, -2px); } }
+@keyframes hoverTeam { 0% { transform: translateY(0); } 50% { transform: translateY(-5px); } 100% { transform: translateY(0); } }
+
+/* TARGET LOCK ANIMATION */
+.target-lock { width: 64px; height: 64px; border: 2px dashed var(--accent); border-radius: 50%; position: absolute; left: -16px; top: -16px; animation: lock-in 1s forwards ease-out, spin-lock 4s linear infinite; box-shadow: 0 0 15px var(--accent-glow); pointer-events: none;}
+.target-lock.red { border-color: var(--alert-red); box-shadow: 0 0 15px var(--alert-glow); }
+@keyframes lock-in { 0% { transform: scale(3); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes spin-lock { 100% { transform: scale(1) rotate(360deg); } }
+
+/* DISPATCH LASER ROUTE ANIMATION */
+.laser-route { animation: dash 20s linear infinite; }
+@keyframes dash { to { stroke-dashoffset: -1000; } }
+
+/* RADAR SCAN LINE */
+.map-scan { position: absolute; left: 0; right: 0; height: 2px; background: var(--accent); box-shadow: 0 0 10px var(--accent); z-index: 999; pointer-events: none; animation: scan-line 4s linear infinite; }
+@keyframes scan-line { 0% { top: 0; opacity: 0; } 10% { opacity: 0.5; } 90% { opacity: 0.5; } 100% { top: 100%; opacity: 0; } }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+  <header class="header">
+    <div class="brand">ROTA<span>+</span> NEXUS</div>
+    <div style="font-size: 16px; letter-spacing: 4px; color: var(--accent);">OTONOM İZLEME VE RADAR MODU AKTİF</div>
+    <div class="sys-status">
+      <div class="status-item"><div class="led yellow" id="led-fb"></div> DB: FIRESTORE</div>
+      <div class="status-item"><div class="led yellow" id="led-kandilli"></div> USGS DEPREM</div>
+      <div class="status-item"><div class="led yellow" id="led-firms"></div> NASA FIRMS</div>
+      <div class="status-item" id="sys-clock" style="color: var(--text-main);">...</div>
+    </div>
+  </header>
+
+  <aside class="panel-left">
+    <!-- TEAMS SECTION -->
+    <div class="panel-section" style="flex: 1.2;">
+      <div class="panel-title">SAHA BİRİMLERİ <span id="team-count">[0]</span></div>
+      <div class="list-container" id="team-list">
+        <div style="padding: 24px; color: var(--text-muted); text-align: center;">Uydu bağlantısı aranıyor...</div>
+      </div>
+    </div>
+    <!-- INCIDENTS SECTION -->
+    <div class="panel-section" style="flex: 1;">
+      <div class="panel-title red">AKTİF RİSKLER (YANGIN/DEPREM) <span id="incident-count">[0]</span></div>
+      <div class="list-container" id="incident-list">
+        <div style="padding: 24px; color: var(--text-muted); text-align: center;">Radar tarıyor...</div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="map-area">
+    <div class="map-scan"></div>
+    <div class="alert-overlay" id="alert-overlay"></div>
+    <div class="toast-container" id="toast-container"></div>
+    
+    <div class="map-overlay-hud">
+      <div class="hud-box">
+        <div class="hud-title">SAHADAKİ BİRİMLER</div>
+        <div class="hud-val" id="hud-team-count" style="color: var(--safe-green)">0</div>
+      </div>
+      <div class="hud-box">
+        <div class="hud-title">TÜM VAKALAR</div>
+        <div class="hud-val" id="hud-risk-count">0</div>
+      </div>
+    </div>
+
+    <!-- LAYER CONTROLS -->
+    <div class="filter-panel">
+      <label class="filter-lbl"><input type="checkbox" id="chk-teams" checked onchange="renderIncidents()"> Ekipler</label>
+      <label class="filter-lbl"><input type="checkbox" id="chk-quakes" checked onchange="renderIncidents()"> Deprem</label>
+      <label class="filter-lbl"><input type="checkbox" id="chk-fires" checked onchange="renderIncidents()"> Yangın</label>
+      <label class="filter-lbl" style="color:var(--accent);"><input type="checkbox" id="chk-radar" onchange="toggleWeatherRadar()"> Yağış Radarı</label>
+    </div>
+
+    <div id="map"></div>
+  </main>
+
+  <aside class="panel-right">
+    <div class="panel-title" id="detail-title">HEDEF DETAYI</div>
+    <div class="details-content" id="detail-content">
+      <div style="color: var(--text-muted); text-align: center; margin-top: 40px; font-family: var(--font-hud);">Sistem bekleyişte. Haritadan veya radar listesinden bir hedef seçin.</div>
+    </div>
+  </aside>
+
+  <footer class="panel-log">
+    <div class="log-header">
+      <span>SİSTEM LOGLARI & METEOROLOJİ RAPORLARI</span>
+      <span id="next-poll-countdown" style="color: var(--accent);">Tarama periyodu: Aktif</span>
+    </div>
+    <div class="log-content" id="log-container"></div>
+  </footer>
+</div>
+
+<!-- LEAFLET -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<!-- FIREBASE COMPAT SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+<script>
+  // Clock
+  setInterval(() => document.getElementById('sys-clock').innerText = new Date().toLocaleString('tr-TR'), 1000);
+
+  // System Logger
+  function addLog(src, msg, type='') {
+    const time = new Date().toTimeString().split(' ')[0];
+    const div = document.createElement('div');
+    div.className = `log-line ${type}`;
+    div.innerHTML = `<span class="log-time">[${time}]</span> <span class="log-src">${src}</span> <span class="log-msg">${msg}</span>`;
+    const container = document.getElementById('log-container');
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }
+  
+  // Audio Context Setup
+  let audioCtx = null;
+  document.body.addEventListener('click', () => {
+    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+  }, {once: true});
+
+  function playAlarm(type) {
+    if(!audioCtx) return;
+    for(let i=0; i<6; i++) {
+      setTimeout(() => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type === 'fire' ? 'sawtooth' : 'square';
+        osc.frequency.setValueAtTime(type === 'fire' ? 1200 : 800, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(type === 'fire' ? 800 : 600, audioCtx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+      }, i * 350);
+    }
+  }
+
+  // MAP INIT
+  const map = L.map('map', { zoomControl: false, attributionControl: false }).setView([39.0, 35.0], 6);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
+  L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+  let weatherRadarLayer = null;
+
+  async function toggleWeatherRadar() {
+    const isChecked = document.getElementById('chk-radar').checked;
+    if(weatherRadarLayer) { map.removeLayer(weatherRadarLayer); weatherRadarLayer = null; }
+    
+    if(isChecked) {
+      addLog('SYS', 'Meteoroloji Canlı Yağış Radarı indiriliyor...', 'safe');
+      try {
+        const res = await fetch('https://api.rainviewer.com/public/weather-maps.json');
+        const data = await res.json();
+        const latestTime = data.radar.past[data.radar.past.length - 1].time;
+        weatherRadarLayer = L.tileLayer(`https://tilecache.rainviewer.com/v2/radar/${latestTime}/256/{z}/{x}/{y}/2/1_1.png`, {
+          opacity: 0.6, zIndex: 10
+        }).addTo(map);
+        addLog('SYS', 'Yağış Radarı aktif edildi.', 'safe');
+      } catch(e) {
+        addLog('SYS-ERR', 'Radar sunucusuna ulaşılamadı.', 'warn');
+      }
+    }
+  }
+
+  // SVG ICONS
+  const svgFire = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FF8C00" stroke="#FF2A2A" stroke-width="1.5"><path d="M12 2c0 0-4 4.5-4 9 0 2.2 1.8 4 4 4s4-1.8 4-4c0-4.5-4-9-4-9zm0 10.5c-1.4 0-2.5-1.1-2.5-2.5 0-1.1.9-2.5 2.5-4.5 1.6 2 2.5 3.4 2.5 4.5 0 1.4-1.1 2.5-2.5 2.5z"/></svg>`;
+  const svgQuake = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#FF2A2A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`;
+  const svgTeam = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#00E5FF" stroke="#fff" stroke-width="1"><polygon points="12,2 22,22 12,17 2,22"/></svg>`;
+  const svgSOS = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FF2A2A" stroke="#fff" stroke-width="1"><polygon points="12,2 22,22 12,17 2,22"/></svg>`;
+
+  const getIcon = (type, isLocked = false) => {
+    let svg = ''; let shadow = ''; let clss = type;
+    if(type === 'fire') { svg = svgFire; shadow = 'var(--warn-orange)'; }
+    else if(type === 'quake') { svg = svgQuake; shadow = 'var(--alert-red)'; }
+    else if(type === 'sos') { svg = svgSOS; shadow = 'var(--alert-red)'; clss = 'team'; }
+    else { svg = svgTeam; shadow = 'var(--accent)'; }
+    
+    let lockHtml = isLocked ? `<div class="target-lock ${type === 'quake' || type === 'fire' || type === 'sos' ? 'red' : ''}"></div>` : '';
+
+    return L.divIcon({ 
+      className: 'custom-icon', 
+      html: `${lockHtml}<div class="blip-svg ${clss}" style="filter: drop-shadow(0 0 10px ${shadow})">${svg}</div>`, 
+      iconSize: [32,32], iconAnchor: [16,16] 
+    });
+  };
+
+  // STATE
+  let incidents = [];
+  let mapLayers = [];
+  let windLayer = null;
+  let dispatchLayer = null;
+  let focusedIncidentId = null;
+  const seenIncidentIds = new Set();
+  let isFirstLoad = true;
+
+  // FIREBASE INIT
+  addLog('DB', 'Firebase rotaplus-cd84d projesine bağlanılıyor...');
+  const firebaseConfig = {
+    apiKey: "AIzaSyCovIDS0P5nNlkqLHXgSvmmxqpr1TEQnjs",
+    projectId: "rotaplus-cd84d",
+    storageBucket: "rotaplus-cd84d.firebasestorage.app",
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  document.getElementById('led-fb').className = 'led green';
+  
+  // FİREBASE KİMLİĞİ VE CANLI TAKİP BAŞLATMA
+  async function initFirebaseLiveTracking() {
+    try {
+      try {
+        await firebase.auth().signInAnonymously();
+        addLog('DB', 'Firebase Anonim Girişi (Auth) Başarılı.', 'safe');
+      } catch(authError) {
+         addLog('DB-ERR', 'Firebase Auth Aktif Değil: ' + authError.message, 'warn');
+      }
+
+      addLog('DB', 'Canlı konumlar (users) dinleniyor...', 'safe');
+      db.collection('users').onSnapshot((snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          const data = change.doc.data();
+          const id = `TEAM-${change.doc.id}`;
+          const lat = data.lat || data.latitude || data.last_lat || 39.0;
+          const lng = data.lng || data.longitude || data.last_lng || 35.0;
+          const name = data.username || data.name || data.email || `ROTA+ BİRİM (${change.doc.id.substring(0,4)})`;
+          const isSOS = data.sos || data.is_sos || false;
+          
+          let existing = incidents.find(i => i.id === id);
+          if(existing) {
+            existing.lat = lat; existing.lng = lng; existing.type = isSOS ? 'sos' : 'team';
+            existing.meta2 = isSOS ? 'ACİL DURUM (SOS) AKTİF' : 'Aktif Görevde';
+          } else {
+            incidents.push({
+              id: id, type: isSOS ? 'sos' : 'team', title: name, location: `Konum Verisi Canlı`,
+              lat: lat, lng: lng, meta1: `Grup Lideri`, meta2: isSOS ? 'ACİL DURUM (SOS) AKTİF' : 'Sahada',
+              isNewIncident: true, raw: data
+            });
+          }
+        });
+        renderIncidents();
+      }, (error) => {
+        addLog('DB-ERR', 'Firebase Okuma Hatası (Erişim İzni Yok). Simülasyon moduna geçiliyor...', 'warn');
+        document.getElementById('led-fb').className = 'led yellow';
+        startTeamSimulation();
+      });
+    } catch(e) {
+      console.error(e);
+    }
+  }
+
+  // FALLBACK SIMULATION (If Firebase Rules block reading)
+  let simInterval = null;
+  function startTeamSimulation() {
+    if(simInterval) return;
+    addLog('SYS', 'Firebase kuralları kapalı olduğu için 3 adet AFAD / ROTA+ Simülasyon Ekibi sahaya indirildi.', 'safe');
+    
+    const simTeams = [
+      { id: 'TEAM-SIM1', lat: 39.9, lng: 32.8, name: 'AFAD-ANKARA 1' },
+      { id: 'TEAM-SIM2', lat: 38.5, lng: 27.2, name: 'ROTA+ İZMİR ARAMA' },
+      { id: 'TEAM-SIM3', lat: 37.0, lng: 35.3, name: 'JÖAK ADANA' }
+    ];
+
+    simTeams.forEach(t => {
+      incidents.push({
+        id: t.id, type: 'team', title: t.name, location: 'Simüle Edilmiş Veri',
+        lat: t.lat, lng: t.lng, meta1: 'Saha Ekibi', meta2: 'Aktif Görevde', isNewIncident: true
+      });
+    });
+    renderIncidents();
+
+    simInterval = setInterval(() => {
+      simTeams.forEach(t => {
+        const inc = incidents.find(i => i.id === t.id);
+        if(inc) {
+          inc.lat += (Math.random() - 0.5) * 0.05;
+          inc.lng += (Math.random() - 0.5) * 0.05;
+          if(Math.random() > 0.98 && inc.type !== 'sos') {
+            inc.type = 'sos'; inc.meta2 = 'ACİL DURUM (SOS) AKTİF';
+            triggerCriticalAlert(inc);
+          }
+        }
+      });
+      renderIncidents();
+    }, 5000);
+  }
+
+  // ALARM UI
+  function triggerCriticalAlert(incident) {
+    playAlarm(incident.type);
+    const overlay = document.getElementById('alert-overlay');
+    overlay.classList.add('active');
+    
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerHTML = `KRİTİK UYARI: YENİ BİR ${incident.type.toUpperCase()} TESPİT EDİLDİ! <br> BÖLGE: ${incident.location}`;
+    document.getElementById('toast-container').appendChild(toast);
+    
+    setTimeout(() => { overlay.classList.remove('active'); toast.remove(); }, 10000);
+    map.flyTo([incident.lat, incident.lng], 11, {duration: 1.5});
+    addLog('SYS', `OTOMATİK RADAR: Bölgeye odaklanıldı (${incident.location})`, 'alert');
+  }
+
+  // FETCH EARTHQUAKES (USGS)
+  async function fetchEarthquakes() {
+    try {
+      document.getElementById('led-kandilli').className = 'led yellow';
+      const url = 'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minlatitude=35&maxlatitude=43&minlongitude=25&maxlongitude=45&minmagnitude=2.5&limit=50';
+      const res = await fetch(url);
+      const data = await res.json();
+      document.getElementById('led-kandilli').className = 'led green';
+      
+      let foundNew = false;
+      if(data && data.features) {
+        data.features.forEach(eq => {
+          const props = eq.properties; const geom = eq.geometry;
+          if(props.mag >= 2.5) { 
+            const id = `EQ-${eq.id}`;
+            const isNew = !seenIncidentIds.has(id);
+            if(isNew) seenIncidentIds.add(id);
+
+            if (!incidents.find(i => i.id === id)) {
+              const incData = {
+                id, type: 'quake', title: `DEPREM (Mw ${props.mag.toFixed(1)})`, location: props.place,
+                lat: geom.coordinates[1], lng: geom.coordinates[0], meta1: `Derinlik: ${geom.coordinates[2].toFixed(1)} km`,
+                meta2: new Date(props.time).toLocaleString('tr-TR'), isNewIncident: isNew && !isFirstLoad,
+                raw: { mag: props.mag, depth: geom.coordinates[2] }
+              };
+              incidents.push(incData);
+              if(isNew && !isFirstLoad && props.mag >= 4.5) { triggerCriticalAlert(incData); foundNew = true; }
+            }
+          }
+        });
+        if(foundNew) addLog('API', 'YENİ DEPREM TESPİT EDİLDİ!', 'alert');
+      }
+    } catch(e) { document.getElementById('led-kandilli').className = 'led red'; }
+  }
+
+  // FETCH FIRES (NASA)
+  async function fetchFires() {
+    try {
+      document.getElementById('led-firms').className = 'led yellow';
+      const NASA_API_KEY = "578313c13b05df8edd40ca0816558392"; 
+      const res = await fetch(`https://firms.modaps.eosdis.nasa.gov/api/area/csv/${NASA_API_KEY}/VIIRS_SNPP_NRT/25,35,45,43/1`);
+      const csvText = await res.text();
+      document.getElementById('led-firms').className = 'led green';
+      
+      const lines = csvText.trim().split('\n');
+      if(lines.length > 1 && !lines[0].includes("Error")) {
+        for(let i=1; i<lines.length; i++) {
+          const cols = lines[i].split(',');
+          if(cols.length >= 10) {
+            const lat = parseFloat(cols[0]), lng = parseFloat(cols[1]), conf = cols[9];
+            if(conf === 'n' || conf === 'h') {
+              const id = `FR-${lat.toFixed(3).replace('.','')}-${lng.toFixed(3).replace('.','')}`;
+              const isNew = !seenIncidentIds.has(id);
+              if(isNew) seenIncidentIds.add(id);
+
+              if (!incidents.find(i => i.id === id)) {
+                const incData = {
+                  id, type: 'fire', title: `YANGIN RİSKİ`, location: `Koordinat: ${lat.toFixed(4)}, ${lng.toFixed(4)}`,
+                  lat, lng, meta1: `Sıcaklık: ${cols[2]} K`, meta2: 'Uydu (VIIRS)', isNewIncident: isNew && !isFirstLoad
+                };
+                incidents.push(incData);
+                if(isNew && !isFirstLoad) triggerCriticalAlert(incData);
+              }
+            }
+          }
+        }
+      }
+    } catch(e) { document.getElementById('led-firms').className = 'led red'; }
+  }
+
+  // RENDER UI
+  function renderIncidents() {
+    const teamList = document.getElementById('team-list');
+    const incidentList = document.getElementById('incident-list');
+    teamList.innerHTML = ''; incidentList.innerHTML = '';
+    
+    mapLayers.forEach(l => map.removeLayer(l)); mapLayers = [];
+    
+    const showTeams = document.getElementById('chk-teams').checked;
+    const showQuakes = document.getElementById('chk-quakes').checked;
+    const showFires = document.getElementById('chk-fires').checked;
+
+    let tCount = 0; let rCount = 0;
+    
+    // Sort logic
+    const displayIncidents = [...incidents].sort((a,b) => {
+      if(a.type === 'sos' && b.type !== 'sos') return -1;
+      if(a.type === 'team' && b.type !== 'team') return -1;
+      return 0;
+    });
+
+    displayIncidents.forEach(inc => {
+      const isTeam = inc.type === 'team' || inc.type === 'sos';
+      if(isTeam) tCount++; else rCount++;
+
+      // Filter Check
+      if(isTeam && !showTeams) return;
+      if(inc.type === 'quake' && !showQuakes) return;
+      if(inc.type === 'fire' && !showFires) return;
+
+      // UI List Card
+      const card = document.createElement('div');
+      card.className = `incident-card ${inc.id === focusedIncidentId ? 'active' : ''} ${inc.type === 'sos' || (inc.type === 'quake' && inc.raw && inc.raw.mag >= 5.0) ? 'critical' : ''}`;
+      card.id = `card-${inc.id}`;
+      card.onclick = () => focusIncident(inc.id);
+      
+      const newBadge = inc.isNewIncident ? `<span class="badge-new">YENİ</span>` : '';
+      card.innerHTML = `
+        <div class="incident-header"><span>${isTeam ? 'SAHA BİRİMİ' : 'VAKA'}</span> <span>ID: ${inc.id.split('-')[1]}</span></div>
+        <div class="incident-type ${inc.type}">${inc.title} ${newBadge}</div>
+        <div style="font-size: 11px; margin-top:4px;">${inc.location}</div>
+        <div class="incident-meta"><span>${inc.meta1}</span><span>${inc.meta2}</span></div>
+      `;
+      
+      if(isTeam) teamList.appendChild(card); else incidentList.appendChild(card);
+
+      // Map Marker
+      const isLocked = focusedIncidentId === inc.id;
+      const marker = L.marker([inc.lat, inc.lng], {icon: getIcon(inc.type, isLocked), zIndexOffset: isLocked ? 1000 : 0}).addTo(map);
+      mapLayers.push(marker);
+
+      if(inc.type === 'quake') {
+        const rad = inc.raw ? (inc.raw.mag * 8000) : 20000;
+        const c1 = L.circle([inc.lat, inc.lng], { color: '#FF2A2A', fillColor: '#FF2A2A', fillOpacity: 0.1, radius: rad, weight: 1 }).addTo(map);
+        const c2 = L.circle([inc.lat, inc.lng], { color: '#FF2A2A', fillColor: 'transparent', radius: rad*0.5, weight: 2, dashArray: '5,5' }).addTo(map);
+        mapLayers.push(c1, c2);
+      }
+    });
+
+    document.getElementById('team-count').innerText = `[${tCount}]`;
+    document.getElementById('incident-count').innerText = `[${rCount}]`;
+    document.getElementById('hud-team-count').innerText = tCount;
+    document.getElementById('hud-risk-count').innerText = rCount;
+
+    if(teamList.innerHTML === '') teamList.innerHTML = '<div style="padding:16px; color:var(--text-muted); font-size:11px;">Aktif ekip bulunamadı.</div>';
+    if(incidentList.innerHTML === '') incidentList.innerHTML = '<div style="padding:16px; color:var(--text-muted); font-size:11px;">Risk tespit edilmedi.</div>';
+  }
+
+  // WIND PROPAGATION CONE
+  function drawWindCone(lat, lng, windSpeedKm, windDirDeg) {
+    if(windLayer) map.removeLayer(windLayer);
+    if(windSpeedKm < 5) return;
+    
+    const lengthMeters = windSpeedKm * 300; 
+    const angleRad = (windDirDeg + 180) * (Math.PI / 180); 
+    const spread = 20 * (Math.PI / 180); 
+
+    const earthR = 6378137;
+    const dLat = lengthMeters / earthR;
+    const dLng = lengthMeters / (earthR * Math.cos(Math.PI * lat / 180));
+    
+    const p1 = [lat, lng];
+    const p2 = [ lat + (dLat * Math.cos(angleRad - spread)) * (180/Math.PI), lng + (dLng * Math.sin(angleRad - spread)) * (180/Math.PI) ];
+    const p3 = [ lat + (dLat * Math.cos(angleRad + spread)) * (180/Math.PI), lng + (dLng * Math.sin(angleRad + spread)) * (180/Math.PI) ];
+
+    windLayer = L.polygon([p1, p2, p3], {
+      color: 'transparent', fillColor: '#FF2A2A', fillOpacity: 0.4, className: 'alert-overlay active'
+    }).addTo(map);
+    mapLayers.push(windLayer);
+  }
+
+  // DISPATCH ANIMATION
+  window.dispatchTo = function(lat, lng) {
+    if(dispatchLayer) map.removeLayer(dispatchLayer);
+    const base = [39.92, 32.85];
+    dispatchLayer = L.polyline([base, [lat, lng]], {
+      color: '#00E5FF', weight: 4, dashArray: '10, 15', className: 'laser-route'
+    }).addTo(map);
+    mapLayers.push(dispatchLayer);
+    addLog('SYS-DISPATCH', `AFAD Ekipleri ${lat.toFixed(2)}, ${lng.toFixed(2)} koordinatlarına sevk edildi. İntikal başladı!`, 'safe');
+    alert("Birlik sevk emri verildi! Haritada intikal lazer izini görebilirsiniz.");
+  }
+
+  // FOCUS & DETAILS (TARGET LOCK)
+  async function focusIncident(id) {
+    focusedIncidentId = id;
+    renderIncidents(); // Re-render to show Target Lock Crosshair
+
+    const inc = incidents.find(i => i.id === id);
+    if(!inc) return;
+
+    map.flyTo([inc.lat, inc.lng], 10, {duration: 1.5});
+    document.getElementById('detail-title').innerText = `HEDEF: ${inc.id}`;
+    if(inc.isNewIncident) inc.isNewIncident = false;
+
+    let weatherHtml = '<div style="color:var(--text-muted);font-size:11px;">Hava durumu alınıyor...</div>';
+    document.getElementById('detail-content').innerHTML = `Yükleniyor...`;
+    
+    try {
+      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${inc.lat}&longitude=${inc.lng}&current_weather=true`);
+      const wData = await res.json();
+      if(wData && wData.current_weather) {
+        const w = wData.current_weather;
+        weatherHtml = `
+          <div class="data-box"><div class="lbl">SICAKLIK</div><div class="val">${w.temperature} °C</div></div>
+          <div class="data-box"><div class="lbl">RÜZGAR (Hız/Yön)</div><div class="val">${w.windspeed} km/s (Açı: ${w.winddirection}°)</div></div>
+        `;
+        if(inc.type === 'fire') drawWindCone(inc.lat, inc.lng, w.windspeed, w.winddirection);
+      }
+    } catch(e) {}
+
+    let contentHtml = `
+      <div class="data-grid">
+        <div class="data-box"><div class="lbl">KOORDİNAT</div><div class="val">${inc.lat.toFixed(4)}, ${inc.lng.toFixed(4)}</div></div>
+        <div class="data-box"><div class="lbl">LOKASYON/DURUM</div><div class="val" style="color:var(--accent)">${inc.location}</div></div>
+        ${weatherHtml}
+      </div>
+    `;
+
+    contentHtml += `
+      <div class="section-lbl">TAKTİKSEL KOMUTLAR</div>
+      <button class="btn" onclick="dispatchTo(${inc.lat}, ${inc.lng})">✈ BÖLGEYE BİRİM SEVK ET (İNTİKAL)</button>
+      ${inc.type === 'fire' ? '<button class="btn">İHA TERMAL TARAMA BAŞLAT</button>' : ''}
+      ${inc.type === 'quake' && inc.raw && inc.raw.mag >= 5.0 ? '<button class="btn danger">KIRMIZI ALARM (BÖLGESEL AFET)</button>' : ''}
+    `;
+    document.getElementById('detail-content').innerHTML = contentHtml;
+    addLog('SYS', `HEDEF KİLİTLENDİ: ${inc.title} - Katman Analizi Başladı.`, 'safe');
+  }
+
+  // AUTO POLLING
+  async function pollData() {
+    isFirstLoad = false;
+    await fetchEarthquakes();
+    await fetchFires();
+    renderIncidents();
+  }
+  
+  setTimeout(() => { 
+    initFirebaseLiveTracking();
+    fetchEarthquakes(); 
+    fetchFires(); 
+  }, 1000);
+  setInterval(pollData, 60000);
+
+</script>
+</body>
+</html>

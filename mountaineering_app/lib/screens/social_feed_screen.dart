@@ -704,12 +704,16 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
     }
   }
 
-  void _sharePost(String userName, String desc, String postId) {
-    final text = '📱 Rota+ Acil Durum \u0026 SOS\n'
+  void _sharePost(String userName, String desc, String postId, BuildContext context) {
+    final text = '📱 Rota+ Acil Durum & SOS\n'
         '👤 $userName şunu paylaştı:\n'
         '${desc.isNotEmpty ? '"$desc"' : '(Fotoğraf gönderi)'}\n\n'
         '🔗 Rota+ uygulamasında görüntüleyin.';
-    Share.share(text);
+    final box = context.findRenderObject() as RenderBox?;
+    Share.share(
+      text,
+      sharePositionOrigin: box != null ? box.localToGlobal(Offset.zero) & box.size : null,
+    );
   }
 
   void _banUser(String userId, String userName) {

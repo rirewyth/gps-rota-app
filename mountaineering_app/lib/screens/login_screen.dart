@@ -97,6 +97,10 @@ class _LoginScreenState extends State<LoginScreen> {
         if ((kullanici['is_admin'] as int) == 1) {
           // Admin da ilk girişte onboarding görsün
           final prefs = await SharedPreferences.getInstance();
+          if (mounted) {
+            await StorageHelper.setSosActive(false);
+          }
+          final prefs = await SharedPreferences.getInstance();
           final onboardingDone = prefs.getBool('onboarding_complete_v1') ?? false;
           if (!onboardingDone && mounted) {
             Navigator.pushReplacement(context, MaterialPageRoute(
@@ -106,6 +110,9 @@ class _LoginScreenState extends State<LoginScreen> {
             Navigator.of(context).pushReplacementNamed('/admin');
           }
         } else {
+          if (mounted) {
+            await StorageHelper.setSosActive(false);
+          }
           // İlk giriş kontrolü — onboarding göster
           final prefs = await SharedPreferences.getInstance();
           final onboardingDone = prefs.getBool('onboarding_complete_v1') ?? false;
@@ -148,6 +155,9 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
 
       if (userCred != null && userCred.user != null) {
+        if (mounted) {
+          await StorageHelper.setSosActive(false);
+        }
         // İlk giriş kontrolü — onboarding göster
         final prefs = await SharedPreferences.getInstance();
         final onboardingDone = prefs.getBool('onboarding_complete_v1') ?? false;
@@ -178,6 +188,9 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
 
       if (userCred != null && userCred.user != null) {
+        if (mounted) {
+          await StorageHelper.setSosActive(false);
+        }
         // İlk giriş kontrolü — onboarding göster
         final prefs = await SharedPreferences.getInstance();
         final onboardingDone = prefs.getBool('onboarding_complete_v1') ?? false;

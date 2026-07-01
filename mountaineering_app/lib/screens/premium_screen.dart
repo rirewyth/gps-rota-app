@@ -356,21 +356,29 @@ class _PremiumScreenState extends State<PremiumScreen> {
                         return;
                       }
                       if (_products.isEmpty) {
-                        final storeName = Platform.isAndroid ? 'Google Play' : 'App Store';
-                        showDialog(
-                          context: context,
-                          builder: (ctx) => AlertDialog(
-                            backgroundColor: Colors.white,
-                            title: const Text('Bağlantı Hatası'),
-                            content: Text('$storeName ürünleri yüklenemedi. Lütfen internet bağlantınızı kontrol edin veya $storeName hesabınızla giriş yaptığınızdan emin olun.'),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(ctx),
-                                child: const Text('Tamam', style: TextStyle(color: Colors.green)),
-                              ),
-                            ],
-                          ),
+                        setState(() => _loading = true);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Ürünler yeniden sorgulanıyor... Lütfen bekleyin.')),
                         );
+                        _loadProducts().then((_) {
+                          if (mounted && _products.isEmpty) {
+                            final storeName = Platform.isAndroid ? 'Google Play' : 'App Store';
+                            showDialog(
+                              context: context,
+                              builder: (ctx) => AlertDialog(
+                                backgroundColor: Colors.white,
+                                title: const Text('Bağlantı Hatası'),
+                                content: Text('$storeName ürünleri yüklenemedi. Lütfen internet bağlantınızı kontrol edin veya $storeName hesabınızla giriş yaptığınızdan emin olun.\n\nHata: ${PremiumService.lastError}'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(ctx),
+                                    child: const Text('Tamam', style: TextStyle(color: Colors.green)),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                        });
                         return;
                       }
                       
