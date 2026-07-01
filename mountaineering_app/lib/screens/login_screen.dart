@@ -100,7 +100,6 @@ class _LoginScreenState extends State<LoginScreen> {
           if (mounted) {
             await StorageHelper.setSosActive(false);
           }
-          final prefs = await SharedPreferences.getInstance();
           final onboardingDone = prefs.getBool('onboarding_complete_v1') ?? false;
           if (!onboardingDone && mounted) {
             Navigator.pushReplacement(context, MaterialPageRoute(

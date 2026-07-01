@@ -1342,9 +1342,13 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                           ),
                         ),
                         const Spacer(),
-                        IconButton(
-                          icon: const Icon(Icons.share_outlined, color: Colors.white54, size: 22),
-                          onPressed: () => _sharePost(user, desc, docId),
+                        Builder(
+                          builder: (btnCtx) {
+                            return IconButton(
+                              icon: const Icon(Icons.share_outlined, color: Colors.white54, size: 22),
+                              onPressed: () => _sharePost(user, desc, docId, btnCtx),
+                            );
+                          }
                         ),
                       ],
                     ),
