@@ -1400,6 +1400,86 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
               onPressed: _addFirePin,
             ),
           ),
+          const SizedBox(height: 32),
+          Text('MEVCUT YANGINLAR', style: GoogleFonts.outfit(color: kOrange, fontSize: 18, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 16),
+          StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance.collection('fires').snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator(color: kOrange));
+              }
+              if (snapshot.hasError) {
+                return Text("Hata: ${snapshot.error}", style: const TextStyle(color: Colors.red));
+              }
+              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                return const Text("Kayıtlı yangın bulunmuyor.", style: TextStyle(color: Colors.white54));
+              }
+
+              final docs = snapshot.data!.docs.toList();
+              docs.sort((a, b) {
+                final t1 = (a.data() as Map<String, dynamic>)['timestamp'] as Timestamp?;
+                final t2 = (b.data() as Map<String, dynamic>)['timestamp'] as Timestamp?;
+                if (t1 == null || t2 == null) return 0;
+                return t2.compareTo(t1); // descending
+              });
+
+              return ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: docs.length,
+                itemBuilder: (ctx, i) {
+                  final doc = docs[i];
+                  final data = doc.data() as Map<String, dynamic>;
+                  final name = data['name'] ?? 'Bilinmiyor';
+                  final status = data['status'] ?? 'Aktif';
+                  final lat = data['lat'] ?? 0.0;
+                  final lng = data['lng'] ?? 0.0;
+                  
+                  return Card(
+                    color: kCardBg,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      side: BorderSide(
+                        color: status == 'Söndürüldü' 
+                            ? Colors.grey.withOpacity(0.3) 
+                            : (status == 'Kontrol Altında' ? Colors.orange.withOpacity(0.3) : Colors.redAccent.withOpacity(0.3))
+                      ),
+                    ),
+                    margin: const EdgeInsets.only(bottom: 12),
+                    child: ListTile(
+                      leading: Icon(
+                        Icons.local_fire_department, 
+                        color: status == 'Söndürüldü' ? Colors.grey : (status == 'Kontrol Altında' ? Colors.orange : Colors.redAccent),
+                      ),
+                      title: Text(name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      subtitle: Text('Durum: $status\nKonum: ${lat.toStringAsFixed(4)}, ${lng.toStringAsFixed(4)}', style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                      trailing: PopupMenuButton<String>(
+                        color: const Color(0xFF1A1A1A),
+                        icon: const Icon(Icons.edit, color: Colors.white54),
+                        onSelected: (val) async {
+                          if (val == 'delete') {
+                            await FirebaseFirestore.instance.collection('fires').doc(doc.id).delete();
+                            if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Yangın kaydı silindi.')));
+                          } else {
+                            await FirebaseFirestore.instance.collection('fires').doc(doc.id).update({'status': val});
+                            if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Durum güncellendi: $val')));
+                          }
+                        },
+                        itemBuilder: (ctx) => [
+                          const PopupMenuItem(value: 'Aktif', child: Text('Aktif (Büyüyor)', style: TextStyle(color: Colors.redAccent))),
+                          const PopupMenuItem(value: 'Kontrol Altında', child: Text('Kontrol Altında', style: TextStyle(color: Colors.orange))),
+                          const PopupMenuItem(value: 'Söndürüldü', child: Text('Söndürüldü', style: TextStyle(color: Colors.grey))),
+                          const PopupMenuDivider(),
+                          const PopupMenuItem(value: 'delete', child: Text('Kaydı Sil', style: TextStyle(color: Colors.red))),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
         ],
       ),
     );
