@@ -5,6 +5,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'profile_screen.dart';
+import '../services/routing_service.dart';
 
 class AdminPanelScreen extends StatefulWidget {
   const AdminPanelScreen({Key? key}) : super(key: key);
@@ -28,6 +29,12 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
   String _duyuruSeviye = 'normal'; // normal | warning | critical
   bool _duyuruGonderiyor = false;
 
+  // Fire marker
+  final TextEditingController _fireNameCtrl = TextEditingController();
+  final TextEditingController _fireLatCtrl = TextEditingController();
+  final TextEditingController _fireLngCtrl = TextEditingController();
+  String _fireStatus = 'Aktif';
+
   // Stats
   int _totalUsers = 0;
   int _premiumUsers = 0;
@@ -46,7 +53,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 7, vsync: this);
+    _tabController = TabController(length: 8, vsync: this);
     _loadAll();
   }
 
@@ -55,6 +62,9 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
     _tabController.dispose();
     _duyuruBaslikCtrl.dispose();
     _duyuruIcerikCtrl.dispose();
+    _fireNameCtrl.dispose();
+    _fireLatCtrl.dispose();
+    _fireLngCtrl.dispose();
     super.dispose();
   }
 
@@ -200,6 +210,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                       Tab(icon: Icon(Icons.bar_chart, size: 18), text: 'İSTATİSTİK'),
                       Tab(icon: Icon(Icons.campaign, size: 18), text: 'DUYURULAR'),
                       Tab(icon: Icon(Icons.report, size: 18), text: 'ŞİKAYETLER'),
+                      Tab(icon: Icon(Icons.local_fire_department, size: 18), text: 'YANGINLAR'),
                     ],
                   ),
                 ),
@@ -215,6 +226,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                       _buildStatsTab(),
                       _buildAnnouncementsTab(),
                       _buildReportsTab(),
+                      _buildFiresTab(),
                     ],
                   ),
                 ),
@@ -1187,8 +1199,51 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                     Text('Şikayet Eden UID: $reporter', style: const TextStyle(color: Colors.white70, fontSize: 12)),
                     const SizedBox(height: 4),
                     if (isPostReport) ...[
-                      Text('Şikayet Edilen Post ID: ${data['post_id']}', style: const TextStyle(color: Colors.white70, fontSize: 12)),
-                      Text('Şikayet Edilen UID: ${data['reported_user']}', style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                      FutureBuilder<DocumentSnapshot>(
+                        future: FirebaseFirestore.instance.collection('posts').doc(data['post_id']).get(),
+                        builder: (context, postSnap) {
+                          if (postSnap.connectionState == ConnectionState.waiting) {
+                            return const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 8.0),
+                              child: CircularProgressIndicator(color: kOrange),
+                            );
+                          }
+                          if (!postSnap.hasData || !postSnap.data!.exists) {
+                            return const Text('⚠️ Gönderi bulunamadı (silinmiş olabilir)', style: TextStyle(color: Colors.redAccent));
+                          }
+                          final postData = postSnap.data!.data() as Map<String, dynamic>;
+                          final String postText = postData['text'] ?? '';
+                          final String? postImageUrl = postData['imageUrl'];
+                          
+                          return Container(
+                            margin: const EdgeInsets.only(top: 8),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.black26,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.white12),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('Şikayet Edilen Gönderi:', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 12)),
+                                const SizedBox(height: 6),
+                                if (postText.isNotEmpty)
+                                  Text('"$postText"', style: const TextStyle(color: Colors.white, fontStyle: FontStyle.italic)),
+                                if (postImageUrl != null && postImageUrl.isNotEmpty) ...[
+                                  const SizedBox(height: 8),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(6),
+                                    child: Image.network(postImageUrl, height: 100, width: double.infinity, fit: BoxFit.cover),
+                                  ),
+                                ],
+                                const SizedBox(height: 8),
+                                Text('Post ID: ${data['post_id']}', style: const TextStyle(color: Colors.white38, fontSize: 10)),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
                     ] else ...[
                       Text('Engellenen UID: ${data['blocked_user'] ?? data['reported_user'] ?? ''}', style: const TextStyle(color: Colors.white70, fontSize: 12)),
                     ],
@@ -1228,5 +1283,147 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
         );
       },
     );
+  }
+
+  Widget _buildFiresTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('YENİ YANGIN BİLDİRİMİ', style: GoogleFonts.outfit(color: kOrange, fontSize: 18, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _fireNameCtrl,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: 'Yangın Adı/Lokasyonu',
+                    labelStyle: const TextStyle(color: Colors.white54),
+                    filled: true,
+                    fillColor: kCardBg,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              IconButton(
+                icon: const Icon(Icons.search, color: kOrange),
+                onPressed: () async {
+                  if (_fireNameCtrl.text.isEmpty) return;
+                  try {
+                    // Need to import routing_service.dart at top of file
+                    final results = await RoutingService.searchLocation(_fireNameCtrl.text);
+                    if (results.isNotEmpty) {
+                      setState(() {
+                        _fireLatCtrl.text = results.first.lat.toString();
+                        _fireLngCtrl.text = results.first.lon.toString();
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Koordinatlar bulundu!')));
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Lokasyon bulunamadı.')));
+                    }
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Hata: $e')));
+                  }
+                },
+                tooltip: 'Lokasyondan Koordinat Bul',
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _fireLatCtrl,
+                  style: const TextStyle(color: Colors.white),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  decoration: InputDecoration(
+                    labelText: 'Enlem (Lat)',
+                    labelStyle: const TextStyle(color: Colors.white54),
+                    filled: true,
+                    fillColor: kCardBg,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: TextField(
+                  controller: _fireLngCtrl,
+                  style: const TextStyle(color: Colors.white),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  decoration: InputDecoration(
+                    labelText: 'Boylam (Lng)',
+                    labelStyle: const TextStyle(color: Colors.white54),
+                    filled: true,
+                    fillColor: kCardBg,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<String>(
+            value: _fireStatus,
+            dropdownColor: kCardBg,
+            style: const TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+              labelText: 'Durum',
+              labelStyle: const TextStyle(color: Colors.white54),
+              filled: true,
+              fillColor: kCardBg,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            items: const [
+              DropdownMenuItem(value: 'Aktif', child: Text('Aktif (Büyüyor)')),
+              DropdownMenuItem(value: 'Kontrol Altında', child: Text('Kontrol Altında')),
+              DropdownMenuItem(value: 'Söndürüldü', child: Text('Söndürüldü')),
+            ],
+            onChanged: (v) => setState(() => _fireStatus = v!),
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              icon: const Icon(Icons.local_fire_department, color: Colors.white),
+              label: const Text('HARİTAYA ATEŞ PİNİ EKLE', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              onPressed: _addFirePin,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _addFirePin() async {
+    if (_fireNameCtrl.text.isEmpty || _fireLatCtrl.text.isEmpty || _fireLngCtrl.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Lütfen tüm alanları doldurun!')));
+      return;
+    }
+    try {
+      await FirebaseFirestore.instance.collection('fires').add({
+        'name': _fireNameCtrl.text.trim(),
+        'lat': double.tryParse(_fireLatCtrl.text.trim().replaceAll(',', '.')) ?? 0.0,
+        'lng': double.tryParse(_fireLngCtrl.text.trim().replaceAll(',', '.')) ?? 0.0,
+        'status': _fireStatus,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Ateş pini başarıyla eklendi!'), backgroundColor: Colors.green));
+      _fireNameCtrl.clear();
+      _fireLatCtrl.clear();
+      _fireLngCtrl.clear();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Hata: $e'), backgroundColor: Colors.red));
+    }
   }
 }

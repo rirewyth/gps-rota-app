@@ -52,6 +52,10 @@ class _MapScreenState extends State<MapScreen> {
   List<LocationSearchResult> _aramaSonuclari = [];
   bool _aramaYukleniyor = false;
 
+  // Fire Markers
+  List<QueryDocumentSnapshot> _fireMarkers = [];
+  StreamSubscription? _firesSub;
+
   @override
   void initState() {
     super.initState();
@@ -65,6 +69,10 @@ class _MapScreenState extends State<MapScreen> {
         });
         _konumGetir();
         _loadActiveRoute();
+
+        _firesSub = FirebaseFirestore.instance.collection('fires').snapshots().listen((snap) {
+          if (mounted) setState(() => _fireMarkers = snap.docs);
+        });
       }
     });
   }
@@ -73,6 +81,7 @@ class _MapScreenState extends State<MapScreen> {
   void dispose() {
     _konumStream?.cancel();
     _mapController.dispose();
+    _firesSub?.cancel();
     super.dispose();
   }
 
@@ -151,6 +160,7 @@ class _MapScreenState extends State<MapScreen> {
     final isimController = TextEditingController(
       text: 'Rota ${DateTime.now().day}.${DateTime.now().month}'
     );
+    bool isForestRoute = false;
 
     await showDialog(
       context: context,
@@ -220,6 +230,19 @@ class _MapScreenState extends State<MapScreen> {
                           ),
                         ),
                       ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        const Icon(Icons.nature, color: Colors.green),
+                        const SizedBox(width: 8),
+                        const Expanded(child: Text('Orman / Arazi Rotası', style: TextStyle(color: Colors.white))),
+                        Switch(
+                          value: isForestRoute,
+                          activeColor: Colors.green,
+                          onChanged: (v) => setStateDialog(() => isForestRoute = v),
+                        ),
+                      ],
+                    ),
                   ],
                 );
               }
@@ -234,9 +257,13 @@ class _MapScreenState extends State<MapScreen> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: kOrange),
             onPressed: () async {
-              final isim = isimController.text.trim().isEmpty
+              String isim = isimController.text.trim().isEmpty
                   ? 'İsimsiz Rota'
                   : isimController.text.trim();
+              
+              if (isForestRoute) {
+                isim = '[ORMAN] ' + isim;
+              }
 
               final noktalarMap = _planlamaNoktalar.map((p) => {
                 'lat': p.latitude,
@@ -439,6 +466,32 @@ class _MapScreenState extends State<MapScreen> {
   void _aramaYap(String query) async {
     if (query.trim().length < 3) return;
     setState(() => _aramaYukleniyor = true);
+
+    // Koordinat ile arama desteği (örn: 40.123, 29.456)
+    final coordRegex = RegExp(r'^([-+]?\d{1,2}(?:\.\d+)?)[,\s]+([-+]?\d{1,3}(?:\.\d+)?)$');
+    final match = coordRegex.firstMatch(query.trim());
+    if (match != null) {
+      final lat = double.tryParse(match.group(1)!);
+      final lng = double.tryParse(match.group(2)!);
+      if (lat != null && lng != null && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+        if (mounted) {
+          setState(() {
+            _aramaSonuclari = [
+              LocationSearchResult(
+                displayName: 'Koordinat: $lat, $lng',
+                lat: lat,
+                lon: lng,
+                type: 'coordinate',
+                category: 'place',
+              )
+            ];
+            _aramaYukleniyor = false;
+          });
+        }
+        return;
+      }
+    }
+
     final sonuclar = await RoutingService.searchLocation(query);
     if (mounted) {
       setState(() {
@@ -477,6 +530,45 @@ class _MapScreenState extends State<MapScreen> {
     ));
   }
 
+  void _showFiresList() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: kCardBg,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('AKTİF YANGINLAR', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+              const SizedBox(height: 10),
+              if (_fireMarkers.isEmpty)
+                const Padding(padding: EdgeInsets.all(16), child: Text('Aktif yangın bulunmuyor.', style: TextStyle(color: Colors.white70))),
+              ..._fireMarkers.map((doc) {
+                final data = doc.data() as Map<String, dynamic>;
+                final lat = (data['lat'] as num?)?.toDouble() ?? 0.0;
+                final lng = (data['lng'] as num?)?.toDouble() ?? 0.0;
+                return ListTile(
+                  leading: const Icon(Icons.local_fire_department, color: Colors.redAccent),
+                  title: Text(data['name']?.toString() ?? 'Bilinmeyen Konum', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  subtitle: Text('Durum: ${data['status'] ?? 'Bilinmiyor'}', style: const TextStyle(color: Colors.white70)),
+                  trailing: const Icon(Icons.my_location, color: kOrange, size: 20),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    try {
+                      _mapController.move(LatLng(lat, lng), 14.0);
+                    } catch (_) {}
+                  },
+                );
+              }).toList(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -508,12 +600,14 @@ class _MapScreenState extends State<MapScreen> {
                 tileProvider: NetworkTileProvider(),
               ),
 
-              // Aktif kayıtlı rota - PROFESYONEL PATİKA GÖRÜNÜMÜ
+              // Aktif kayıtlı rota - PROFESYONEL PATİKA GÖRÜNÜMÜ VEYA ORMAN ROTASI GÖRÜNÜMÜ
               if (_aktifRotaHat.length >= 2)
                 PolylineLayer<Object>(polylines: [
                   Polyline<Object>(
                     points: _aktifRotaHat,
-                    color: Colors.blueAccent.withOpacity(0.8),
+                    color: (_aktifRota != null && _aktifRota!['isim']?.toString().startsWith('[ORMAN]') == true) 
+                        ? Colors.deepOrange.withOpacity(0.9)
+                        : Colors.blueAccent.withOpacity(0.8),
                     strokeWidth: 4.5,
                     pattern: StrokePattern.dashed(segments: [15, 15]),
                   ),
@@ -612,6 +706,33 @@ class _MapScreenState extends State<MapScreen> {
                       ],
                     ),
                   )).toList(),
+                ),
+
+              // Yangın Pinleri
+              if (_fireMarkers.isNotEmpty)
+                MarkerLayer(
+                  markers: _fireMarkers.map((doc) {
+                    final data = doc.data() as Map<String, dynamic>;
+                    final lat = (data['lat'] as num?)?.toDouble() ?? 0.0;
+                    final lng = (data['lng'] as num?)?.toDouble() ?? 0.0;
+                    final status = data['status']?.toString() ?? 'Aktif';
+                    return Marker(
+                      point: LatLng(lat, lng),
+                      width: 40,
+                      height: 40,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.local_fire_department, color: status == 'Aktif' ? Colors.red : Colors.orange, size: 28),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                            color: Colors.black87,
+                            child: Text(data['name']?.toString() ?? 'Yangın', style: const TextStyle(color: Colors.white, fontSize: 8)),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
                 ),
             ],
           ),
@@ -971,6 +1092,19 @@ class _MapScreenState extends State<MapScreen> {
                     ),
                   ],
                 ),
+              ),
+            ),
+
+          // ── Aktif Yangınlar Butonu ────────────────────────────────
+          if (_fireMarkers.isNotEmpty)
+            Positioned(
+              top: 150, right: 12,
+              child: FloatingActionButton.extended(
+                heroTag: 'fires_btn',
+                onPressed: _showFiresList,
+                backgroundColor: Colors.redAccent.withOpacity(0.9),
+                icon: const Icon(Icons.local_fire_department, color: Colors.white),
+                label: Text('${_fireMarkers.length} Yangın', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ),
             ),
 

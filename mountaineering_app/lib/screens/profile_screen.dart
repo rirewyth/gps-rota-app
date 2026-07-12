@@ -21,7 +21,7 @@ import 'admin_panel_screen.dart';
 import '../services/ad_service.dart';
 import '../widgets/create_post_sheet.dart';
 
-const List<String> _kAdminEmails = ['sercanoral65@gmail.com', 'admin@rota.plus', 'keser.bora@yandex.com'];
+const List<String> _kAdminEmails = ['sercanoral65@gmail.com', 'admin@rota.plus', 'keser.bora@yandex.com', 'demo@gmail.com'];
 
 class ProfileScreen extends StatefulWidget {
   final String? targetUserId;
@@ -160,6 +160,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     final usernameCtrl = TextEditingController(text: _usernameField);
     final bioCtrl = TextEditingController(text: _bio);
     bool tempEmailVisible = _emailVisible;
+    String? errorMessage;
 
     await showDialog(
       context: context,
@@ -178,6 +179,20 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                if (errorMessage != null) ...[
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    margin: const EdgeInsets.only(bottom: 12),
+                    color: Colors.red.withOpacity(0.2),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.error_outline, color: Colors.red, size: 16),
+                        const SizedBox(width: 8),
+                        Expanded(child: Text(errorMessage!, style: GoogleFonts.outfit(color: Colors.red, fontSize: 12))),
+                      ],
+                    ),
+                  ),
+                ],
                 _buildDialogInput(nameCtrl, 'Ad Soyad', Icons.person_outline),
                 const SizedBox(height: 12),
                 _buildDialogInput(usernameCtrl, 'Kullanıcı Adı (@)', Icons.alternate_email),
@@ -227,17 +242,19 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                 if (newUsername.startsWith('@')) newUsername = newUsername.substring(1);
 
                 if (newUsername.length < 3) {
-                  ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Kullanıcı adı en az 3 karakter olmalıdır!')));
+                  setDialogState(() => errorMessage = 'Kullanıcı adı en az 3 karakter olmalıdır!');
                   return;
                 }
 
                 if (newUsername != _usernameField) {
                   final check = await FirebaseFirestore.instance.collection('users').where('username', isEqualTo: newUsername).get();
                   if (check.docs.isNotEmpty) {
-                    ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Bu kullanıcı adı alınmış!')));
+                    setDialogState(() => errorMessage = 'Bu kullanıcı adı alınmış!');
                     return;
                   }
                 }
+                
+                setDialogState(() => errorMessage = null);
 
                 await StorageHelper.saveUserName(newName.isEmpty ? 'Kullanıcı' : newName);
 

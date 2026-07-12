@@ -101,6 +101,7 @@ class _HomeDashboardState extends State<HomeDashboard>
   bool _isStrobeOn = false;
   bool _isSosFlashOn = false;
   Timer? _strobeTimer;
+  bool _fireWarningShown = false;
 
   // Radar variables
   List<TeammateLocation> _teammates = [];
@@ -708,6 +709,40 @@ class _HomeDashboardState extends State<HomeDashboard>
     final alert = await WeatherService.checkStormRisk(pos.latitude, pos.longitude);
     if (mounted) {
       setState(() => _weatherAlert = alert);
+
+      if (!_fireWarningShown && alert != null && !alert.isLoading) {
+        if (alert.temperature > 30.0 && (alert.humidity ?? 50.0) < 30.0) {
+          _fireWarningShown = true;
+          showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              backgroundColor: const Color(0xFF1F0808),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(0),
+                side: const BorderSide(color: Colors.redAccent, width: 2),
+              ),
+              title: Row(
+                children: [
+                  const Icon(Icons.warning_amber_rounded, color: Colors.redAccent),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text('ORMAN YANGINI RİSKİ', style: GoogleFonts.shareTechMono(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 16))),
+                ],
+              ),
+              content: Text(
+                'Bölgenizde yüksek sıcaklık (${alert.temperature.toStringAsFixed(1)}°C) ve düşük nem (%${alert.humidity?.toStringAsFixed(1)}) saptandı. Orman yangını çıkma riski oldukça yüksektir. Lütfen doğada ateş yakmayın ve dikkatli olun!',
+                style: GoogleFonts.shareTechMono(color: Colors.white70),
+              ),
+              actions: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent, shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero)),
+                  onPressed: () => Navigator.pop(ctx),
+                  child: Text('ANLADIM', style: GoogleFonts.shareTechMono(color: Colors.white, fontWeight: FontWeight.bold)),
+                ),
+              ],
+            ),
+          );
+        }
+      }
     }
   }
 

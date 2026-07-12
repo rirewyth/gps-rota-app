@@ -803,47 +803,135 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: kBackground,
-      appBar: AppBar(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('ROTA+ ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: 1.5)),
-            Text('ACİL DURUM', style: GoogleFonts.outfit(color: kOrange, fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: 1.5, fontStyle: FontStyle.italic)),
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        backgroundColor: kBackground,
+        appBar: AppBar(
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('ROTA+ ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: 1.5)),
+              Text('ACİL DURUM', style: GoogleFonts.outfit(color: kOrange, fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: 1.5, fontStyle: FontStyle.italic)),
+            ],
+          ),
+          backgroundColor: Colors.black,
+          elevation: 0,
+          bottom: const TabBar(
+            indicatorColor: kOrange,
+            labelColor: kOrange,
+            unselectedLabelColor: Colors.white54,
+            indicatorWeight: 3,
+            labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal, fontSize: 12),
+            tabs: [
+              Tab(text: 'GENEL'),
+              Tab(text: 'TAKİP EDİLENLER'),
+              Tab(text: 'YANGINLAR'),
+            ],
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.mark_email_unread_outlined, color: Colors.white),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DmListScreen())),
+            ),
           ],
         ),
-        backgroundColor: Colors.black,
-        elevation: 0,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(40),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            alignment: Alignment.centerLeft,
-            child: Text(
-              'ACİL DURUM AKIŞI',
-              style: GoogleFonts.shareTechMono(color: kOrange, fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 1.2),
-            ),
-          ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: _showCreatePostSheet,
+          backgroundColor: kOrange,
+          child: const Icon(Icons.add, color: Colors.black),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.mark_email_unread_outlined, color: Colors.white),
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DmListScreen())),
-          ),
-        ],
+        body: Column(
+          children: [
+            _buildAnnouncementBanner(),
+            Expanded(
+              child: TabBarView(
+                children: [
+                  _buildSocialFeedTab(onlyFollowing: false),
+                  _buildFollowingFeedWrapper(),
+                  _buildFiresFeedTab(),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showCreatePostSheet,
-        backgroundColor: kOrange,
-        child: const Icon(Icons.add, color: Colors.black),
-      ),
-      body: Column(
-        children: [
-          _buildAnnouncementBanner(),
-          Expanded(child: _buildSocialFeedTab()),
-        ],
-      ),
+    );
+  }
+
+  Widget _buildFollowingFeedWrapper() {
+    if (_currentUser == null) {
+      return const Center(child: Text('Giriş yapmanız gerekiyor.', style: TextStyle(color: Colors.white54)));
+    }
+    return StreamBuilder<DocumentSnapshot>(
+      stream: FirebaseFirestore.instance.collection('users').doc(_currentUser!.uid).snapshots(),
+      builder: (context, snap) {
+        if (!snap.hasData) return const Center(child: CircularProgressIndicator(color: kOrange));
+        final data = snap.data!.data() as Map<String, dynamic>?;
+        final following = (data?['following'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [];
+        if (following.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.person_add_disabled, color: kOrange.withOpacity(0.4), size: 80),
+                const SizedBox(height: 16),
+                const Text('Henüz kimseyi takip etmiyorsunuz.', style: TextStyle(color: Colors.white54, fontSize: 14)),
+              ],
+            ),
+          );
+        }
+        return _buildSocialFeedTab(onlyFollowing: true, followingList: following);
+      },
+    );
+  }
+
+  Widget _buildFiresFeedTab() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collection('fires').snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator(color: kOrange));
+        }
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.local_fire_department, color: kOrange.withOpacity(0.4), size: 80),
+                const SizedBox(height: 16),
+                const Text('Aktif yangın bulunmuyor.', style: TextStyle(color: Colors.white54, fontSize: 14)),
+              ],
+            ),
+          );
+        }
+        return ListView.builder(
+          padding: const EdgeInsets.all(12),
+          itemCount: snapshot.data!.docs.length,
+          itemBuilder: (context, index) {
+            final doc = snapshot.data!.docs[index];
+            final data = doc.data() as Map<String, dynamic>;
+            final status = data['status']?.toString() ?? 'Aktif';
+            final name = data['name']?.toString() ?? 'Bilinmeyen Konum';
+            final isControlled = status == 'Kontrol Altında';
+            return Card(
+              color: kCardBg,
+              margin: const EdgeInsets.only(bottom: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: isControlled ? Colors.green.withOpacity(0.3) : Colors.redAccent.withOpacity(0.3))),
+              child: ListTile(
+                contentPadding: const EdgeInsets.all(16),
+                leading: Icon(Icons.local_fire_department, color: isControlled ? Colors.green : Colors.redAccent, size: 32),
+                title: Text(name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                subtitle: Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Text('Durum: $status\nLat: ${data['lat']}, Lng: ${data['lng']}', style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -1011,7 +1099,7 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
     );
   }
 
-  Widget _buildSocialFeedTab() {
+  Widget _buildSocialFeedTab({bool onlyFollowing = false, List<String>? followingList}) {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance.collection('posts').orderBy('timestamp', descending: true).snapshots(),
       builder: (context, snapshot) {
@@ -1056,7 +1144,9 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
         final posts = docs.where((doc) {
           final data = doc.data() as Map<String, dynamic>;
           final uid = data['userId'] as String? ?? '';
-          return !_blockedUsers.contains(uid);
+          if (_blockedUsers.contains(uid)) return false;
+          if (onlyFollowing && followingList != null && !followingList.contains(uid)) return false;
+          return true;
         }).toList();
         
         // Premium değilse aralara reklam yerleştir

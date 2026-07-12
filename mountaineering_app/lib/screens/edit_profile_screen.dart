@@ -104,6 +104,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final usernameCtrl = TextEditingController(text: _usernameField);
     final bioCtrl = TextEditingController(text: _bio);
     bool tempEmailVisible = _emailVisible;
+    String? errorMessage;
 
     await showDialog(
       context: context,
@@ -124,6 +125,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                if (errorMessage != null) ...[
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    margin: const EdgeInsets.only(bottom: 12),
+                    color: Colors.red.withOpacity(0.2),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.error_outline, color: Colors.red, size: 16),
+                        const SizedBox(width: 8),
+                        Expanded(child: Text(errorMessage!, style: GoogleFonts.shareTechMono(color: Colors.red, fontSize: 12))),
+                      ],
+                    ),
+                  ),
+                ],
                 _buildDialogInput(nameCtrl, 'Ad Soyad', Icons.person_outline),
                 const SizedBox(height: 12),
                 _buildDialogInput(usernameCtrl, 'Kullanıcı Adı (@)', Icons.alternate_email),
@@ -171,17 +186,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 if (newUsername.startsWith('@')) newUsername = newUsername.substring(1);
 
                 if (newUsername.length < 3) {
-                  ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text('Kullanıcı adı en az 3 karakter olmalı!'), backgroundColor: Colors.red));
+                  setDialogState(() => errorMessage = 'Kullanıcı adı en az 3 karakter olmalı!');
                   return;
                 }
 
                 if (newUsername != _usernameField) {
                   final check = await FirebaseFirestore.instance.collection('users').where('username', isEqualTo: newUsername).get();
                   if (check.docs.isNotEmpty) {
-                    ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text('Bu kullanıcı adı alınmış!'), backgroundColor: Colors.red));
+                    setDialogState(() => errorMessage = 'Bu kullanıcı adı alınmış!');
                     return;
                   }
                 }
+                
+                setDialogState(() => errorMessage = null);
 
                 await StorageHelper.saveUserName(newName.isEmpty ? 'Kullanıcı' : newName);
 

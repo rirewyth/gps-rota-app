@@ -80,38 +80,48 @@ class AdService {
     required Function() onAdLoaded,
     required Function(Ad, LoadAdError) onAdFailedToLoad,
   }) {
-    if (Platform.isAndroid) {
-      return AdWidget(
-        ad: NativeAd(
-          adUnitId: nativeAdUnitId,
-          factoryId: 'listTile',
-          request: const AdRequest(),
-          listener: NativeAdListener(
-            onAdLoaded: (ad) => onAdLoaded(),
-            onAdFailedToLoad: (ad, error) {
-              ad.dispose();
-              onAdFailedToLoad(ad, error);
-            },
+    return AdWidget(
+      ad: NativeAd(
+        adUnitId: nativeAdUnitId,
+        request: const AdRequest(),
+        nativeTemplateStyle: NativeTemplateStyle(
+          templateType: TemplateType.medium,
+          mainBackgroundColor: Colors.black,
+          cornerRadius: 12,
+          callToActionTextStyle: NativeTemplateTextStyle(
+            textColor: Colors.white,
+            backgroundColor: const Color(0xFFFF6B00), // kOrange
+            style: NativeTemplateFontStyle.bold,
+            size: 14.0,
           ),
-        )..load(),
-      );
-    } else {
-      // iOS için şimdilik Banner fallback (Native ID ile banner deniyoruz veya banner ID kullanıyoruz)
-      return AdWidget(
-        ad: BannerAd(
-          adUnitId: bannerAdUnitId,
-          size: AdSize.banner,
-          request: const AdRequest(),
-          listener: BannerAdListener(
-            onAdLoaded: (ad) => onAdLoaded(),
-            onAdFailedToLoad: (ad, error) {
-              ad.dispose();
-              onAdFailedToLoad(ad, error);
-            },
+          primaryTextStyle: NativeTemplateTextStyle(
+            textColor: Colors.white,
+            backgroundColor: Colors.transparent,
+            style: NativeTemplateFontStyle.bold,
+            size: 16.0,
           ),
-        )..load(),
-      );
-    }
+          secondaryTextStyle: NativeTemplateTextStyle(
+            textColor: Colors.white70,
+            backgroundColor: Colors.transparent,
+            style: NativeTemplateFontStyle.normal,
+            size: 14.0,
+          ),
+          tertiaryTextStyle: NativeTemplateTextStyle(
+            textColor: Colors.white54,
+            backgroundColor: Colors.transparent,
+            style: NativeTemplateFontStyle.normal,
+            size: 12.0,
+          ),
+        ),
+        listener: NativeAdListener(
+          onAdLoaded: (ad) => onAdLoaded(),
+          onAdFailedToLoad: (ad, error) {
+            ad.dispose();
+            onAdFailedToLoad(ad, error);
+          },
+        ),
+      )..load(),
+    );
   }
 
   void loadRewardedAd({Function? onLoaded}) {
