@@ -1,0 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg-color: #0D0D0D;
+  --panel-bg: rgba(20, 20, 20, 0.7);
+  --panel-border: rgba(255, 255, 255, 0.1);
+  --text-primary: #FFFFFF;
+  --text-secondary: #A0A0A0;
+  
+  --color-orange: #FF6A00;
+  --color-orange-glow: rgba(255, 106, 0, 0.3);
+  --color-green: #00FF66;
+  --color-green-glow: rgba(0, 255, 102, 0.3);
+  --color-red: #FF3333;
+  --color-red-glow: rgba(255, 51, 51, 0.3);
+  --color-blue: #3399FF;
+  --color-blue-glow: rgba(51, 153, 255, 0.3);
+  --color-yellow: #FFCC00;
+
+  --glass-blur: blur(16px);
+  --z-map: 1;
+  --z-panel: 10;
+  --z-modal: 100;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  overflow: hidden; /* Prevent scrolling, dashboard layout */
+}
+
+/* Glassmorphism Panels */
+.glass-panel {
+  background: var(--panel-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-orange);
+}
+
+/* Map specific override for dark theme leaflet */
+.leaflet-container {
+  background-color: #0d0d0d !important;
+}
+.dark-tiles {
+  filter: invert(1) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
