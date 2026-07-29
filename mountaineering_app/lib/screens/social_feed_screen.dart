@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:latlong2/latlong.dart';
+import 'map_screen.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -914,18 +916,130 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
             final data = doc.data() as Map<String, dynamic>;
             final status = data['status']?.toString() ?? 'Aktif';
             final name = data['name']?.toString() ?? 'Bilinmeyen Konum';
-            final isControlled = status == 'Kontrol Altında';
-            return Card(
-              color: kCardBg,
-              margin: const EdgeInsets.only(bottom: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: isControlled ? Colors.green.withOpacity(0.3) : Colors.redAccent.withOpacity(0.3))),
-              child: ListTile(
-                contentPadding: const EdgeInsets.all(16),
-                leading: Icon(Icons.local_fire_department, color: isControlled ? Colors.green : Colors.redAccent, size: 32),
-                title: Text(name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                subtitle: Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: Text('Durum: $status\nLat: ${data['lat']}, Lng: ${data['lng']}', style: const TextStyle(color: Colors.white70, fontSize: 12)),
+            
+            // Renk ve Tema Belirleme
+            Color statusColor;
+            Color bgColor;
+            IconData statusIcon = Icons.local_fire_department;
+            
+            if (status.toLowerCase().contains('soğutma')) {
+              statusColor = Colors.lightBlueAccent;
+              bgColor = Colors.lightBlue.withOpacity(0.15);
+              statusIcon = Icons.water_drop;
+            } else if (status.toLowerCase().contains('kontrol')) {
+              statusColor = Colors.orangeAccent;
+              bgColor = Colors.orange.withOpacity(0.15);
+              statusIcon = Icons.warning_amber_rounded;
+            } else if (status.toLowerCase().contains('söndürüldü')) {
+              statusColor = Colors.greenAccent;
+              bgColor = Colors.green.withOpacity(0.15);
+              statusIcon = Icons.check_circle;
+            } else {
+              // Varsayılan Aktif
+              statusColor = Colors.redAccent;
+              bgColor = Colors.red.withOpacity(0.15);
+              statusIcon = Icons.local_fire_department;
+            }
+
+            return GestureDetector(
+              onTap: () {
+                // Tıklanınca harita sekmesine/sayfasına uç ve pinle
+                if (data['lat'] != null && data['lng'] != null) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MapScreen(
+                        focusLocation: LatLng(
+                          (data['lat'] as num).toDouble(),
+                          (data['lng'] as num).toDouble(),
+                        ),
+                      ),
+                    ),
+                  );
+                }
+              },
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                decoration: BoxDecoration(
+                  color: kCardBg,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: statusColor.withOpacity(0.4), width: 1.5),
+                  boxShadow: [
+                    BoxShadow(
+                      color: statusColor.withOpacity(0.2),
+                      blurRadius: 10,
+                      spreadRadius: 1,
+                    )
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Stack(
+                    children: [
+                      // Dekoratif arka plan parlaklığı
+                      Positioned(
+                        right: -20,
+                        top: -20,
+                        child: Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: bgColor,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: bgColor,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(statusIcon, color: statusColor, size: 28),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    name,
+                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: statusColor.withOpacity(0.2),
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                        child: Text(
+                                          status.toUpperCase(),
+                                          style: TextStyle(color: statusColor, fontSize: 10, fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Koordinat: ${data['lat']}, ${data['lng']}',
+                                    style: const TextStyle(color: Colors.white54, fontSize: 11),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(Icons.map, color: Colors.white30, size: 24),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             );

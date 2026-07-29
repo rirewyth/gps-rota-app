@@ -17,7 +17,7 @@ class AdService {
 
   // Real Ad Unit IDs
   static const String _rewardedAdUnitIdAndroid = 'ca-app-pub-3676572486266282/9344128856';
-  static const String _rewardedAdUnitIdIos = 'ca-app-pub-3676572486266282/9344128856'; 
+  static const String _rewardedAdUnitIdIos = 'ca-app-pub-3676572486266282/9076936867'; 
 
   // Native Ad ID (Real)
   static const String _nativeAdUnitIdAndroid = 'ca-app-pub-3676572486266282/6396840817';
@@ -25,7 +25,7 @@ class AdService {
 
   // Banner Ad IDs
   static const String _bannerAdUnitIdAndroid = 'ca-app-pub-3676572486266282/1657210527';
-  static const String _bannerAdUnitIdIos = 'ca-app-pub-3676572486266282/1657210527';
+  static const String _bannerAdUnitIdIos = 'ca-app-pub-3676572486266282/3496738903';
 
   String get rewardedAdUnitId {
     if (kDebugMode) {

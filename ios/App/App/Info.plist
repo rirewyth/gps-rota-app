@@ -49,5 +49,14 @@
 	<true/>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>GPS Rota uygulaması, rotanız üzerinde nerede olduğunuzu göstermek için konum izninize ihtiyaç duyar.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Arka planda (ekran kapalıyken) rotanızı kaydetmeye ve konum göndermeye devam edebilmek için her zaman izin vermeniz gerekir.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Arka planda (ekran kapalıyken) rotanızı kaydetmeye ve konum göndermeye devam edebilmek için her zaman izin vermeniz gerekir.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>remote-notification</string>
+	</array>
 </dict>
 </plist>

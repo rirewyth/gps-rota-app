@@ -20,7 +20,8 @@ const Color kCardBg = Color(0xFF141414);
 const Color kGreen = Color(0xFF62FF4C);
 
 class MapScreen extends StatefulWidget {
-  const MapScreen({Key? key}) : super(key: key);
+  final LatLng? focusLocation;
+  const MapScreen({Key? key, this.focusLocation}) : super(key: key);
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -73,6 +74,15 @@ class _MapScreenState extends State<MapScreen> {
         _firesSub = FirebaseFirestore.instance.collection('fires').snapshots().listen((snap) {
           if (mounted) setState(() => _fireMarkers = snap.docs);
         });
+
+        // Eğer parametre olarak odak noktası geldiyse haritayı oraya uçur
+        if (widget.focusLocation != null) {
+          Future.delayed(const Duration(milliseconds: 500), () {
+            if (mounted) {
+              _mapController.move(widget.focusLocation!, 14.0);
+            }
+          });
+        }
       }
     });
   }
@@ -718,8 +728,8 @@ class _MapScreenState extends State<MapScreen> {
                     final status = data['status']?.toString() ?? 'Aktif';
                     return Marker(
                       point: LatLng(lat, lng),
-                      width: 40,
-                      height: 40,
+                      width: 80,
+                      height: 60,
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -736,194 +746,17 @@ class _MapScreenState extends State<MapScreen> {
                 ),
             ],
           ),
-          // ── Arama Çubuğu ───────────────────────────────────────────
-          Positioned(
-            top: 70, left: 16, right: 16,
-            child: Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.7),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.white10),
-                    boxShadow: [BoxShadow(color: Colors.black54, blurRadius: 10)],
-                  ),
-                  child: TextField(
-                    controller: _aramaController,
-                    style: const TextStyle(color: Colors.white, fontSize: 13),
-                    onChanged: _aramaYap,
-                    decoration: InputDecoration(
-                      hintText: 'DAĞ, ZİRVE VEYA KONUM ARA...',
-                      hintStyle: const TextStyle(color: Colors.white38, fontSize: 11),
-                      icon: const Icon(Icons.search, color: kOrange, size: 20),
-                      border: InputBorder.none,
-                      suffixIcon: _aramaController.text.isNotEmpty 
-                        ? IconButton(
-                            icon: const Icon(Icons.close, color: Colors.white38, size: 16),
-                            onPressed: () {
-                              _aramaController.clear();
-                              setState(() => _aramaSonuclari = []);
-                            },
-                          )
-                        : null,
-                    ),
-                  ),
-                ),
-                if (_aramaSonuclari.isNotEmpty)
-                  Container(
-                    margin: const EdgeInsets.only(top: 4),
-                    constraints: const BoxConstraints(maxHeight: 300),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.95),
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: kOrange.withOpacity(0.3)),
-                    ),
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      padding: EdgeInsets.zero,
-                      itemCount: _aramaSonuclari.length,
-                      separatorBuilder: (_, __) => const Divider(color: Colors.white10, height: 1),
-                      itemBuilder: (ctx, i) {
-                        final res = _aramaSonuclari[i];
-                        return ListTile(
-                          dense: true,
-                          leading: Icon(
-                            res.type == 'peak' ? Icons.terrain : Icons.location_on,
-                            color: res.type == 'peak' ? kOrange : Colors.white38,
-                            size: 16,
-                          ),
-                          title: Text(res.displayName.split(',').first, 
-                            style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
-                          subtitle: Text(res.displayName, 
-                            style: const TextStyle(color: Colors.white38, fontSize: 10, overflow: TextOverflow.ellipsis)),
-                          onTap: () => _aramaSonucuSec(res),
-                        );
-                      },
-                    ),
-                  ),
-                if (_aramaYukleniyor)
-                  const Padding(
-                    padding: EdgeInsets.only(top: 8),
-                    child: SizedBox(width: 20, height: 2, child: LinearProgressIndicator(color: kOrange, backgroundColor: Colors.transparent)),
-                  ),
-              ],
-            ),
-          ),
-
-          // ── Üst Araç Çubuğu ────────────────────────────────────
+          // ── Üst Araç Çubuğu (Basitleştirilmiş) ─────────────────
           Positioned(
             top: 0, left: 0, right: 0,
             child: Container(
-              padding: const EdgeInsets.fromLTRB(16, 12, 8, 10),
+              padding: const EdgeInsets.fromLTRB(16, 50, 8, 10),
               color: Colors.black.withOpacity(0.85),
               child: Row(
                 children: [
-                  // Başlık
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('CANLI HARİTA',
-                        style: TextStyle(color: kOrange, fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: 2)),
-                      if (_aktifRota != null)
-                        Text('📍 HEDEF: ${_aktifRota!['isim']}',
-                          style: const TextStyle(color: kGreen, fontSize: 11, fontWeight: FontWeight.bold))
-                      else
-                        const Text('⚠️ Lütfen bir rota seçin',
-                          style: TextStyle(color: Colors.white38, fontSize: 11)),
-                    ],
-                  ),
+                  const Text('CANLI HARİTA',
+                    style: TextStyle(color: kOrange, fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: 2)),
                   const Spacer(),
-
-                  // Geri Al (Undo) Butonu
-                  if (_planlamaAktif && _planlamaNoktalar.isNotEmpty)
-                    GestureDetector(
-                      onTap: () {
-                        setState(() => _planlamaNoktalar.removeLast());
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                        margin: const EdgeInsets.only(right: 6),
-                        color: Colors.redAccent.withOpacity(0.8),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.undo, color: Colors.white, size: 16),
-                            SizedBox(width: 4),
-                            Text('SİL', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                  GestureDetector(
-                    onTap: () {
-                      if (!_planlamaAktif) {
-                        setState(() => _planlamaAktif = true);
-                      } else if (_planlamaNoktalar.length >= 2) {
-                        _rotaKaydet();
-                      }
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: _planlamaAktif ? kOrange : Colors.white12,
-                        borderRadius: BorderRadius.circular(4),
-                        boxShadow: _planlamaAktif ? [BoxShadow(color: kOrange.withOpacity(0.3), blurRadius: 10, spreadRadius: 2)] : [],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            _planlamaAktif
-                              ? (_planlamaNoktalar.length >= 2 ? Icons.check_circle_outline : Icons.edit_location_alt)
-                              : Icons.add_location_alt_rounded,
-                            color: _planlamaAktif ? Colors.black : Colors.white,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            _planlamaAktif
-                              ? (_planlamaNoktalar.length >= 2 ? 'TAMAMLA' : 'NOKTA EKLE')
-                              : 'YENİ ROTA',
-                            style: TextStyle(
-                              color: _planlamaAktif ? Colors.black : Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-
-                  // İndir butonu
-                  if (!_planlamaAktif && _aktifRota != null)
-                    IconButton(
-                      icon: Icon(_isDownloading ? Icons.downloading : Icons.map_outlined, 
-                        color: _isDownloading ? kOrange : Colors.white60),
-                      onPressed: _isDownloading ? null : _offlineMapDownload,
-                      tooltip: 'Çevrimdışı Harita İndir',
-                    ),
-
-                  // Rotalar listesi
-                  IconButton(
-                    icon: const Icon(Icons.route, color: Colors.white60),
-                    onPressed: _rotaListesiGoster,
-                    tooltip: 'Kayıtlı Rotalar',
-                  ),
-
-                  // Planlama iptal
-                  if (_planlamaAktif)
-                    IconButton(
-                      icon: const Icon(Icons.clear, color: Colors.redAccent, size: 20),
-                      onPressed: () => setState(() {
-                        _planlamaAktif = false;
-                        _planlamaNoktalar.clear();
-                      }),
-                    ),
-                  
                   // Harita Stili Seçici
                   IconButton(
                     icon: Icon(Icons.layers, color: _currentMapStyle == 'osm' ? Colors.white60 : kOrange),
@@ -934,166 +767,6 @@ class _MapScreenState extends State<MapScreen> {
               ),
             ),
           ),
-
-          // ── SOS Butonu ───────────────────────────────────────────
-          if (!_planlamaAktif)
-            Positioned(
-              bottom: 100, right: 12,
-              child: FloatingActionButton.extended(
-                onPressed: _sosGonder,
-                backgroundColor: Colors.red.shade900,
-                elevation: 10,
-                icon: const Icon(Icons.emergency, color: Colors.white, size: 28),
-                label: const Text('SOS', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 2, fontSize: 18)),
-              ),
-            ),
-
-          // ── Planlama İpucu Mesajı ───────────────────────────────
-          if (_planlamaAktif)
-            Positioned(
-              top: 65, left: 0, right: 0,
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                color: kOrange.withOpacity(0.9),
-                child: Row(
-                  children: [
-                    const Icon(Icons.touch_app, color: Colors.black, size: 18),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        _planlamaNoktalar.isEmpty
-                          ? 'Rota başlangıç noktasına dokun…'
-                          : '${_planlamaNoktalar.length} nokta eklendi. Devam et veya KAYDET\'e bas.',
-                        style: const TextStyle(color: Colors.black, fontSize: 11, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    if (_planlamaNoktalar.isNotEmpty)
-                      GestureDetector(
-                        onTap: () => setState(() => _planlamaNoktalar.removeLast()),
-                        child: const Icon(Icons.undo, color: Colors.black, size: 18),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-
-          // ── GPS Yükleniyor ──────────────────────────────────────
-          if (_konumYukleniyor)
-            Positioned(
-              bottom: 170, left: 0, right: 0,
-              child: Center(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  color: Colors.black.withOpacity(0.85),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(width: 16, height: 16,
-                        child: CircularProgressIndicator(color: kOrange, strokeWidth: 2)),
-                      SizedBox(width: 8),
-                      Text('GPS sinyali aranıyor...', style: TextStyle(color: kOrange, fontSize: 11)),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-          // ── İndirme Progress bar ───────────────────────────────
-          if (_isDownloading)
-            Positioned(
-              top: 65, left: 0, right: 0,
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                padding: const EdgeInsets.all(12),
-                color: Colors.black.withOpacity(0.9),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.download, color: kOrange, size: 16),
-                        const SizedBox(width: 8),
-                        const Text('Harita Karoları İndiriliyor...', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
-                        const Spacer(),
-                        Text('%${(_downloadProgress * 100).toInt()}', style: const TextStyle(color: kOrange, fontSize: 11, fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    LinearProgressIndicator(value: _downloadProgress, backgroundColor: Colors.white10, color: kOrange, minHeight: 2),
-                  ],
-                ),
-              ),
-            ),
-
-          // ── Modern Planlama HUD ─────────────────────────────────
-          if (_planlamaAktif)
-            Positioned(
-              bottom: 20, left: 12, right: 12,
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.95),
-                  border: const Border(top: BorderSide(color: kOrange, width: 2)),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text('PLANLANAN MESAFE', style: TextStyle(color: Colors.white38, fontSize: 9, fontWeight: FontWeight.bold)),
-                            Text(
-                              _toplamMesafe > 1000 
-                                ? '${(_toplamMesafe/1000).toStringAsFixed(2)} KM' 
-                                : '${_toplamMesafe.toInt()} METRE',
-                              style: const TextStyle(color: kOrange, fontSize: 24, fontWeight: FontWeight.w900),
-                            ),
-                          ],
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            const Text('TAHMİNİ SÜRE', style: TextStyle(color: Colors.white38, fontSize: 9, fontWeight: FontWeight.bold)),
-                            Text(
-                              '${(_toplamMesafe / 50).toInt()} DK', // Mock: 50m/dk tırmanış hızı
-                              style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    const Divider(color: Colors.white10, height: 24),
-                    Row(
-                      children: [
-                        const Icon(Icons.info_outline, color: Colors.white38, size: 14),
-                        const SizedBox(width: 8),
-                        Text(
-                          _planlamaNoktalar.isEmpty 
-                            ? 'Rotayı başlatmak için haritaya dokun.'
-                            : '${_planlamaNoktalar.length} nokta belirlendi.',
-                          style: const TextStyle(color: Colors.white60, fontSize: 10),
-                        ),
-                        const Spacer(),
-                        if (_planlamaNoktalar.isNotEmpty)
-                          TextButton.icon(
-                            onPressed: () {
-                              setState(() {
-                                _planlamaNoktalar.removeLast();
-                                _hesaplaPlanMesafe();
-                              });
-                            },
-                            icon: const Icon(Icons.undo, color: Colors.redAccent, size: 16),
-                            label: const Text('GERİ AL', style: TextStyle(color: Colors.redAccent, fontSize: 11, fontWeight: FontWeight.bold)),
-                          ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
 
           // ── Aktif Yangınlar Butonu ────────────────────────────────
           if (_fireMarkers.isNotEmpty)

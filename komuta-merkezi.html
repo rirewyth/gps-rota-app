@@ -64,6 +64,13 @@ body::after {
 .incident-type.team { color: var(--safe-green); }
 .incident-meta { font-size: 10px; margin-top: 6px; display: flex; justify-content: space-between; color: var(--text-muted); }
 
+/* DECORATIVE BADGES FOR STATUSES */
+.badge-active { background: rgba(255, 42, 42, 0.15); color: var(--alert-red); border: 1px solid var(--alert-red); padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 10px; box-shadow: 0 0 10px rgba(255, 42, 42, 0.4); animation: pulse-red 2s infinite; margin-left: 8px; letter-spacing: 1px; }
+.badge-cooling { background: rgba(0, 229, 255, 0.1); color: var(--accent); border: 1px solid var(--accent); padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 10px; box-shadow: 0 0 10px rgba(0, 229, 255, 0.3); margin-left: 8px; letter-spacing: 1px; }
+
+@keyframes pulse-red { 0% { box-shadow: 0 0 5px rgba(255, 42, 42, 0.2); } 50% { box-shadow: 0 0 15px rgba(255, 42, 42, 0.8); } 100% { box-shadow: 0 0 5px rgba(255, 42, 42, 0.2); } }
+
+
 /* ── CENTER MAP ── */
 .map-area { grid-area: map; position: relative; background: var(--bg); overflow: hidden; }
 #map { width: 100%; height: 100%; }
@@ -476,14 +483,25 @@ body::after {
           if(cols.length >= 10) {
             const lat = parseFloat(cols[0]), lng = parseFloat(cols[1]), conf = cols[9];
             if(conf === 'n' || conf === 'h') {
+              const temp = parseFloat(cols[2]);
+              let fireStatus = 'AKTİF 🔥';
+              let badgeClass = 'badge-active';
+              
+              // Eğer yangın sıcaklığı düşükse (veya 'n' confidence ise), soğutma sayalım
+              if (conf === 'n' && temp < 315) {
+                 fireStatus = 'SOĞUTMADA 💧';
+                 badgeClass = 'badge-cooling';
+              }
+
               const id = `FR-${lat.toFixed(3).replace('.','')}-${lng.toFixed(3).replace('.','')}`;
               const isNew = !seenIncidentIds.has(id);
               if(isNew) seenIncidentIds.add(id);
 
               if (!incidents.find(i => i.id === id)) {
                 const incData = {
-                  id, type: 'fire', title: `YANGIN RİSKİ`, location: `Koordinat: ${lat.toFixed(4)}, ${lng.toFixed(4)}`,
-                  lat, lng, meta1: `Sıcaklık: ${cols[2]} K`, meta2: 'Uydu (VIIRS)', isNewIncident: isNew && !isFirstLoad
+                  id, type: 'fire', title: `YANGIN RİSKİ <span class="${badgeClass}">${fireStatus}</span>`, location: `Koordinat: ${lat.toFixed(4)}, ${lng.toFixed(4)}`,
+                  lat, lng, meta1: `Sıcaklık: ${cols[2]} K`, meta2: 'Uydu (VIIRS)', isNewIncident: isNew && !isFirstLoad,
+                  fireStatus: fireStatus
                 };
                 incidents.push(incData);
                 if(isNew && !isFirstLoad) triggerCriticalAlert(incData);
@@ -606,7 +624,8 @@ body::after {
     const inc = incidents.find(i => i.id === id);
     if(!inc) return;
 
-    map.flyTo([inc.lat, inc.lng], 10, {duration: 1.5});
+    // Hedefe tıklayınca iyice yaklaştırarak pinlenmiş hissi ver
+    map.flyTo([inc.lat, inc.lng], 15, {duration: 1.5});
     document.getElementById('detail-title').innerText = `HEDEF: ${inc.id}`;
     if(inc.isNewIncident) inc.isNewIncident = false;
 

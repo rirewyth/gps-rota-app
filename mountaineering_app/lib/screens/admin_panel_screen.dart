@@ -1368,6 +1368,31 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
             ],
           ),
           const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.white,
+                side: const BorderSide(color: kOrange),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+              icon: const Icon(Icons.map, color: kOrange),
+              label: const Text('HARİTADAN SEÇ'),
+              onPressed: () async {
+                final LatLng? picked = await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const _AdminMapPickerScreen()),
+                );
+                if (picked != null) {
+                  setState(() {
+                    _fireLatCtrl.text = picked.latitude.toString();
+                    _fireLngCtrl.text = picked.longitude.toString();
+                  });
+                }
+              },
+            ),
+          ),
+          const SizedBox(height: 12),
           DropdownButtonFormField<String>(
             value: _fireStatus,
             dropdownColor: kCardBg,
@@ -1382,6 +1407,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
             items: const [
               DropdownMenuItem(value: 'Aktif', child: Text('Aktif (Büyüyor)')),
               DropdownMenuItem(value: 'Kontrol Altında', child: Text('Kontrol Altında')),
+              DropdownMenuItem(value: 'Soğutma', child: Text('Soğutma')),
               DropdownMenuItem(value: 'Söndürüldü', child: Text('Söndürüldü')),
             ],
             onChanged: (v) => setState(() => _fireStatus = v!),
@@ -1505,5 +1531,64 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Hata: $e'), backgroundColor: Colors.red));
     }
+  }
+}
+
+class _AdminMapPickerScreen extends StatefulWidget {
+  const _AdminMapPickerScreen({Key? key}) : super(key: key);
+
+  @override
+  State<_AdminMapPickerScreen> createState() => _AdminMapPickerScreenState();
+}
+
+class _AdminMapPickerScreenState extends State<_AdminMapPickerScreen> {
+  LatLng? _selectedPoint;
+  final MapController _mapController = MapController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Haritadan Konum Seç'),
+        backgroundColor: Colors.black,
+        actions: [
+          if (_selectedPoint != null)
+            IconButton(
+              icon: const Icon(Icons.check, color: Colors.green),
+              onPressed: () => Navigator.pop(context, _selectedPoint),
+            )
+        ],
+      ),
+      body: FlutterMap(
+        mapController: _mapController,
+        options: MapOptions(
+          initialCenter: LatLng(39.0, 35.0), // Default Turkey
+          initialZoom: 5,
+          onTap: (tapPosition, point) {
+            setState(() {
+              _selectedPoint = point;
+            });
+          },
+        ),
+        children: [
+          TileLayer(
+            urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            subdomains: const ['a', 'b', 'c'],
+            userAgentPackageName: 'RotaPlus_Tactical_v1.0',
+          ),
+          if (_selectedPoint != null)
+            MarkerLayer(
+              markers: [
+                Marker(
+                  point: _selectedPoint!,
+                  width: 40,
+                  height: 40,
+                  child: const Icon(Icons.location_on, color: Colors.red, size: 40),
+                )
+              ],
+            ),
+        ],
+      ),
+    );
   }
 }

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">GPSRota</string>
+    <string name="title_activity_main">GPSRota</string>
+    <string name="package_name">com.rotaplus.emniyetteyim</string>
+    <string name="custom_url_scheme">com.rotaplus.emniyetteyim</string>
+</resources>

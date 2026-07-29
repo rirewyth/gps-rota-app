@@ -962,10 +962,6 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
               const SizedBox(width: 8),
               GestureDetector(
                 onTap: () {
-                  if (!_isPremiumUser) {
-                    PremiumService.showPremiumRequired(context, 'Walkie-Talkie (Push-to-Talk) Modu');
-                    return;
-                  }
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                     content: Text('🎤 Walkie-Talkie için basılı tutun', style: TextStyle(fontWeight: FontWeight.bold)), 
                     backgroundColor: kTOrange,
@@ -973,10 +969,6 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                   ));
                 },
                 onLongPressStart: (_) async {
-                  if (!_isPremiumUser) {
-                    PremiumService.showPremiumRequired(context, 'Walkie-Talkie (Push-to-Talk) Modu');
-                    return;
-                  }
                   
                   _isPressingPtt = true;
                   if (await _audioRecorder.hasPermission()) {
@@ -1254,10 +1246,6 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
           // PTT Butonu
           GestureDetector(
             onLongPressStart: (_) async {
-              if (!_isPremiumUser) {
-                PremiumService.showPremiumRequired(context, 'Walkie-Talkie Modu');
-                return;
-              }
               _isPressingPtt = true;
               if (await _audioRecorder.hasPermission()) {
                 try { Vibration.vibrate(duration: 100, amplitude: 255); } catch (_) {}

@@ -74,7 +74,7 @@
 		</array>
 		<!-- AdMob App ID (Real) -->
 		<key>GADApplicationIdentifier</key>
-		<string>ca-app-pub-3676572486266282~5769840223</string>
+		<string>ca-app-pub-3676572486266282~8319289356</string>
 		<key>MBXAccessToken</key>
 		<string>pk.eyJ1Ijoic2VyY2Fub3JhbGwiLCJhIjoiY21vdGxneTR1MDZkNjJ1czl5OG4xZGRtNSJ9.aZd3CyiISCcxlcR0hXkhhQ</string>
 		<!-- Required Privacy Keys -->

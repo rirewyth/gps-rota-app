@@ -1,3 +1,58 @@
+// Supabase Ayarları
+const supabaseUrl = 'https://lfudtzoxyiiysawikwyi.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxmdWR0em94eWlpeXNhd2lrd3lpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NzU3MzYsImV4cCI6MjEwMDA1MTczNn0.9HpTyHeeqSNJyZgwndfHDIuqKaI0HId9A2zoZNfXtq4';
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+// Cihaz için eşsiz bir ID oluştur (Sadece ilk girişte)
+let deviceId = localStorage.getItem('rota_device_id');
+if (!deviceId) {
+    deviceId = crypto.randomUUID ? crypto.randomUUID() : 'id-' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('rota_device_id', deviceId);
+}
+let username = localStorage.getItem('rota_username') || `Kullanıcı-${deviceId.substring(0, 4)}`;
+
+// Capacitor Native Eklentileri (Arka plan ve Ekran)
+document.addEventListener('DOMContentLoaded', async () => {
+    if (window.Capacitor && window.Capacitor.Plugins) {
+        const { KeepAwake, PushNotifications } = Capacitor.Plugins;
+
+        // Ekranın uyku moduna geçmesini (kapanmasını) engelle
+        if (KeepAwake) {
+            try {
+                await KeepAwake.keepAwake();
+                console.log('KeepAwake Aktif: Ekran uyanık kalacak.');
+            } catch (e) {
+                console.error('KeepAwake desteklenmiyor veya başlatılamadı:', e);
+            }
+        }
+
+        // Push Notifications (Anlık Bildirim) Başlatma
+        if (PushNotifications) {
+            try {
+                let permStatus = await PushNotifications.checkPermissions();
+                if (permStatus.receive === 'prompt') {
+                    permStatus = await PushNotifications.requestPermissions();
+                }
+                if (permStatus.receive === 'granted') {
+                    PushNotifications.register();
+                }
+                
+                PushNotifications.addListener('registration', (token) => {
+                    console.log('Push Registration Token: ', token.value);
+                    // Supabase users tablosuna token eklenecek
+                    supabase.from('users').update({ push_token: token.value }).eq('id', deviceId).then();
+                });
+
+                PushNotifications.addListener('pushNotificationReceived', (notification) => {
+                    console.log('Yeni Bildirim:', notification);
+                });
+            } catch (e) {
+                console.error('Push Notifications başlatılamadı:', e);
+            }
+        }
+    }
+});
+
 // Haritayı oluştur
 const map = L.map('map', {
     zoomControl: false 
@@ -82,7 +137,7 @@ const gpsIcon = L.divIcon({
 });
 
 // Konum başarılı şekilde haritada bulunduğunda
-map.on('locationfound', function(e) {
+map.on('locationfound', async function(e) {
     if (!userMarker) {
         userMarker = L.marker(e.latlng, { icon: gpsIcon }).addTo(map);
     } else {
@@ -96,6 +151,28 @@ map.on('locationfound', function(e) {
     }
     
     locateBtn.classList.add('active');
+
+    // Supabase'e konumu gönder (Upsert: Varsa güncelle, yoksa ekle)
+    try {
+        const { error } = await supabase
+            .from('users')
+            .upsert({
+                id: deviceId,
+                username: username,
+                latitude: e.latlng.lat,
+                longitude: e.latlng.lng,
+                is_sos: false, // İleride SOS butonu eklendiğinde burası değişecek
+                updated_at: new Date().toISOString()
+            });
+            
+        if (error) {
+            console.error('Konum gönderilirken hata oluştu:', error);
+        } else {
+            console.log('Konum başarıyla Supabase sunucusuna gönderildi.');
+        }
+    } catch (err) {
+        console.error('Supabase bağlantı hatası:', err);
+    }
 });
 
 // Konum bulmada hata oluşursa (izin reddedilirse vs.)
@@ -105,8 +182,48 @@ map.on('locationerror', function(e) {
 });
 
 // Sağ alttaki 'Konumumu Bul' butonuna tıklama olayı
-locateBtn.addEventListener('click', () => {
+locateBtn.addEventListener('click', async () => {
     isTracking = true;
-    // watch: true ile harita açık kaldığı sürece konumu arka planda dinlemeye başlar
-    map.locate({ setView: false, watch: true, enableHighAccuracy: true });
+    
+    // Eğer native mobil (Capacitor) çalışıyorsa ve BackgroundGeolocation varsa
+    if (window.Capacitor && window.Capacitor.Plugins && Capacitor.Plugins.BackgroundGeolocation) {
+        try {
+            const { BackgroundGeolocation } = Capacitor.Plugins;
+            
+            // Arka planda konumu dinlemeye başla
+            BackgroundGeolocation.addWatcher(
+                {
+                    backgroundMessage: "Rota arka planda izleniyor.",
+                    backgroundTitle: "Rota Takibi",
+                    requestPermissions: true,
+                    stale: false,
+                    distanceFilter: 10 // 10 metrede bir güncelle
+                },
+                function callback(location, error) {
+                    if (error) {
+                        if (error.code === "NOT_AUTHORIZED") {
+                            alert("Konum izni verilmedi.");
+                        }
+                        return console.error(error);
+                    }
+                    
+                    // Leaflet'in beklediği formatta bir event fırlatarak mevcut kodu tetikle
+                    map.fireEvent('locationfound', {
+                        latlng: L.latLng(location.latitude, location.longitude),
+                        accuracy: location.accuracy
+                    });
+                }
+            ).then(function(watcher_id) {
+                console.log('Background Geolocation başlatıldı, watcher ID: ', watcher_id);
+                locateBtn.classList.add('active');
+            });
+        } catch (e) {
+            console.error('Background Geolocation hatası:', e);
+            // Hata olursa standart yönteme dön
+            map.locate({ setView: false, watch: true, enableHighAccuracy: true });
+        }
+    } else {
+        // Web ortamındaysa (veya eklenti yoksa) standart HTML5 Geolocation kullan
+        map.locate({ setView: false, watch: true, enableHighAccuracy: true });
+    }
 });
