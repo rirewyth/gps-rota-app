@@ -130,17 +130,6 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
     _initGps();
     if (mounted) _loadAktifRota();
     _checkPremium();
-    // Siri/Asistan komutları için dinleyici
-    EventChannel('com.rota.app/voice').receiveBroadcastStream().listen((event) {
-      if (event == 'START_TRACKING' && !_isTracking) {
-        _startTracking();
-      } else if (event == 'STOP_TRACKING' && _isTracking) {
-        _stopTracking();
-      } else if (event == 'SOS') {
-        _activateSOS();
-      }
-    });
-
     if (widget.autoStart) {
       Future.delayed(const Duration(milliseconds: 1500), () {
         if (mounted && !_isTracking) {
