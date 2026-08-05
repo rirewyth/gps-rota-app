@@ -234,23 +234,21 @@ class MountaineeringApp extends StatelessWidget {
 
 
 class MainAppScreen extends StatefulWidget {
-  const MainAppScreen({Key? key}) : super(key: key);
+  final int initialIndex;
+  final bool autoStartTracking;
+  const MainAppScreen({
+    Key? key,
+    this.initialIndex = 0,
+    this.autoStartTracking = false,
+  }) : super(key: key);
 
   @override
   State<MainAppScreen> createState() => _MainAppScreenState();
 }
 
 class _MainAppScreenState extends State<MainAppScreen> {
-  int _currentIndex = 0;
-
-  final List<Widget> _screens = const [
-    HomeDashboard(),
-    SocialFeedScreen(),
-    LiveTrackingScreen(),
-    RoutePlanningScreen(),
-    TeamScreen(),
-    ProfileScreen(),
-  ];
+  late int _currentIndex;
+  late List<Widget> _screens;
 
   int _unreadNotifCount = 0;
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
@@ -258,6 +256,15 @@ class _MainAppScreenState extends State<MainAppScreen> {
   @override
   void initState() {
     super.initState();
+    _currentIndex = widget.initialIndex;
+    _screens = [
+      const HomeDashboard(),
+      const SocialFeedScreen(),
+      LiveTrackingScreen(autoStart: widget.autoStartTracking),
+      const RoutePlanningScreen(),
+      const TeamScreen(),
+      const ProfileScreen(),
+    ];
      const AndroidInitializationSettings initAndroid = AndroidInitializationSettings('ic_notification');
      const InitializationSettings initSettings = InitializationSettings(android: initAndroid);
      _flutterLocalNotificationsPlugin.initialize(

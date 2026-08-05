@@ -1965,7 +1965,12 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
                               );
                               Navigator.pushAndRemoveUntil(
                                 ctx,
-                                MaterialPageRoute(builder: (_) => const MainAppScreen()),
+                                MaterialPageRoute(
+                                  builder: (_) => const MainAppScreen(
+                                    initialIndex: 2,
+                                    autoStartTracking: true,
+                                  ),
+                                ),
                                 (route) => false,
                               );
                             },
