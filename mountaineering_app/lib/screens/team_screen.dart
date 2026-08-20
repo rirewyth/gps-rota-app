@@ -717,7 +717,7 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
   Widget _buildChatTab() {
     if (_teamId == null) return const SizedBox.shrink();
     
-    if (_membersStream == null || _messagesStream == null) {
+    if (_membersStream == null || _messagesStream == null || _activeStreamTeamId != _teamId) {
       _setupTeamStreams();
     }
     
@@ -1009,7 +1009,7 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                 },
                 onLongPressEnd: (_) async {
                   _isPressingPtt = false;
-                  if (!_isPremiumUser || !_isRecordingVoice) return;
+                  if (!_isRecordingVoice) return;
                   
                   try {
                     final path = await _audioRecorder.stop();
@@ -1282,7 +1282,7 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
             },
             onLongPressEnd: (_) async {
               _isPressingPtt = false;
-              if (!_isPremiumUser || !_isRecordingVoice) return;
+              if (!_isRecordingVoice) return;
               try {
                 final path = await _audioRecorder.stop();
                 setState(() => _isRecordingVoice = false);

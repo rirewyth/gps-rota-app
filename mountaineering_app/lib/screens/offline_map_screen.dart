@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart' as fm;
 import 'package:latlong2/latlong.dart' as ll;
@@ -33,8 +34,25 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
 
     // Mapbox Offline Manager entegrasyonu gelecek
     // Şimdilik bounds alma simülasyonu
-    final cameraState = await _mapboxMap?.getCameraState();
-    if (cameraState == null) return;
+    double minL = 39.0;
+    double maxL = 39.1;
+    double minLn = 35.0;
+    double maxLn = 35.1;
+
+    if (Platform.isIOS) {
+      final bounds = _mapController.camera.visibleBounds;
+      minL = bounds.south;
+      maxL = bounds.north;
+      minLn = bounds.west;
+      maxLn = bounds.east;
+    } else {
+      final cameraState = await _mapboxMap?.getCameraState();
+      if (cameraState == null) return;
+      minL = cameraState.center.coordinates.lat?.toDouble() ?? 39.0;
+      maxL = minL + 0.1;
+      minLn = cameraState.center.coordinates.lng?.toDouble() ?? 35.0;
+      maxLn = minLn + 0.1;
+    }
     
     setState(() {
       _isDownloading = true;
@@ -43,10 +61,10 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
     });
     
     await OfflineMapManager.preCacheArea(
-      minLat: cameraState.center.coordinates.lat?.toDouble() ?? 39.0, // Örnek
-      maxLat: (cameraState.center.coordinates.lat?.toDouble() ?? 39.0) + 0.1,
-      minLng: cameraState.center.coordinates.lng?.toDouble() ?? 35.0,
-      maxLng: (cameraState.center.coordinates.lng?.toDouble() ?? 35.0) + 0.1,
+      minLat: minL,
+      maxLat: maxL,
+      minLng: minLn,
+      maxLng: maxLn,
       minZoom: 11,
       maxZoom: 15,
       onProgress: (done, total) {
@@ -82,7 +100,21 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
       ),
       body: Stack(
         children: [
-          mbx.MapWidget(
+          Platform.isIOS 
+          ? fm.FlutterMap(
+              mapController: _mapController,
+              options: fm.MapOptions(
+                initialCenter: const ll.LatLng(39.0, 35.0),
+                initialZoom: 6.0,
+              ),
+              children: [
+                fm.TileLayer(
+                  urlTemplate: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+                  subdomains: const ['a', 'b', 'c'],
+                ),
+              ],
+            )
+          : mbx.MapWidget(
             key: const ValueKey("offline_mapbox"),
             onMapCreated: (map) => _mapboxMap = map,
             styleUri: mbx.MapboxStyles.OUTDOORS,

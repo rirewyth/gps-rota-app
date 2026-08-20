@@ -104,31 +104,41 @@ class EarthquakeService {
       final allQuakes = [...quakes, ...aprsQuakes];
       
       if (allQuakes.isNotEmpty) {
-        final latest = allQuakes.first;
+        // Sort by date descending to ensure first is newest
+        allQuakes.sort((a, b) => b.date.compareTo(a.date));
         
-        if (_lastNotifiedDate == latest.date) return;
-        _lastNotifiedDate = latest.date;
-
-        // 1. General Notification (Optional)
-        final bool generalEnabled = await StorageHelper.getEqGeneralNotif();
-        if (generalEnabled) {
-           _showNotification('Yeni Deprem Verisi', '${latest.location} - M:${latest.mag}');
+        if (_lastNotifiedDate == null) {
+          _lastNotifiedDate = allQuakes.first.date;
+          return; // Skip initial run to avoid alerting for old earthquakes
         }
 
-        // 2. Early Warning (Critical)
         final double minMag = await StorageHelper.getEqMinMag();
         final double maxDist = await StorageHelper.getEqMaxDist();
+        final bool generalEnabled = await StorageHelper.getEqGeneralNotif();
 
-        if (latest.mag >= minMag) {
-          double dist = Geolocator.distanceBetween(currentPos.latitude, currentPos.longitude, latest.lat, latest.lng) / 1000;
-          double arrivalTime = dist / _waveSpeed;
-
-          if (dist < maxDist) {
-             if (!generalEnabled) {
-               _showNotification('Kritik Uyarı', 'M${latest.mag.toStringAsFixed(1)}, ${latest.location}');
-             }
-             onWarning?.call(latest.mag, arrivalTime, latest.location, latest.lat, latest.lng);
+        for (var quake in allQuakes) {
+          if (quake.date.compareTo(_lastNotifiedDate!) <= 0) break; // Reached already processed quakes
+          
+          if (generalEnabled) {
+             _showNotification('Yeni Deprem Verisi', '${quake.location} - M:${quake.mag}');
           }
+
+          if (quake.mag >= minMag) {
+            double dist = Geolocator.distanceBetween(currentPos.latitude, currentPos.longitude, quake.lat, quake.lng) / 1000;
+            double arrivalTime = dist / _waveSpeed;
+
+            if (dist < maxDist) {
+               if (!generalEnabled) {
+                 _showNotification('Kritik Uyarı', 'M${quake.mag.toStringAsFixed(1)}, ${quake.location}');
+               }
+               onWarning?.call(quake.mag, arrivalTime, quake.location, quake.lat, quake.lng);
+            }
+          }
+        }
+        
+        // Update last notified to the newest we just processed
+        if (allQuakes.first.date.compareTo(_lastNotifiedDate!) > 0) {
+          _lastNotifiedDate = allQuakes.first.date;
         }
       }
     });

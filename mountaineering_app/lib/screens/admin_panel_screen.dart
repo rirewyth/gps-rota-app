@@ -33,6 +33,8 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
   final TextEditingController _fireNameCtrl = TextEditingController();
   final TextEditingController _fireLatCtrl = TextEditingController();
   final TextEditingController _fireLngCtrl = TextEditingController();
+  final TextEditingController _fireDescCtrl = TextEditingController();
+  final TextEditingController _fireTeamCtrl = TextEditingController();
   String _fireStatus = 'Aktif';
 
   // Stats
@@ -65,6 +67,8 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
     _fireNameCtrl.dispose();
     _fireLatCtrl.dispose();
     _fireLngCtrl.dispose();
+    _fireDescCtrl.dispose();
+    _fireTeamCtrl.dispose();
     super.dispose();
   }
 
@@ -1393,6 +1397,30 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
             ),
           ),
           const SizedBox(height: 12),
+          TextField(
+            controller: _fireDescCtrl,
+            style: const TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+              labelText: 'Açıklama (Opsiyonel)',
+              labelStyle: const TextStyle(color: Colors.white54),
+              filled: true,
+              fillColor: kCardBg,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _fireTeamCtrl,
+            style: const TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+              labelText: 'Atanan Ekip (Opsiyonel)',
+              labelStyle: const TextStyle(color: Colors.white54),
+              filled: true,
+              fillColor: kCardBg,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+          ),
+          const SizedBox(height: 12),
           DropdownButtonFormField<String>(
             value: _fireStatus,
             dropdownColor: kCardBg,
@@ -1406,6 +1434,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
             ),
             items: const [
               DropdownMenuItem(value: 'Aktif', child: Text('Aktif (Büyüyor)')),
+              DropdownMenuItem(value: 'Kısmi Kontrol Altında', child: Text('Kısmi Kontrol Altında')),
               DropdownMenuItem(value: 'Kontrol Altında', child: Text('Kontrol Altında')),
               DropdownMenuItem(value: 'Soğutma', child: Text('Soğutma')),
               DropdownMenuItem(value: 'Söndürüldü', child: Text('Söndürüldü')),
@@ -1488,13 +1517,18 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                             await FirebaseFirestore.instance.collection('fires').doc(doc.id).delete();
                             if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Yangın kaydı silindi.')));
                           } else {
-                            await FirebaseFirestore.instance.collection('fires').doc(doc.id).update({'status': val});
+                            await FirebaseFirestore.instance.collection('fires').doc(doc.id).update({
+                              'status': val,
+                              'update_time': DateTime.now().toIso8601String(),
+                            });
                             if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Durum güncellendi: $val')));
                           }
                         },
                         itemBuilder: (ctx) => [
                           const PopupMenuItem(value: 'Aktif', child: Text('Aktif (Büyüyor)', style: TextStyle(color: Colors.redAccent))),
+                          const PopupMenuItem(value: 'Kısmi Kontrol Altında', child: Text('Kısmi Kontrol Altında', style: TextStyle(color: Colors.orangeAccent))),
                           const PopupMenuItem(value: 'Kontrol Altında', child: Text('Kontrol Altında', style: TextStyle(color: Colors.orange))),
+                          const PopupMenuItem(value: 'Soğutma', child: Text('Soğutma', style: TextStyle(color: Colors.lightBlue))),
                           const PopupMenuItem(value: 'Söndürüldü', child: Text('Söndürüldü', style: TextStyle(color: Colors.grey))),
                           const PopupMenuDivider(),
                           const PopupMenuItem(value: 'delete', child: Text('Kaydı Sil', style: TextStyle(color: Colors.red))),
@@ -1519,15 +1553,20 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
     try {
       await FirebaseFirestore.instance.collection('fires').add({
         'name': _fireNameCtrl.text.trim(),
+        'description': _fireDescCtrl.text.trim(),
+        'assigned_team': _fireTeamCtrl.text.trim(),
         'lat': double.tryParse(_fireLatCtrl.text.trim().replaceAll(',', '.')) ?? 0.0,
         'lng': double.tryParse(_fireLngCtrl.text.trim().replaceAll(',', '.')) ?? 0.0,
         'status': _fireStatus,
+        'update_time': DateTime.now().toIso8601String(),
         'timestamp': FieldValue.serverTimestamp(),
       });
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Ateş pini başarıyla eklendi!'), backgroundColor: Colors.green));
       _fireNameCtrl.clear();
       _fireLatCtrl.clear();
       _fireLngCtrl.clear();
+      _fireDescCtrl.clear();
+      _fireTeamCtrl.clear();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Hata: $e'), backgroundColor: Colors.red));
     }

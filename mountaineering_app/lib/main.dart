@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:ui';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'storage_helper.dart';
 import 'services/cloud_sync_service.dart';
@@ -139,7 +141,22 @@ void main() async {
     debugPrint("CRITICAL STARTUP ERROR: $e");
   }
   
-  runApp(const MountaineeringApp());
+  // Global Error Handlers
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    debugPrint("Flutter Error Caught: ${details.exception}");
+  };
+
+  PlatformDispatcher.instance.onError = (error, stack) {
+    debugPrint("Platform Error Caught: $error");
+    return true; // prevent crash
+  };
+
+  runZonedGuarded(() {
+    runApp(const MountaineeringApp());
+  }, (error, stackTrace) {
+    debugPrint("runZonedGuarded Caught Error: $error");
+  });
 }
 
 Future<void> _startBackgroundServices() async {

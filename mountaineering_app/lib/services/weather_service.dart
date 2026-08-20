@@ -179,9 +179,6 @@ class WeatherService {
         if (current == null) return null;
 
         double temp = (current['temperature_2m'] ?? 0.0).toDouble();
-        if (elevation != null && elevation > 0) {
-          temp = temp - (elevation / 1000 * 6.5);
-        }
         final double wind = (current['wind_speed_10m'] ?? 0.0).toDouble();
         final double windDir = (current['wind_direction_10m'] ?? 0.0).toDouble();
         final int wCode = (current['weather_code'] ?? 0).toInt();
@@ -305,9 +302,6 @@ class WeatherService {
           final dt = DateTime.parse(times[i]);
           if (dt.isBefore(now.subtract(const Duration(hours: 6)))) continue;
           double hTemp = (hourlyData['temperature_2m'][i] ?? 0.0).toDouble();
-          if (altitudeMeters > 0) {
-            hTemp = hTemp - (altitudeMeters / 1000 * 6.5);
-          }
           hourlyList.add(HourlyWeather(
             time: dt,
             temperature: hTemp,
@@ -328,11 +322,6 @@ class WeatherService {
         for (int i = 0; i < times.length; i++) {
           double dMin = (dailyData['temperature_2m_min'][i] ?? 0.0).toDouble();
           double dMax = (dailyData['temperature_2m_max'][i] ?? 0.0).toDouble();
-          if (altitudeMeters > 0) {
-            final lapse = altitudeMeters / 1000 * 6.5;
-            dMin -= lapse;
-            dMax -= lapse;
-          }
           dailyList.add(DailyWeather(
             date: DateTime.parse(times[i]),
             tempMin: dMin,

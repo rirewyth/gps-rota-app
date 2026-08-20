@@ -427,6 +427,22 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
   }
 
   void _toggleBleBeacon() async {
+    if (Platform.isIOS) {
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: Colors.black,
+          title: const Text('iOS Kısıtlaması', style: TextStyle(color: Colors.orangeAccent)),
+          content: const Text('Apple işletim sistemi kısıtlamaları nedeniyle Bluetooth Mesh yayın özelliği iPhone cihazlarda tam olarak desteklenmemektedir.', style: TextStyle(color: Colors.white70)),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('ANLADIM', style: TextStyle(color: Colors.orangeAccent))),
+          ],
+        )
+      );
+      return;
+    }
+
     if (_isBleBeaconActive) {
       await Nearby().stopAdvertising();
       setState(() => _isBleBeaconActive = false);

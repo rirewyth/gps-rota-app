@@ -416,7 +416,13 @@ class _WeatherScreenState extends State<WeatherScreen> with TickerProviderStateM
                       style: GoogleFonts.outfit(color: Colors.white, fontSize: 42, fontWeight: FontWeight.w900)),
                     Text(label, style: TextStyle(color: alertColor, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1)),
                     if (_searchAltitude != null && _searchAltitude! > 0)
-                      Text('${_searchAltitude!.toInt()} m irtifa', style: const TextStyle(color: Colors.white38, fontSize: 11)),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('${_searchAltitude!.toInt()} m irtifa', style: const TextStyle(color: Colors.white38, fontSize: 11)),
+                          Text('Sıcaklık durumu bulunduğunuz mevcut irtifadan hesaplanmaktadır.', style: const TextStyle(color: kOrange, fontSize: 9, fontStyle: FontStyle.italic)),
+                        ],
+                      ),
                   ],
                 ),
               ),
