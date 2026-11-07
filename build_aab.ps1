@@ -1,6 +1,4 @@
 # ROTA+ EMNİYETTEYİM (v1.2.0 Build 145) - Google Play Store AAB Derleme Betiği
-$ErrorActionPreference = "Stop"
-
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location "$scriptDir\mountaineering_app"
 
@@ -18,23 +16,24 @@ Write-Host "Paketler güncelleniyor (flutter pub get)..."
 Write-Host "Production AAB derleniyor..."
 & "C:\gps-rota-app-main\flutter\bin\flutter.bat" build aab --release
 
-if ($LASTEXITCODE -eq 0) {
-    $aabPath = "$scriptDir\mountaineering_app\build\app\outputs\bundle\release\app-release.aab"
-    if (-not (Test-Path $aabPath)) {
-        $aab = Get-ChildItem -Path "$scriptDir\mountaineering_app\build" -Recurse -Filter "app-release.aab" -ErrorAction SilentlyContinue | Select-Object -First 1
-        if ($aab) { $aabPath = $aab.FullName }
-    }
+$aabPath = "$scriptDir\mountaineering_app\build\app\outputs\bundle\release\app-release.aab"
+if (-not (Test-Path $aabPath)) {
+    $aabPath = "$scriptDir\mountaineering_app\android\app\build\outputs\bundle\release\app-release.aab"
+}
+if (-not (Test-Path $aabPath)) {
+    $found = Get-ChildItem -Path "$scriptDir\mountaineering_app\android\app\build\outputs" -Recurse -Filter "app-release.aab" -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($found) { $aabPath = $found.FullName }
+}
 
-    if (Test-Path $aabPath) {
-        $dest = "$scriptDir\RotaPlus_v1.2.0_release.aab"
-        Copy-Item $aabPath $dest -Force
-        Write-Host "=========================================" -ForegroundColor Green
-        Write-Host "BAŞARILI: Google Play Store AAB oluşturuldu!" -ForegroundColor Green
-        Write-Host "Konum: $dest" -ForegroundColor Green
-        Write-Host "=========================================" -ForegroundColor Green
-    } else {
-        Write-Warning "AAB üretildi ancak dosya konumu saptanamadı."
-    }
+if (Test-Path $aabPath) {
+    $dest = "$scriptDir\RotaPlus_v1.2.0_release.aab"
+    Copy-Item $aabPath $dest -Force
+    Write-Host "=========================================" -ForegroundColor Green
+    Write-Host "BAŞARILI: Google Play Store AAB oluşturuldu!" -ForegroundColor Green
+    Write-Host "Dosya: $dest" -ForegroundColor Green
+    $sizeMb = [math]::Round((Get-Item $dest).Length / 1MB, 2)
+    Write-Host "Boyut: $sizeMb MB" -ForegroundColor Green
+    Write-Host "=========================================" -ForegroundColor Green
 } else {
-    Write-Error "AAB derleme işlemi başarısız oldu (Hata Kodu: $LASTEXITCODE)."
+    Write-Error "AAB derleme işlemi başarısız oldu: AAB dosyası bulunamadı."
 }
