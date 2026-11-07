@@ -88,6 +88,8 @@ flutter_native_splash:
 
 
 flutter:
+  config:
+    enable-swift-package-manager: false
   uses-material-design: true
   assets:
     - assets/icon/

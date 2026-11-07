@@ -50,6 +50,12 @@ workflows:
           </dict>
           </plist>
           EOF
+      - name: Disable Swift Package Manager (Fix CocoaPods conflict with google_mobile_ads)
+        script: |
+          flutter config --no-enable-swift-package-manager
+          rm -rf ios/Flutter/ephemeral/Packages
+          rm -rf ios/Pods
+          rm -f ios/Podfile.lock
       - name: Get Flutter packages
         script: flutter packages pub get
       - name: Build iOS IPA
@@ -110,6 +116,12 @@ workflows:
           </dict>
           </plist>
           EOF
+      - name: Disable Swift Package Manager (Fix CocoaPods conflict with google_mobile_ads)
+        script: |
+          flutter config --no-enable-swift-package-manager
+          rm -rf ios/Flutter/ephemeral/Packages
+          rm -rf ios/Pods
+          rm -f ios/Podfile.lock
       - name: Get Flutter packages
         script: flutter packages pub get
       - name: Build iOS IPA
