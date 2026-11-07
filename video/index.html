@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIDEO AI STUDIO</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="logo">VIDEO AI STUDIO</div>
+    </header>
+
+    <main id="app-container">
+        <!-- Home Screen -->
+        <section id="home-screen" class="active">
+            <h1 class="hero-title">Turn your ideas into professional videos.</h1>
+            
+            <div class="idea-box">
+                <textarea id="idea-input" placeholder="Nasıl bir video oluşturmak istiyorsun? Örn: Yağmurlu bir gecede İstanbul sokaklarında yürüyen bir adam. Sinematik ve gerçekçi."></textarea>
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" id="enhance-btn"><i class="fas fa-magic"></i> AI ENHANCE</button>
+                    <button class="btn btn-primary" id="generate-btn">GENERATE VIDEO <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <div class="style-selector">
+                <h3>Choose your style</h3>
+                <div class="style-grid">
+                    <div class="style-card active" data-style="Realistic">Realistic</div>
+                    <div class="style-card" data-style="Cinematic">Cinematic</div>
+                    <div class="style-card" data-style="Animation">Animation</div>
+                    <div class="style-card" data-style="Commercial">Commercial</div>
+                    <div class="style-card" data-style="Documentary">Documentary</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Generation Screen -->
+        <section id="generation-screen">
+            <div class="generation-container">
+                <div class="loader-circle">
+                    <svg viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="45"></circle>
+                    </svg>
+                </div>
+                <h2>AI Creative Director Working</h2>
+                <div class="status-list" id="status-list">
+                    <div class="status-item pending" id="step-1">○ Analyzing idea</div>
+                    <div class="status-item pending" id="step-2">○ Building story</div>
+                    <div class="status-item pending" id="step-3">○ Selecting visual style</div>
+                    <div class="status-item pending" id="step-4">○ Designing camera movement</div>
+                    <div class="status-item pending" id="step-5">○ Creating storyboard</div>
+                    <div class="status-item pending" id="step-6">○ Optimizing prompt</div>
+                    <div class="status-item pending" id="step-7">○ Generating video</div>
+                    <div class="status-item pending" id="step-8">○ Finalizing</div>
+                </div>
+                <div class="ai-explanation" id="ai-explanation">
+                    "I am analyzing the prompt to determine the best cinematic approach..."
+                </div>
+            </div>
+        </section>
+
+        <!-- Preview Screen -->
+        <section id="preview-screen">
+            <div class="preview-container">
+                <div class="video-player" style="position: relative; background: #000;">
+                    <video id="result-video" width="100%" height="100%" controls style="display: none; border-radius: 8px 8px 0 0;">
+                        <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                        Your browser does not support HTML video.
+                    </video>
+                    <div class="video-placeholder" id="video-placeholder" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                        <i class="fas fa-play-circle play-icon" onclick="document.getElementById('video-placeholder').style.display='none'; document.getElementById('result-video').style.display='block'; document.getElementById('result-video').play();"></i>
+                        <p>Video Hazır - İzlemek İçin Tıklayın</p>
+                    </div>
+                </div>
+                
+                <div class="project-details">
+                    <h3>Project Details</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <span class="label">Mode</span>
+                            <span class="value" id="res-mode">Cinematic Realism</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Duration</span>
+                            <span class="value">10 sec</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Camera</span>
+                            <span class="value">Low-angle tracking shot</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="preview-actions">
+                    <button class="btn btn-secondary" onclick="resetApp()"><i class="fas fa-redo"></i> New Project</button>
+                    <button class="btn btn-secondary"><i class="fas fa-edit"></i> Edit Prompt</button>
+                    <button class="btn btn-primary" onclick="alert('Gerçek bir Video AI servisine (Runway, Sora) bağlı olmadığımız için şu an sadece AI Yönetmen senaryosu ve Görsel taslağı (Storyboard) oluşturuldu. Videoyu indirmek için bu sisteme ücretli bir Video Motoru API\\'si entegre edilmesi gerekir.')"><i class="fas fa-info-circle"></i> Sistem Notu</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

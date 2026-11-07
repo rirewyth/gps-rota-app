@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+requests
+shapely
+geopandas
+websockets
+python-dotenv

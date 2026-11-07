@@ -1,0 +1,90 @@
+{
+  "totalFrames": 2805,
+  "fps": 30,
+  "scenes": [
+    {
+      "id": "scene_00_intro",
+      "fig": "FIG. 00",
+      "fig_title": "ROTA MEDYA ÖZEL DOSYA",
+      "coords": "41.01°K  028.98°D",
+      "scale": "1000 km",
+      "script": "Rota Medya Özel Dosya. İstanbul Afet Raporu.",
+      "startFrame": 0,
+      "endFrame": 153,
+      "durationFrames": 153,
+      "audioDurationSec": 4.488005
+    },
+    {
+      "id": "scene_01_rekor",
+      "fig": "FIG. 01",
+      "fig_title": "84 YILIN REKORU",
+      "coords": "41.13°K  029.10°D",
+      "scale": "500 km",
+      "script": "14 Ekim gecesi İstanbul, 84 yılın en büyük yağış rekoruna uyandı. Beykoz ve Sarıyer'de metrekareye tam 272 kilogram su indi. Peki aylar süren şiddetli kuraklıktan sonra nasıl oldu da tek bir günde bu felaket yaşandı?",
+      "startFrame": 153,
+      "endFrame": 619,
+      "durationFrames": 466,
+      "audioDurationSec": 14.904014
+    },
+    {
+      "id": "scene_02_toprak",
+      "fig": "FIG. 02",
+      "fig_title": "TOPRAK PARADOKSU",
+      "coords": "41.11°K  029.08°D",
+      "scale": "10 m (KESİT)",
+      "script": "Çoğu insan kurak toprağın suyu sünger gibi çekeceğini düşünür; oysa zemin fiziğinde durum tam tersidir. Aylarca kavrulan toprak gözeneklerini kapatır ve hidrofobik bir taşa dönüşür. Yağan su toprağa sızamaz, camdan akar gibi doğrudan sele dönüşür.",
+      "startFrame": 619,
+      "endFrame": 1082,
+      "durationFrames": 463,
+      "audioDurationSec": 14.832018
+    },
+    {
+      "id": "scene_03_meteoroloji",
+      "fig": "FIG. 03",
+      "fig_title": "SÜPERHÜCRE VE TREN ETKİSİ",
+      "coords": "41.20°K  029.05°D",
+      "scale": "14 km (TROPOSFER)",
+      "script": "İkinci darbe gökyüzünden geldi. Karadeniz'in mevsim normallerinden 4 derece sıcak suları, kuzeyden inen eksi 25 derecelik kutup havasıyla Boğaz üzerinde çarpıştı. Oluşan süperhücre, tren etkisiyle hareket etmeden saatlerce aynı ilçelerin üzerine boşaldı.",
+      "startFrame": 1082,
+      "endFrame": 1576,
+      "durationFrames": 494,
+      "audioDurationSec": 15.864014
+    },
+    {
+      "id": "scene_04_beton",
+      "fig": "FIG. 04",
+      "fig_title": "BETON ZIRH VE DERELER",
+      "coords": "41.08°K  028.97°D",
+      "scale": "50 m (KENTSEL)",
+      "script": "Megakent ise bu suyu karşılayacak durumda değildi. İstanbul'un yüzde 80'i beton ve asfaltla kaplı. Üstelik geçmişte suyu denize taşıyan doğal derelerin üzeri binalarla kapatıldı. Menfezlere sığmayan su, kendi eski yatağını zorla geri aldı.",
+      "startFrame": 1576,
+      "endFrame": 2064,
+      "durationFrames": 488,
+      "audioDurationSec": 15.648413
+    },
+    {
+      "id": "scene_05_sunger",
+      "fig": "FIG. 05",
+      "fig_title": "ÇÖZÜM: SÜNGER ŞEHİR",
+      "coords": "41.00°K  029.00°D",
+      "scale": "MİMARİ TASARIM",
+      "script": "Peki çare ne? Klasik yağmur boruları artık yetersiz. İklim krizinde tek kurtuluş; suyu hızla tahliye etmek yerine sünger gibi emen geçirimli kaldırımlar, yağmur bahçeleri ve yeraltı sarnıçlarına sahip Sünger Şehir modelidir.",
+      "startFrame": 2064,
+      "endFrame": 2504,
+      "durationFrames": 440,
+      "audioDurationSec": 14.064014
+    },
+    {
+      "id": "scene_06_sonuc",
+      "fig": "FIG. 06",
+      "fig_title": "SONUÇ VE TARTIŞMA",
+      "coords": "41.01°K  028.98°D",
+      "scale": "RAPOR SONU",
+      "script": "Unutmayın: Doğa, kendisine ait olanı eninde sonunda geri alır. Sizce şehirlerimiz bu yeni iklim çağına hazır mı? Yorumlarda tartışalım.",
+      "startFrame": 2504,
+      "endFrame": 2805,
+      "durationFrames": 301,
+      "audioDurationSec": 9.408005
+    }
+  ]
+}

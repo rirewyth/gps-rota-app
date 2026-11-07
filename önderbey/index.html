@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Önderbey Nakliyat | İzmir'in Premium Taşıma Markası</title>
+    <meta name="description" content="İzmir evden eve, şehir içi, şehirler arası ve asansörlü nakliyat hizmetleri. Özgür Bey ve ekibi ile sorunsuz, profesyonel taşıma.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#030303',
+                        surface: '#0a0a0a',
+                        brand: '#FF5A00',
+                        brand_light: '#FF8A3D',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Syncopate', 'sans-serif'],
+                        heading: ['Outfit', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'brand': '0 0 30px rgba(255, 90, 0, 0.3)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700;800;900&family=Syncopate:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+    
+    <style>
+        /* CSS Reset for safety against clipping */
+        *, *::before, *::after { box-sizing: border-box !important; }
+        
+        html, body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden !important;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif; 
+            background-color: #030303; 
+            color: #f5f5f5; 
+            cursor: none;
+            position: relative;
+        }
+
+        h1, h2, h3, h4, .font-heading { font-family: 'Outfit', sans-serif; }
+        .font-display { font-family: 'Syncopate', sans-serif; letter-spacing: -0.05em; }
+        
+        /* Fixed Aurora Background */
+        .aurora-bg {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -1;
+            overflow: hidden;
+            background: #030303;
+        }
+        .aurora-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(140px);
+            opacity: 0.15;
+            animation: moveBlobs 30s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: #FF5A00; }
+        .blob-2 { bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: #c24100; animation-delay: -5s; animation-direction: alternate-reverse; }
+        
+        @keyframes moveBlobs {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(5%, 10%) scale(1.1); }
+            100% { transform: translate(-5%, -5%) scale(0.9); }
+        }
+        
+        /* Custom Cursor */
+        .cursor-dot, .cursor-outline {
+            position: fixed; top: 0; left: 0; transform: translate(-50%, -50%);
+            border-radius: 50%; z-index: 999999; pointer-events: none;
+        }
+        .cursor-dot { width: 8px; height: 8px; background-color: #FF5A00; }
+        .cursor-outline {
+            width: 40px; height: 40px; border: 2px solid rgba(255, 90, 0, 0.5);
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+        }
+        
+        /* Preloader */
+        #preloader {
+            position: fixed; inset: 0; background: #030303; z-index: 100000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+        .loader-text {
+            font-family: 'Syncopate', sans-serif; font-size: 3rem; font-weight: 700;
+            background: linear-gradient(to right, #FF5A00, #FF8A3D);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: pulse 1.5s infinite;
+        }
+        
+        /* Premium UI Elements */
+        .glass-nav {
+            background: rgba(3, 3, 3, 0.8);
+            backdrop-filter: blur(24px); border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .bento-card {
+            background: rgba(15, 15, 15, 0.8); border: 1px solid rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 24px; overflow: hidden; position: relative;
+            transform-style: preserve-3d;
+            transition: border-color 0.4s ease;
+        }
+        .bento-card:hover { border-color: rgba(255, 90, 0, 0.4); box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
+
+        .text-brand-gradient {
+            background: linear-gradient(135deg, #FF5A00 0%, #FFB03A 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        /* 3D Parallax Glass UI */
+        .preserve-3d { transform-style: preserve-3d; }
+        .layer-shadow { transform: translateZ(-80px); }
+        .layer-bg { transform: translateZ(-40px); }
+        .layer-card { transform: translateZ(40px); }
+        .layer-float-1 { transform: translateZ(90px); }
+        .layer-float-2 { transform: translateZ(120px); }
+
+        /* Marquee Fixes */
+        .marquee-container { overflow: hidden; white-space: nowrap; width: 100%; display: flex; }
+        .marquee-content { display: flex; width: max-content; animation: marquee 30s linear infinite; }
+        .marquee-content span { flex-shrink: 0; display: inline-block; padding: 0 2rem; }
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+        /* Swiper Fixes - Equal Heights */
+        .swiper-slide { height: auto !important; }
+        .swiper-pagination-bullet { background: rgba(255,255,255,0.3); width: 8px; height: 8px; transition: 0.3s; }
+        .swiper-pagination-bullet-active { background: #FF5A00; width: 32px; border-radius: 12px; }
+
+        /* Fixed Form Elements - Higher contrast, bigger text */
+        select, input, textarea {
+            background: #111111;
+            border: 1px solid #333333;
+            color: #ffffff;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            width: 100%;
+            max-width: 100%;
+            transition: all 0.3s;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            appearance: none;
+            display: block;
+        }
+        select {
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23ffffff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1.2rem top 50%;
+            background-size: 0.8rem auto;
+        }
+        select:focus, input:focus, textarea:focus {
+            outline: none; border-color: #FF5A00; background: #1a1a1a; box-shadow: 0 0 15px rgba(255, 90, 0, 0.2);
+        }
+        select option { background: #111; color: #fff; padding: 15px; font-size: 1.1rem; }
+        
+        .form-label { display: block; margin-bottom: 0.5rem; font-size: 1rem; color: #f3f4f6; font-weight: 600; font-family: 'Outfit', sans-serif;}
+
+        /* GSAP Initial States */
+        .gsap-reveal { opacity: 0; transform: translateY(40px); }
+        .gsap-scale { opacity: 0; transform: scale(0.95); }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Animated Aurora Background -->
+    <div class="aurora-bg">
+        <div class="aurora-blob blob-1"></div>
+        <div class="aurora-blob blob-2"></div>
+    </div>
+
+    <!-- Custom Cursor -->
+    <div class="cursor-dot" id="cursor-dot"></div>
+    <div class="cursor-outline" id="cursor-outline"></div>
+
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="loader-text">ÖNDERBEY</div>
+        <div class="mt-4 text-gray-500 font-heading tracking-widest text-sm uppercase">İzmir'in Premium Nakliyatı</div>
+    </div>
+
+    <!-- Header -->
+    <header id="header" class="fixed w-full top-0 z-50 transition-all duration-500 py-6">
+        <div class="container mx-auto px-6 md:px-12 flex justify-between items-center">
+            <a href="#" class="flex items-center">
+                <img src="images/logo-transparent.png" alt="Önderbey Nakliyat" class="h-10 md:h-14 w-auto drop-shadow-2xl hover:scale-105 transition-transform">
+            </a>
+            
+            <nav class="hidden lg:flex space-x-10 text-xs font-bold tracking-[0.2em] uppercase text-gray-400">
+                <a href="#" class="text-white hover:text-brand transition cursor-hover">ANA SAYFA</a>
+                <a href="#biz-kimiz" class="hover:text-brand transition cursor-hover">KURUMSAL</a>
+                <a href="#hizmetler" class="hover:text-brand transition cursor-hover">HİZMETLER</a>
+                <a href="#galeri" class="hover:text-brand transition cursor-hover">GALERİ</a>
+                <a href="#yorumlar" class="hover:text-brand transition cursor-hover">YORUMLAR</a>
+            </nav>
+
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="tel:05061097095" class="text-white font-heading font-bold text-lg hover:text-brand transition cursor-hover">
+                    0506 109 70 95
+                </a>
+                <a href="#teklif-al" class="bg-brand text-white px-8 py-3 rounded-full font-heading font-bold uppercase tracking-wider text-sm transition hover:bg-white hover:text-black cursor-hover">
+                    Teklif Al
+                </a>
+            </div>
+
+            <button id="mobile-menu-btn" class="lg:hidden text-2xl text-white cursor-hover"><i class="fas fa-bars"></i></button>
+        </div>
+    </header>
+
+    <!-- Ultra Premium Hero Section -->
+    <section class="relative h-screen min-h-[800px] flex items-center justify-center overflow-hidden pt-32 lg:pt-40">
+        <!-- Background Image -->
+        <div class="absolute inset-0 z-0">
+            <img src="images/media_1791370095385.png" alt="Önderbey Filo" class="w-full h-full object-cover opacity-30">
+            <div class="absolute inset-0 bg-gradient-to-b from-[#030303]/80 via-transparent to-[#030303]"></div>
+        </div>
+
+        <div class="container mx-auto px-6 md:px-12 relative z-10 flex flex-col lg:flex-row items-center gap-12 mt-16 md:mt-24">
+            
+            <!-- Hero Text -->
+            <div class="lg:w-1/2 text-left">
+                <div class="gsap-hero mb-6">
+                    <span class="px-5 py-2 rounded-full border border-white/10 bg-black/40 backdrop-blur-md text-xs font-bold tracking-[0.2em] uppercase text-gray-300 inline-block">
+                        <i class="fas fa-layer-group text-brand mr-2"></i> Yeni Nesil Taşımacılık
+                    </span>
+                </div>
+                
+                <h1 class="text-7xl md:text-[7rem] lg:text-[9rem] font-display font-black leading-none mb-8 text-white gsap-hero uppercase tracking-tighter drop-shadow-2xl py-4">
+                    SIFIR<br>
+                    <span class="text-brand">STRES.</span><br>
+                    SIFIR<br>
+                    RİSK.
+                </h1>
+                
+                <p class="text-lg md:text-xl text-gray-300 font-light mb-12 gsap-hero leading-relaxed max-w-xl">
+                    Premium taşınma deneyimi ile eşyalarınızı değil, hayatınızı taşıyoruz. Yenilikçi paketleme ve teknolojik taşıma vizyonumuzla tanışın.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-6 gsap-hero">
+                    <a href="#teklif-al" class="bg-white text-black px-10 py-5 rounded-full font-heading font-bold text-lg transition hover:scale-105 cursor-hover flex items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.2)]">
+                        Hemen Fiyat Alın <i class="fas fa-arrow-right ml-3"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- CSS 3D Model: Premium Parallax Glass Stack -->
+            <div class="lg:w-1/2 flex justify-center items-center gsap-hero mt-12 lg:mt-0 relative h-[400px] md:h-[500px]">
+                <!-- Tilt Wrapper -->
+                <div class="w-[300px] h-[350px] md:w-[380px] md:h-[450px] preserve-3d cursor-hover" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-perspective="1000">
+                    
+                    <!-- Base Glowing Shadow -->
+                    <div class="absolute inset-0 bg-brand/30 blur-[80px] rounded-full layer-shadow"></div>
+
+                    <!-- Layer 1: Tech Grid Background -->
+                    <div class="absolute inset-0 bg-[#050505]/80 border border-white/5 backdrop-blur-md rounded-3xl layer-bg flex items-center justify-center overflow-hidden">
+                        <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(rgba(255,90,0,0.8) 1px, transparent 1px); background-size: 20px 20px;"></div>
+                    </div>
+
+                    <!-- Layer 2: Main Glass Card (UPDATED with IDs for JS cycle) -->
+                    <div class="absolute inset-6 md:inset-8 bg-gradient-to-br from-white/10 to-transparent border border-white/20 backdrop-blur-2xl rounded-2xl layer-card flex flex-col justify-center p-8 shadow-[0_30px_50px_rgba(0,0,0,0.5)]">
+                        <div class="w-14 h-14 bg-brand/20 rounded-2xl flex items-center justify-center text-brand mb-6 shadow-brand border border-brand/30">
+                            <i id="dynamic-card-icon" class="fas fa-boxes-packing text-2xl"></i>
+                        </div>
+                        <h3 id="dynamic-card-title" class="text-white font-heading font-bold text-3xl mb-3">VİP<br>Paketleme</h3>
+                        <p id="dynamic-card-desc" class="text-gray-400 text-sm font-light">Eşyalarınız Avrupa standartlarında özel olarak ambalajlanır.</p>
+                    </div>
+
+                    <!-- Layer 3: Floating Asansörlü Badge (UPDATED with IDs) -->
+                    <div class="absolute -right-10 -top-6 bg-brand text-white border border-brand_light p-4 px-6 rounded-2xl layer-float-1 shadow-brand flex items-center gap-4 animate-[bounce_4s_infinite]">
+                        <i id="float1-icon" class="fas fa-elevator text-3xl"></i>
+                        <div class="text-left">
+                            <div id="float1-title" class="font-bold text-sm leading-tight">Asansörlü</div>
+                            <div id="float1-desc" class="text-xs text-white/80">Taşıma Sistemi</div>
+                        </div>
+                    </div>
+
+                    <!-- Layer 4: Floating Status Badge (UPDATED with IDs) -->
+                    <div class="absolute -left-6 bottom-16 bg-[#0a0a0a]/90 text-white border border-white/10 pl-4 pr-6 py-4 rounded-full layer-float-2 backdrop-blur-xl flex items-center gap-4 shadow-2xl">
+                        <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_#22c55e]"></div>
+                        <span id="float2-text" class="font-bold tracking-widest text-xs uppercase text-gray-300">Sigortalı Nakliyat</span>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Marquee -->
+    <div class="py-6 border-y border-white/5 bg-black/50 backdrop-blur-sm relative z-20 marquee-container">
+        <div class="marquee-content items-center text-4xl md:text-6xl font-display font-bold uppercase text-transparent stroke-text" style="-webkit-text-stroke: 1px rgba(255,255,255,0.3);">
+            <span class="mx-8 hover:text-brand transition duration-300">ÖNDERBEY NAKLİYAT</span>
+            <span class="mx-8 hover:text-brand transition duration-300">İZMİR EVDEN EVE</span>
+            <span class="mx-8 hover:text-brand transition duration-300">ASANSÖRLÜ TAŞIMA</span>
+            <span class="mx-8 hover:text-brand transition duration-300">VİP PAKETLEME</span>
+            <span class="mx-8 hover:text-brand transition duration-300">ÖNDERBEY NAKLİYAT</span>
+            <span class="mx-8 hover:text-brand transition duration-300">İZMİR EVDEN EVE</span>
+            <span class="mx-8 hover:text-brand transition duration-300">ASANSÖRLÜ TAŞIMA</span>
+            <span class="mx-8 hover:text-brand transition duration-300">VİP PAKETLEME</span>
+        </div>
+    </div>
+
+    <!-- UPDATED: Biz Kimiz / About Us (Full Text & Stats added) -->
+    <section id="biz-kimiz" class="py-32 relative">
+        <div class="container mx-auto px-6 md:px-12">
+            <div class="flex flex-col lg:flex-row items-center gap-16">
+                <!-- Left: Stats & Image -->
+                <div class="lg:w-1/2 w-full gsap-reveal" data-tilt data-tilt-max="3" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.1">
+                    <div class="relative rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl mb-8">
+                        <img src="images/media_1791370095521.png" alt="Önderbey Ekibi" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+                        <div class="absolute bottom-6 left-6 right-6 flex items-center justify-between">
+                            <div>
+                                <h4 class="font-heading font-bold text-2xl text-white mb-1">Önderbey Nakliyat</h4>
+                                <p class="text-brand font-medium">Güven Transferi</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-full bg-brand flex items-center justify-center text-white shadow-brand">
+                                <i class="fas fa-check"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- New Stats Grid based on prompt -->
+                    <div class="grid grid-cols-3 gap-4 border-t border-white/10 pt-8">
+                        <div class="text-center">
+                            <div class="text-4xl lg:text-5xl font-display font-bold text-white mb-2">2000</div>
+                            <div class="text-brand text-xs font-bold uppercase tracking-widest">Kuruluş Yılı</div>
+                        </div>
+                        <div class="text-center border-x border-white/10">
+                            <div class="text-4xl lg:text-5xl font-display font-bold text-white mb-2">35</div>
+                            <div class="text-brand text-xs font-bold uppercase tracking-widest">İş Ortağı</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-4xl lg:text-5xl font-display font-bold text-white mb-2">15</div>
+                            <div class="text-brand text-xs font-bold uppercase tracking-widest">Profesyonel Çalışan</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Content -->
+                <div class="lg:w-1/2 w-full gsap-reveal">
+                    <span class="text-brand font-bold tracking-widest uppercase text-sm mb-4 block">Biz Kimiz</span>
+                    <h2 class="text-4xl md:text-5xl font-heading font-black text-white mb-8 leading-tight">Şirketimiz Hakkında</h2>
+                    
+                    <div class="space-y-6 text-gray-300 font-light leading-relaxed text-lg">
+                        <p>İzmir merkezli Önderbey Nakliyat olarak, taşımacılığı sadece eşya transferi değil, <strong class="text-white font-medium">güven transferi</strong> olarak görüyoruz. Yılların verdiği tecrübe ve profesyonel ekibimizle evden eve nakliyat, ofis taşımacılığı ve şehirler arası nakliye hizmetlerinde müşterilerimize hızlı, güvenli ve sorunsuz çözümler sunuyoruz.</p>
+                        
+                        <p>Kurulduğumuz günden bu yana müşteri memnuniyetini temel ilke edindik. Her taşınma sürecini titizlikle planlıyor, eşyalarınızı paketleme aşamasından yeni adresinize yerleştirilene kadar büyük bir özenle taşıyoruz. Modern araç filomuz ve asansörlü taşıma sistemlerimiz sayesinde hem zamandan tasarruf sağlıyor hem de eşyalarınızı maksimum güvenle naklediyoruz.</p>
+                        
+                        <p>Önderbey Nakliyat olarak <strong class="text-white font-medium">şeffaf fiyat politikasıyla</strong> çalışır, sürpriz maliyetler oluşturmayız. Sigortalı taşımacılık hizmetimizle müşterilerimize ekstra güvence sunarız. Bizim için her müşteri, uzun vadeli bir iş ortaklığı demektir.</p>
+                        
+                        <p>Bugün İzmir ve çevresinde güvenilir nakliye denildiğinde akla gelen firmalardan biri olmaktan gurur duyuyoruz. Çünkü biz, sadece eşya değil; <strong class="text-brand font-medium">hayallerinizi, anılarınızı ve yeni başlangıçlarınızı</strong> taşıyoruz.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NEW: Müşterilerimiz (Partners Marquee matching user image) -->
+    <section class="py-20 relative bg-[#050505] border-t border-white/5 overflow-hidden">
+        <div class="container mx-auto px-6 md:px-12 text-center mb-12 gsap-reveal">
+            <span class="text-gray-500 font-bold tracking-widest uppercase text-sm mb-4 block">Müşterilerimiz</span>
+            <h2 class="text-3xl md:text-5xl font-heading font-bold text-brand">Bizim için her müşteri uzun<br>vadeli bir ortaklıktır</h2>
+        </div>
+        
+        <!-- Continuous Logo Marquee -->
+        <div class="marquee-container opacity-50 hover:opacity-100 transition duration-500">
+            <div class="marquee-content items-center text-xl md:text-2xl font-heading font-bold text-white flex gap-24">
+                <div class="flex items-center gap-3"><i class="fas fa-city text-brand"></i> OAK HILLS CITY</div>
+                <div class="flex items-center gap-3"><i class="fas fa-leaf text-brand"></i> BRONFMAN HOTEL</div>
+                <div class="flex items-center gap-3"><i class="fas fa-plus text-brand"></i> NEST MEDICAL</div>
+                <div class="flex items-center gap-3"><i class="fas fa-cube text-brand"></i> SHAWNS</div>
+                <div class="flex items-center gap-3"><i class="fas fa-circle-dot text-brand"></i> Latch.</div>
+                <div class="flex items-center gap-3"><i class="fas fa-bolt text-brand"></i> TOCKET</div>
+                <div class="flex items-center gap-3"><i class="fas fa-mountain text-brand"></i> Makeofit</div>
+                <div class="flex items-center gap-3"><i class="fas fa-shapes text-brand"></i> DEMOTIVE</div>
+                <!-- Duplicate for seamless scroll -->
+                <div class="flex items-center gap-3"><i class="fas fa-city text-brand"></i> OAK HILLS CITY</div>
+                <div class="flex items-center gap-3"><i class="fas fa-leaf text-brand"></i> BRONFMAN HOTEL</div>
+                <div class="flex items-center gap-3"><i class="fas fa-plus text-brand"></i> NEST MEDICAL</div>
+                <div class="flex items-center gap-3"><i class="fas fa-cube text-brand"></i> SHAWNS</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- UPDATED: Hizmetlerimiz (Grid Layout matching user image) -->
+    <section id="hizmetler" class="py-32 relative border-y border-white/5 bg-black/30">
+        <div class="container mx-auto px-6 md:px-12">
+            
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-16 gsap-reveal">
+                <div class="max-w-3xl">
+                    <span class="text-gray-500 font-bold tracking-widest uppercase text-sm mb-4 block">Hizmetlerimiz</span>
+                    <h2 class="text-4xl md:text-5xl lg:text-6xl font-heading font-bold text-brand leading-tight tracking-tight">Evden eve, şehir içi & şehirler arası nakliyat, asansörlü taşıma ve paketleme hizmeti.</h2>
+                </div>
+                <a href="#teklif-al" class="mt-8 lg:mt-0 bg-brand text-white px-8 py-4 rounded-xl font-heading font-bold transition hover:bg-white hover:text-black shadow-brand whitespace-nowrap">
+                    İletişime Geç
+                </a>
+            </div>
+
+            <!-- 8-Box Grid (Matches image structure but dark theme) -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 gsap-reveal">
+                
+                <!-- Box 1 -->
+                <div class="bg-[#0a0a0a] border border-[#222] p-8 rounded-2xl flex flex-col justify-center items-center text-center hover:border-brand transition duration-300 cursor-hover group" data-tilt data-tilt-max="5" data-tilt-speed="400">
+                    <i class="fas fa-building text-5xl text-brand mb-6 group-hover:scale-110 transition duration-300"></i>
+                    <h3 class="text-white font-heading font-bold text-lg">Evden Eve<br>Nakliyat</h3>
+                </div>
+                
+                <!-- Box 2 -->
+                <div class="bg-[#0a0a0a] border border-[#222] p-8 rounded-2xl flex flex-col justify-center items-center text-center hover:border-brand transition duration-300 cursor-hover group" data-tilt data-tilt-max="5" data-tilt-speed="400">
+                    <i class="fas fa-house text-5xl text-brand mb-6 group-hover:scale-110 transition duration-300"></i>
+                    <h3 class="text-white font-heading font-bold text-lg">Villa<br>Taşıma</h3>
+                </div>
+                
+                <!-- Box 3 -->
+                <div class="bg-[#0a0a0a] border border-[#222] p-8 rounded-2xl flex flex-col justify-center items-center text-center hover:border-brand transition duration-300 cursor-hover group" data-tilt data-tilt-max="5" data-tilt-speed="400">
+                    <i class="fas fa-file-contract text-5xl text-brand mb-6 group-hover:scale-110 transition duration-300"></i>
+                    <h3 class="text-white font-heading font-bold text-lg">Sigortalı<br>Taşıma</h3>
+                </div>
+                
+                <!-- Box 4 -->
+                <div class="bg-[#0a0a0a] border border-[#222] p-8 rounded-2xl flex flex-col justify-center items-center text-center hover:border-brand transition duration-300 cursor-hover group" data-tilt data-tilt-max="5" data-tilt-speed="400">
+                    <i class="fas fa-users-gear text-5xl text-brand mb-6 group-hover:scale-110 transition duration-300"></i>
+                    <h3 class="text-white font-heading font-bold text-lg">Uzman Ekip İle<br>Taşıma</h3>
+                </div>
+                
+                <!-- Box 5 -->
+                <div class="bg-[#0a0a0a] border border-[#222] p-8 rounded-2xl flex flex-col justify-center items-center text-center hover:border-brand transition duration-300 cursor-hover group" data-tilt data-tilt-max="5" data-tilt-speed="400">
+                    <i class="fas fa-elevator text-5xl text-brand mb-6 group-hover:scale-110 transition duration-300"></i>
+                    <h3 class="text-white font-heading font-bold text-lg">Asansörlü<br>Nakliyat</h3>
+                </div>
+                
+                <!-- Box 6 -->
+                <div class="bg-[#0a0a0a] border border-[#222] p-8 rounded-2xl flex flex-col justify-center items-center text-center hover:border-brand transition duration-300 cursor-hover group" data-tilt data-tilt-max="5" data-tilt-speed="400">
+                    <i class="fas fa-map-location-dot text-5xl text-brand mb-6 group-hover:scale-110 transition duration-300"></i>
+                    <h3 class="text-white font-heading font-bold text-lg">Şehir İçi<br>Nakliyat</h3>
+                </div>
+                
+                <!-- Box 7 -->
+                <div class="bg-[#0a0a0a] border border-[#222] p-8 rounded-2xl flex flex-col justify-center items-center text-center hover:border-brand transition duration-300 cursor-hover group" data-tilt data-tilt-max="5" data-tilt-speed="400">
+                    <i class="fas fa-route text-5xl text-brand mb-6 group-hover:scale-110 transition duration-300"></i>
+                    <h3 class="text-white font-heading font-bold text-lg">Şehirler Arası<br>Nakliyat</h3>
+                </div>
+                
+                <!-- Box 8 -->
+                <div class="bg-[#0a0a0a] border border-[#222] p-8 rounded-2xl flex flex-col justify-center items-center text-center hover:border-brand transition duration-300 cursor-hover group" data-tilt data-tilt-max="5" data-tilt-speed="400">
+                    <i class="fas fa-boxes-packing text-5xl text-brand mb-6 group-hover:scale-110 transition duration-300"></i>
+                    <h3 class="text-white font-heading font-bold text-lg">Ambalajlı<br>Nakliyat</h3>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Typography Focused Reviews (Equal Height, Clean Layout) -->
+    <section id="yorumlar" class="py-32 relative bg-black/50 border-y border-white/5">
+        <div class="container mx-auto px-6 md:px-12">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-20 gsap-reveal">
+                <h2 class="text-5xl md:text-7xl font-heading font-black text-white tracking-tight py-4">Müşteri <br><span class="text-gray-500">Yorumları.</span></h2>
+                <a href="https://www.google.com/maps/place/Önder+Bey+Nakliyat/@38.4364616,27.1048089,13z" target="_blank" class="mt-6 md:mt-0 flex items-center gap-3 text-white font-bold hover:text-brand transition cursor-hover bg-white/5 px-8 py-4 rounded-full border border-white/10 backdrop-blur-md">
+                    <i class="fab fa-google text-2xl text-brand"></i> Tüm Yorumları Gör
+                </a>
+            </div>
+
+            <div class="swiper reviewSwiper gsap-reveal pb-16">
+                <div class="swiper-wrapper flex items-stretch">
+                    <!-- R1 -->
+                    <div class="swiper-slide md:w-1/2 lg:w-1/3">
+                        <div class="p-8 bg-[#0a0a0a] rounded-3xl border border-[#222] h-full flex flex-col hover:border-brand/40 transition duration-300">
+                            <div class="flex text-brand mb-6 text-xl"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                            <p class="text-lg text-gray-300 font-heading leading-relaxed mb-8 flex-grow">"Makul fiyat düzgün iş. Güvenilir hizmet. Sağolsun herkes daha iyi fiyata ve hızlı şekilde tasınmamı yaptılar."</p>
+                            <div class="flex items-center gap-4 mt-auto">
+                                <div class="w-12 h-12 bg-[#1e3a8a] rounded-full flex items-center justify-center font-bold text-white">U</div>
+                                <div><h4 class="font-bold text-white">Umit Uckan</h4><span class="text-sm text-gray-500">Yerel Rehber</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- R2 -->
+                    <div class="swiper-slide md:w-1/2 lg:w-1/3">
+                        <div class="p-8 bg-[#0a0a0a] rounded-3xl border border-[#222] h-full flex flex-col hover:border-brand/40 transition duration-300">
+                            <div class="flex text-brand mb-6 text-xl"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                            <p class="text-lg text-gray-300 font-heading leading-relaxed mb-8 flex-grow">"Gerçekten işinde disiplinli güleryüzlü herkese tavsiye edebileceğim güzel insanlarsınız işiniz hep rasgitsin 🙏🙏🙏🙏🙏"</p>
+                            <div class="flex items-center gap-4 mt-auto">
+                                <div class="w-12 h-12 bg-[#831843] rounded-full flex items-center justify-center font-bold text-white">M</div>
+                                <div><h4 class="font-bold text-white">Meryem Buldan</h4><span class="text-sm text-gray-500">2 yorum</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- R3 -->
+                    <div class="swiper-slide md:w-1/2 lg:w-1/3">
+                        <div class="p-8 bg-[#0a0a0a] rounded-3xl border border-[#222] h-full flex flex-col hover:border-brand/40 transition duration-300">
+                            <div class="flex text-brand mb-6 text-xl"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                            <p class="text-lg text-gray-300 font-heading leading-relaxed mb-8 flex-grow">"Özgür bey çok ilgili, taşıma işlemi için gelen genç arkadaşlarda çok güzel çalıştılar. Eşyalarım sorunsuz taşındı, herhangi bi hasar vs. olmadı."</p>
+                            <div class="flex items-center gap-4 mt-auto">
+                                <div class="w-12 h-12 bg-[#312e81] rounded-full flex items-center justify-center font-bold text-white">M</div>
+                                <div><h4 class="font-bold text-white">Melike Atmaca</h4><span class="text-sm text-gray-500">Yerel Rehber</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- R4 -->
+                    <div class="swiper-slide md:w-1/2 lg:w-1/3">
+                        <div class="p-8 bg-[#0a0a0a] rounded-3xl border border-[#222] h-full flex flex-col hover:border-brand/40 transition duration-300">
+                            <div class="flex text-brand mb-6 text-xl"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                            <p class="text-lg text-gray-300 font-heading leading-relaxed mb-8 flex-grow">"Kırılmadan dökülmeden güzel temiz işini yapan bir firma teşekkür ederim herşey için ev taşıma derdi sıkıntılı işler umarım bu son olur."</p>
+                            <div class="flex items-center gap-4 mt-auto">
+                                <div class="w-12 h-12 bg-[#065f46] rounded-full flex items-center justify-center font-bold text-white">E</div>
+                                <div><h4 class="font-bold text-white">Emrulla Demirkaya</h4><span class="text-sm text-gray-500">3 yorum</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- R5 -->
+                    <div class="swiper-slide md:w-1/2 lg:w-1/3">
+                        <div class="p-8 bg-[#0a0a0a] rounded-3xl border border-[#222] h-full flex flex-col hover:border-brand/40 transition duration-300">
+                            <div class="flex text-brand mb-6 text-xl"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                            <p class="text-lg text-gray-300 font-heading leading-relaxed mb-8 flex-grow">"Elinize emeğinize sağlık tekrardan; sabırla, kırmadan dökmeden taşıma yaptınız. Çok memnunuz. Öneriyoruz. 5 üzerinden 5 yıldız."</p>
+                            <div class="flex items-center gap-4 mt-auto">
+                                <div class="w-12 h-12 bg-[#92400e] rounded-full flex items-center justify-center font-bold text-white">M</div>
+                                <div><h4 class="font-bold text-white">Mustafa Dönmez</h4><span class="text-sm text-gray-500">1 yorum</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- R6 -->
+                    <div class="swiper-slide md:w-1/2 lg:w-1/3">
+                        <div class="p-8 bg-[#0a0a0a] rounded-3xl border border-[#222] h-full flex flex-col hover:border-brand/40 transition duration-300">
+                            <div class="flex text-brand mb-6 text-xl"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                            <p class="text-lg text-gray-300 font-heading leading-relaxed mb-8 flex-grow">"Nakliye hizmetinden oldukça memnun kaldım. Eşyalarım özenli ve dikkatli bir şekilde taşındı. Zamanında gelmeleri, güler yüzlü ve ilgili olmaları çok iyi."</p>
+                            <div class="flex items-center gap-4 mt-auto">
+                                <div class="w-12 h-12 bg-[#b91c1c] rounded-full flex items-center justify-center font-bold text-white">G</div>
+                                <div><h4 class="font-bold text-white">Gizem Basum</h4><span class="text-sm text-gray-500">1 yorum</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- R7 -->
+                    <div class="swiper-slide md:w-1/2 lg:w-1/3">
+                        <div class="p-8 bg-[#0a0a0a] rounded-3xl border border-[#222] h-full flex flex-col hover:border-brand/40 transition duration-300">
+                            <div class="flex text-brand mb-6 text-xl"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                            <p class="text-lg text-gray-300 font-heading leading-relaxed mb-8 flex-grow">"İşini titizlikle yapan, aynı zamanda profesyonel ve güleryüzlü hizmet sunan bir şirkettir. Biz çok memnun kaldık, kesinlikle tavsiye ediyorum."</p>
+                            <div class="flex items-center gap-4 mt-auto">
+                                <div class="w-12 h-12 bg-[#1e293b] rounded-full flex items-center justify-center font-bold text-white">O</div>
+                                <div><h4 class="font-bold text-white">Orkun Turan</h4><span class="text-sm text-gray-500">2 yorum</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-pagination mt-10 relative"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Massive Advanced Quote Form (Safeguarded structure) -->
+    <section id="teklif-al" class="py-32 relative bg-black border-t border-white/5 w-full">
+        <div class="container mx-auto px-4 md:px-8 max-w-4xl gsap-reveal relative z-10" data-tilt data-tilt-max="1" data-tilt-speed="400">
+            <div class="text-center mb-12">
+                <h2 class="text-5xl md:text-7xl font-display font-black text-white mb-6 tracking-tight py-2">İletişime <span class="text-brand">Geç.</span></h2>
+                <p class="text-gray-400 text-xl font-light">Taşınma detaylarınızı tam olarak belirterek en net fiyat teklifini alın.</p>
+            </div>
+            
+            <form class="bg-[#0a0a0a] border border-[#222] p-6 md:p-12 rounded-[2rem] shadow-2xl relative w-full overflow-hidden block">
+                <!-- Decorative glow -->
+                <div class="absolute top-0 right-0 w-64 h-64 bg-brand rounded-full filter blur-[150px] opacity-10 pointer-events-none"></div>
+
+                <div class="flex flex-col md:flex-row gap-6 mb-6 w-full">
+                    <div class="w-full">
+                        <label class="form-label">İsim Soyisim*</label>
+                        <input type="text" placeholder="Örn: Ahmet Yılmaz" class="cursor-hover" required>
+                    </div>
+                    <div class="w-full">
+                        <label class="form-label">Telefon*</label>
+                        <input type="tel" placeholder="05XX XXX XX XX" class="cursor-hover" required>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-6 mb-6 w-full">
+                    <div class="w-full">
+                        <label class="form-label">Nereden Nereye*</label>
+                        <select class="cursor-hover" required>
+                            <option value="" disabled selected>Seçiniz</option>
+                            <option value="il-disi">İzmir'den Başka Bir İl'e</option>
+                            <option value="ilce">İzmir İçi (İlçeden İlçeye)</option>
+                        </select>
+                    </div>
+                    <div class="w-full">
+                        <label class="form-label">Ev Kaç Odalı*</label>
+                        <select class="cursor-hover" required>
+                            <option value="" disabled selected>Oda Sayısı Seçiniz</option>
+                            <option value="1+1">1+1</option>
+                            <option value="2+1">2+1</option>
+                            <option value="3+1">3+1</option>
+                            <option value="4+1">4+1 ve üzeri</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-6 mb-6 w-full">
+                    <div class="w-full">
+                        <label class="form-label">Asansör İstiyor Musunuz?*</label>
+                        <select class="cursor-hover" required>
+                            <option value="" disabled selected>Seçiniz</option>
+                            <option value="Evet">Evet</option>
+                            <option value="Hayır">Hayır</option>
+                        </select>
+                    </div>
+                    <div class="w-full">
+                        <label class="form-label">Hamal İstiyor Musunuz?*</label>
+                        <select class="cursor-hover" required>
+                            <option value="" disabled selected>Seçiniz</option>
+                            <option value="Evet">Evet</option>
+                            <option value="Hayır">Hayır</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-6 w-full">
+                    <label class="form-label">Kaçıncı Kattan Kaçıncı Kata Taşınacaksınız?*</label>
+                    <div class="flex flex-col md:flex-row gap-6 w-full">
+                        <select class="cursor-hover w-full" required>
+                            <option value="" disabled selected>Eski Ev Katı Seçiniz</option>
+                            <option value="1">1. Kat</option>
+                            <option value="2">2. Kat</option>
+                            <option value="3">3. Kat</option>
+                            <option value="4+">4. Kat ve üzeri</option>
+                        </select>
+                        <select class="cursor-hover w-full" required>
+                            <option value="" disabled selected>Yeni Ev Katı Seçiniz</option>
+                            <option value="1">1. Kat</option>
+                            <option value="2">2. Kat</option>
+                            <option value="3">3. Kat</option>
+                            <option value="4+">4. Kat ve üzeri</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-6 mb-8 w-full">
+                    <div class="w-full">
+                        <label class="form-label">Taşınma Tarihi*</label>
+                        <select class="cursor-hover" required>
+                            <option value="" disabled selected>Tarih Seçiniz</option>
+                            <option value="Hemen">Hemen</option>
+                            <option value="1-2 Hafta">1-2 Hafta İçinde</option>
+                            <option value="1-2 Ay">1-2 ay içinde</option>
+                            <option value="Belirsiz">(Belirsiz) fiyat araştırıyorum</option>
+                        </select>
+                    </div>
+                    <div class="w-full">
+                        <label class="form-label">Bütçe Aralığınız</label>
+                        <select class="cursor-hover">
+                            <option value="" disabled selected>Seçiniz</option>
+                            <option value="Bütçem Yok">Teklif almak istiyorum</option>
+                            <option value="Düşük">Ekonomik (Uygun Fiyat)</option>
+                            <option value="Normal">Standart (Tam Hizmet)</option>
+                            <option value="Yüksek">VIP (Her şey dahil)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-10 w-full">
+                    <label class="form-label">Açıklama Ekleyin</label>
+                    <textarea rows="4" class="cursor-hover resize-none w-full" placeholder="Örn: Buca'dan Bornova'ya Taşınmak İstiyorum. 2 kattan 3 kata taşınacağım..."></textarea>
+                </div>
+
+                <div class="text-center pt-6 border-t border-[#222]">
+                    <button type="submit" class="w-full md:w-auto bg-brand text-white px-20 py-6 rounded-2xl font-heading font-black text-2xl transition hover:bg-brand_light cursor-hover shadow-brand border border-brand/50 hover:scale-105">
+                        FİYAT AL
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Ultra Minimal Footer -->
+    <footer class="bg-black pt-20 pb-10 border-t border-[#222] relative z-10 w-full">
+        <div class="container mx-auto px-6 md:px-12 text-center md:text-left">
+            <div class="flex flex-col md:flex-row justify-between items-center md:items-end mb-16 gap-8">
+                <div>
+                    <img src="images/logo-transparent.png" alt="Önderbey Nakliyat" class="h-16 md:h-20 w-auto opacity-80 hover:opacity-100 transition-opacity">
+                </div>
+                <div class="flex gap-6">
+                    <a href="#" class="w-14 h-14 rounded-full border border-[#222] flex items-center justify-center text-white hover:bg-white hover:text-black transition cursor-hover text-xl"><i class="fab fa-instagram"></i></a>
+                    <a href="https://wa.me/905061097095" class="w-14 h-14 rounded-full border border-[#222] flex items-center justify-center text-white hover:bg-[#25D366] hover:border-[#25D366] transition cursor-hover text-xl"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+            <div class="border-t border-[#222] pt-8 flex flex-col md:flex-row justify-between text-gray-500 text-sm font-light">
+                <p>&copy; 2026 Önderbey Nakliyat. Tüm hakları saklıdır.</p>
+                <p class="mt-2 md:mt-0">İzmir'in Yeni Nesil Nakliyat Markası.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- GSAP, Swiper & Vanilla Tilt -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+
+    <script>
+        // Custom Cursor
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorOutline = document.getElementById('cursor-outline');
+        
+        window.addEventListener('mousemove', function(e) {
+            const posX = e.clientX;
+            const posY = e.clientY;
+            
+            cursorDot.style.left = `${posX}px`;
+            cursorDot.style.top = `${posY}px`;
+            
+            setTimeout(() => {
+                cursorOutline.style.left = `${posX}px`;
+                cursorOutline.style.top = `${posY}px`;
+            }, 50);
+        });
+
+        const hoverElements = document.querySelectorAll('.cursor-hover, a, button, input, select, textarea');
+        hoverElements.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursorOutline.style.width = '60px';
+                cursorOutline.style.height = '60px';
+                cursorOutline.style.backgroundColor = 'rgba(255, 90, 0, 0.1)';
+            });
+            el.addEventListener('mouseleave', () => {
+                cursorOutline.style.width = '40px';
+                cursorOutline.style.height = '40px';
+                cursorOutline.style.backgroundColor = 'transparent';
+            });
+        });
+
+        // Preloader
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const preloader = document.getElementById('preloader');
+                preloader.style.transform = 'translateY(-100%)';
+                
+                gsap.to('.gsap-hero', {
+                    y: 0, opacity: 1, duration: 1, stagger: 0.2, ease: "power4.out", delay: 0.2
+                });
+            }, 1200);
+        });
+
+        // GSAP Scroll Animations
+        gsap.registerPlugin(ScrollTrigger);
+
+        gsap.utils.toArray('.gsap-reveal').forEach(element => {
+            gsap.to(element, {
+                scrollTrigger: { trigger: element, start: "top 85%" },
+                y: 0, opacity: 1, duration: 1, ease: "power3.out"
+            });
+        });
+
+        // Header Style on Scroll
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('glass-nav', 'py-4');
+                header.classList.remove('py-6');
+            } else {
+                header.classList.remove('glass-nav', 'py-4');
+                header.classList.add('py-6');
+            }
+        });
+
+        // Swiper
+        var swiper = new Swiper(".reviewSwiper", {
+            slidesPerView: 1,
+            spaceBetween: 24,
+            pagination: { el: ".swiper-pagination", clickable: true },
+            breakpoints: {
+                768: { slidesPerView: 2, spaceBetween: 24 },
+                1024: { slidesPerView: 3, spaceBetween: 30 },
+            },
+            autoplay: { delay: 6000, disableOnInteraction: false }
+        });
+
+        // Initialize VanillaTilt explicitly just in case
+        VanillaTilt.init(document.querySelectorAll("[data-tilt]"));
+
+        // Dynamic 3D Card Content Cycling
+        const cardData = [
+            { 
+                mainIcon: 'fas fa-boxes-packing text-2xl', mainTitle: 'VİP<br>Paketleme', mainDesc: 'Eşyalarınız Avrupa standartlarında özel olarak ambalajlanır.',
+                f1Icon: 'fas fa-elevator text-3xl', f1Title: 'Asansörlü', f1Desc: 'Taşıma Sistemi',
+                f2Text: 'Sigortalı Nakliyat'
+            },
+            { 
+                mainIcon: 'fas fa-truck-fast text-2xl', mainTitle: 'Hızlı<br>Teslimat', mainDesc: 'Söz verdiğimiz gün ve saatte, sıfır gecikme ile taşıyoruz.',
+                f1Icon: 'fas fa-truck text-3xl', f1Title: 'Geniş', f1Desc: 'Araç Filosu',
+                f2Text: '7/24 Kesintisiz Hizmet'
+            },
+            { 
+                mainIcon: 'fas fa-shield-halved text-2xl', mainTitle: '%100<br>Güvenli', mainDesc: 'Tüm eşyalarınız taşıma süresince sigorta kapsamındadır.',
+                f1Icon: 'fas fa-clipboard-check text-3xl', f1Title: 'Ücretsiz', f1Desc: 'Ekspertiz',
+                f2Text: 'Sıfır Çizik Garantisi'
+            },
+            { 
+                mainIcon: 'fas fa-couch text-2xl', mainTitle: 'Özenli<br>Montaj', mainDesc: 'Mobilyalarınız uzman ekibimiz tarafından sökülüp kurulur.',
+                f1Icon: 'fas fa-user-check text-3xl', f1Title: 'Deneyimli', f1Desc: 'Personel',
+                f2Text: '%100 Memnuniyet'
+            }
+        ];
+
+        let currentCardIndex = 0;
+        
+        // Main Card
+        const dcIcon = document.getElementById('dynamic-card-icon');
+        const dcTitle = document.getElementById('dynamic-card-title');
+        const dcDesc = document.getElementById('dynamic-card-desc');
+        
+        // Float 1
+        const f1Icon = document.getElementById('float1-icon');
+        const f1Title = document.getElementById('float1-title');
+        const f1Desc = document.getElementById('float1-desc');
+        
+        // Float 2
+        const f2Text = document.getElementById('float2-text');
+
+        setInterval(() => {
+            gsap.to([dcIcon, dcTitle, dcDesc, f1Icon, f1Title, f1Desc, f2Text], {
+                opacity: 0,
+                y: -10,
+                duration: 0.4,
+                onComplete: () => {
+                    currentCardIndex = (currentCardIndex + 1) % cardData.length;
+                    const data = cardData[currentCardIndex];
+                    
+                    // Update Main
+                    dcIcon.className = data.mainIcon;
+                    dcTitle.innerHTML = data.mainTitle;
+                    dcDesc.innerHTML = data.mainDesc;
+                    
+                    // Update Float 1
+                    f1Icon.className = data.f1Icon;
+                    f1Title.innerHTML = data.f1Title;
+                    f1Desc.innerHTML = data.f1Desc;
+                    
+                    // Update Float 2
+                    f2Text.innerHTML = data.f2Text;
+                    
+                    gsap.to([dcIcon, dcTitle, dcDesc, f1Icon, f1Title, f1Desc, f2Text], {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.4,
+                        ease: "power2.out"
+                    });
+                }
+            });
+        }, 3000);
+    </script>
+</body>
+</html>

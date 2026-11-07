@@ -24,6 +24,7 @@ import 'survival_guide_screen.dart';
 import 'dm_list_screen.dart';
 import 'ar_compass_screen.dart';
 import 'mesh_network_screen.dart';
+import 'avalanche_module_screen.dart';
 import '../services/weather_service.dart';
 import '../services/radar_service.dart';
 import '../services/offline_map_manager.dart';
@@ -710,39 +711,8 @@ class _HomeDashboardState extends State<HomeDashboard>
     if (mounted) {
       setState(() => _weatherAlert = alert);
 
-      if (!_fireWarningShown && alert != null && !alert.isLoading) {
-        if (alert.temperature > 30.0 && (alert.humidity ?? 50.0) < 30.0) {
-          _fireWarningShown = true;
-          showDialog(
-            context: context,
-            builder: (ctx) => AlertDialog(
-              backgroundColor: const Color(0xFF1F0808),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(0),
-                side: const BorderSide(color: Colors.redAccent, width: 2),
-              ),
-              title: Row(
-                children: [
-                  const Icon(Icons.warning_amber_rounded, color: Colors.redAccent),
-                  const SizedBox(width: 8),
-                  Expanded(child: Text('ORMAN YANGINI RİSKİ', style: GoogleFonts.shareTechMono(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 16))),
-                ],
-              ),
-              content: Text(
-                'Bölgenizde yüksek sıcaklık (${alert.temperature.toStringAsFixed(1)}°C) ve düşük nem (%${alert.humidity?.toStringAsFixed(1)}) saptandı. Orman yangını çıkma riski oldukça yüksektir. Lütfen doğada ateş yakmayın ve dikkatli olun!',
-                style: GoogleFonts.shareTechMono(color: Colors.white70),
-              ),
-              actions: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent, shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero)),
-                  onPressed: () => Navigator.pop(ctx),
-                  child: Text('ANLADIM', style: GoogleFonts.shareTechMono(color: Colors.white, fontWeight: FontWeight.bold)),
-                ),
-              ],
-            ),
-          );
-        }
-      }
+      // Yangın modülü kapatıldı (Devre dışı bırakıldı)
+      // Yangın uyarıları gösterilmez
     }
   }
 
@@ -1730,11 +1700,47 @@ class _HomeDashboardState extends State<HomeDashboard>
                       const Icon(Icons.warning_amber_rounded, color: Colors.redAccent, size: 24),
                       const SizedBox(width: 12),
                       Text(
-                        'DEPREM MODU',
+                        'DEPREM MODU (M4.0+)',
                         style: GoogleFonts.shareTechMono(color: Colors.redAccent, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1),
                       ),
                       const Spacer(),
                       const Icon(Icons.arrow_forward_ios, color: Colors.redAccent, size: 14),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            // ── ÇIĞ GÜVENLİK VE ARVA MODÜLÜ (RECEIVER & TRANSCEIVER) ───────
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AvalancheModuleScreen()),
+                  );
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF00E5FF).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(color: const Color(0xFF00E5FF).withOpacity(0.5)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.ac_unit, color: Color(0xFF00E5FF), size: 24),
+                      const SizedBox(width: 12),
+                      Text(
+                        'ÇIĞ MODÜLÜ (ARVA / TRANSCEIVER)',
+                        style: GoogleFonts.shareTechMono(color: const Color(0xFF00E5FF), fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1),
+                      ),
+                      const Spacer(),
+                      const Icon(Icons.arrow_forward_ios, color: Color(0xFF00E5FF), size: 14),
                     ],
                   ),
                 ),

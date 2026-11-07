@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="tr" style="background-color: #02040A; color: #F8FAFC; margin: 0; padding: 0; overflow: hidden;">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300E5FF'><polygon points='12 2 2 7 12 12 22 7 12 2'/><polyline points='2 17 12 22 22 17'/><polyline points='2 12 12 17 22 12'/></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ROTA+ NEXUS | Taktik Afet & Operasyon Komuta Merkezi</title>
+    
+    <script>
+      window.addEventListener('error', function(e) {
+        var errBox = document.getElementById('debug-error-box');
+        if (!errBox) {
+          errBox = document.createElement('div');
+          errBox.id = 'debug-error-box';
+          errBox.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#991b1b;color:#fef2f2;padding:16px;z-index:999999;font-family:monospace;font-size:13px;white-space:pre-wrap;box-shadow:0 4px 20px rgba(0,0,0,0.8);';
+          document.documentElement.appendChild(errBox);
+        }
+        errBox.textContent += '\n[JS HATA]: ' + e.message + ' (' + (e.filename || 'bundle') + ':' + e.lineno + ')';
+      });
+      window.addEventListener('unhandledrejection', function(e) {
+        var errBox = document.getElementById('debug-error-box');
+        if (!errBox) {
+          errBox = document.createElement('div');
+          errBox.id = 'debug-error-box';
+          errBox.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#991b1b;color:#fef2f2;padding:16px;z-index:999999;font-family:monospace;font-size:13px;white-space:pre-wrap;box-shadow:0 4px 20px rgba(0,0,0,0.8);';
+          document.documentElement.appendChild(errBox);
+        }
+        errBox.textContent += '\n[PROMISE HATA]: ' + (e.reason?.message || e.reason || 'Bilinmeyen Hata');
+      });
+    </script>
+
+    <!-- Google Fonts for Tactical HUD -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <script type="module" crossorigin src="/assets/index-BfseXYZE.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BKjDCVGD.css">
+  </head>
+  <body style="background-color: #02040A; color: #F8FAFC; margin: 0; padding: 0; overflow: hidden;" class="bg-[#02040A] text-slate-100 overflow-hidden select-none font-sans antialiased">
+    <div id="root"></div>
+  </body>
+</html>

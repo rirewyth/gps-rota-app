@@ -1,0 +1,603 @@
+{
+  "totalFrames": 1617,
+  "fps": 30,
+  "scenes": [
+    {
+      "id": "scene_00_intro",
+      "badge": "ROTA MEDYA ÖZEL DOSYA",
+      "timer": "00:00",
+      "script": "Rota Medya Özel Dosya.",
+      "startFrame": 0,
+      "endFrame": 96,
+      "durationFrames": 96,
+      "audioDurationSec": 2.568005,
+      "words": [
+        {
+          "text": "Rota",
+          "startFrame": 0,
+          "endFrame": 16
+        },
+        {
+          "text": "Medya",
+          "startFrame": 16,
+          "endFrame": 36
+        },
+        {
+          "text": "Özel",
+          "startFrame": 36,
+          "endFrame": 52
+        },
+        {
+          "text": "Dosya.",
+          "startFrame": 52,
+          "endFrame": 76
+        }
+      ]
+    },
+    {
+      "id": "scene_01_hook",
+      "badge": "🛸 YERÇEKİMİ: 0G",
+      "timer": "10.0 SN",
+      "script": "Peki ya Dünya'da yerçekimi bir anda, sadece 10 saniyeliğine tamamen yok olsaydı ne olurdu?",
+      "startFrame": 96,
+      "endFrame": 322,
+      "durationFrames": 226,
+      "audioDurationSec": 6.912018,
+      "words": [
+        {
+          "text": "Peki",
+          "startFrame": 96,
+          "endFrame": 106
+        },
+        {
+          "text": "ya",
+          "startFrame": 106,
+          "endFrame": 111
+        },
+        {
+          "text": "Dünya'da",
+          "startFrame": 111,
+          "endFrame": 132
+        },
+        {
+          "text": "yerçekimi",
+          "startFrame": 132,
+          "endFrame": 156
+        },
+        {
+          "text": "bir",
+          "startFrame": 156,
+          "endFrame": 164
+        },
+        {
+          "text": "anda,",
+          "startFrame": 164,
+          "endFrame": 177
+        },
+        {
+          "text": "sadece",
+          "startFrame": 177,
+          "endFrame": 193
+        },
+        {
+          "text": "10",
+          "startFrame": 193,
+          "endFrame": 198
+        },
+        {
+          "text": "saniyeliğine",
+          "startFrame": 198,
+          "endFrame": 230
+        },
+        {
+          "text": "tamamen",
+          "startFrame": 230,
+          "endFrame": 248
+        },
+        {
+          "text": "yok",
+          "startFrame": 248,
+          "endFrame": 256
+        },
+        {
+          "text": "olsaydı",
+          "startFrame": 256,
+          "endFrame": 274
+        },
+        {
+          "text": "ne",
+          "startFrame": 274,
+          "endFrame": 279
+        },
+        {
+          "text": "olurdu?",
+          "startFrame": 279,
+          "endFrame": 297
+        }
+      ]
+    },
+    {
+      "id": "scene_02_room",
+      "badge": "☕ HAVADA SÜZÜLME",
+      "timer": "08.5 SN",
+      "script": "İlk saniyede hiçbir şey fark etmezsin. Ta ki masandaki kahve fincandan çıkıp havada bir su küresi gibi süzülene ve sen tavana doğru uçana kadar!",
+      "startFrame": 322,
+      "endFrame": 626,
+      "durationFrames": 304,
+      "audioDurationSec": 9.528005,
+      "words": [
+        {
+          "text": "İlk",
+          "startFrame": 322,
+          "endFrame": 329
+        },
+        {
+          "text": "saniyede",
+          "startFrame": 329,
+          "endFrame": 347
+        },
+        {
+          "text": "hiçbir",
+          "startFrame": 347,
+          "endFrame": 361
+        },
+        {
+          "text": "şey",
+          "startFrame": 361,
+          "endFrame": 368
+        },
+        {
+          "text": "fark",
+          "startFrame": 368,
+          "endFrame": 377
+        },
+        {
+          "text": "etmezsin.",
+          "startFrame": 377,
+          "endFrame": 398
+        },
+        {
+          "text": "Ta",
+          "startFrame": 398,
+          "endFrame": 402
+        },
+        {
+          "text": "ki",
+          "startFrame": 402,
+          "endFrame": 406
+        },
+        {
+          "text": "masandaki",
+          "startFrame": 406,
+          "endFrame": 427
+        },
+        {
+          "text": "kahve",
+          "startFrame": 427,
+          "endFrame": 438
+        },
+        {
+          "text": "fincandan",
+          "startFrame": 438,
+          "endFrame": 459
+        },
+        {
+          "text": "çıkıp",
+          "startFrame": 459,
+          "endFrame": 470
+        },
+        {
+          "text": "havada",
+          "startFrame": 470,
+          "endFrame": 484
+        },
+        {
+          "text": "bir",
+          "startFrame": 484,
+          "endFrame": 491
+        },
+        {
+          "text": "su",
+          "startFrame": 491,
+          "endFrame": 495
+        },
+        {
+          "text": "küresi",
+          "startFrame": 495,
+          "endFrame": 509
+        },
+        {
+          "text": "gibi",
+          "startFrame": 509,
+          "endFrame": 518
+        },
+        {
+          "text": "süzülene",
+          "startFrame": 518,
+          "endFrame": 536
+        },
+        {
+          "text": "ve",
+          "startFrame": 536,
+          "endFrame": 540
+        },
+        {
+          "text": "sen",
+          "startFrame": 540,
+          "endFrame": 547
+        },
+        {
+          "text": "tavana",
+          "startFrame": 547,
+          "endFrame": 561
+        },
+        {
+          "text": "doğru",
+          "startFrame": 561,
+          "endFrame": 572
+        },
+        {
+          "text": "uçana",
+          "startFrame": 572,
+          "endFrame": 583
+        },
+        {
+          "text": "kadar!",
+          "startFrame": 583,
+          "endFrame": 597
+        }
+      ]
+    },
+    {
+      "id": "scene_03_street",
+      "badge": "☁️ İRTİFA: +45 METRE",
+      "timer": "06.0 SN",
+      "script": "Dışarıda ise tam bir kaos başlar! Arabaların tekerlekleri havada boşa döner. İnsanlar, köpekler ve sokaktaki her şey gökyüzüne doğru savrulur.",
+      "startFrame": 626,
+      "endFrame": 964,
+      "durationFrames": 338,
+      "audioDurationSec": 10.656009,
+      "words": [
+        {
+          "text": "Dışarıda",
+          "startFrame": 626,
+          "endFrame": 646
+        },
+        {
+          "text": "ise",
+          "startFrame": 646,
+          "endFrame": 653
+        },
+        {
+          "text": "tam",
+          "startFrame": 653,
+          "endFrame": 660
+        },
+        {
+          "text": "bir",
+          "startFrame": 660,
+          "endFrame": 667
+        },
+        {
+          "text": "kaos",
+          "startFrame": 667,
+          "endFrame": 677
+        },
+        {
+          "text": "başlar!",
+          "startFrame": 677,
+          "endFrame": 695
+        },
+        {
+          "text": "Arabaların",
+          "startFrame": 695,
+          "endFrame": 720
+        },
+        {
+          "text": "tekerlekleri",
+          "startFrame": 720,
+          "endFrame": 751
+        },
+        {
+          "text": "havada",
+          "startFrame": 751,
+          "endFrame": 766
+        },
+        {
+          "text": "boşa",
+          "startFrame": 766,
+          "endFrame": 776
+        },
+        {
+          "text": "döner.",
+          "startFrame": 776,
+          "endFrame": 791
+        },
+        {
+          "text": "İnsanlar,",
+          "startFrame": 791,
+          "endFrame": 814
+        },
+        {
+          "text": "köpekler",
+          "startFrame": 814,
+          "endFrame": 834
+        },
+        {
+          "text": "ve",
+          "startFrame": 834,
+          "endFrame": 839
+        },
+        {
+          "text": "sokaktaki",
+          "startFrame": 839,
+          "endFrame": 862
+        },
+        {
+          "text": "her",
+          "startFrame": 862,
+          "endFrame": 869
+        },
+        {
+          "text": "şey",
+          "startFrame": 869,
+          "endFrame": 876
+        },
+        {
+          "text": "gökyüzüne",
+          "startFrame": 876,
+          "endFrame": 899
+        },
+        {
+          "text": "doğru",
+          "startFrame": 899,
+          "endFrame": 911
+        },
+        {
+          "text": "savrulur.",
+          "startFrame": 911,
+          "endFrame": 934
+        }
+      ]
+    },
+    {
+      "id": "scene_04_oceans",
+      "badge": "🌊 OKYANUSLAR UÇUYOR",
+      "timer": "03.0 SN",
+      "script": "Daha kötüsü; Dünya'nın dönüş hızı yüzünden okyanuslar dev kütleler halinde havaya yükselir ve atmosfer uzaya doğru kaçmaya başlar!",
+      "startFrame": 964,
+      "endFrame": 1218,
+      "durationFrames": 254,
+      "audioDurationSec": 7.848005,
+      "words": [
+        {
+          "text": "Daha",
+          "startFrame": 964,
+          "endFrame": 972
+        },
+        {
+          "text": "kötüsü;",
+          "startFrame": 972,
+          "endFrame": 986
+        },
+        {
+          "text": "Dünya'nın",
+          "startFrame": 986,
+          "endFrame": 1004
+        },
+        {
+          "text": "dönüş",
+          "startFrame": 1004,
+          "endFrame": 1014
+        },
+        {
+          "text": "hızı",
+          "startFrame": 1014,
+          "endFrame": 1022
+        },
+        {
+          "text": "yüzünden",
+          "startFrame": 1022,
+          "endFrame": 1038
+        },
+        {
+          "text": "okyanuslar",
+          "startFrame": 1038,
+          "endFrame": 1058
+        },
+        {
+          "text": "dev",
+          "startFrame": 1058,
+          "endFrame": 1064
+        },
+        {
+          "text": "kütleler",
+          "startFrame": 1064,
+          "endFrame": 1080
+        },
+        {
+          "text": "halinde",
+          "startFrame": 1080,
+          "endFrame": 1094
+        },
+        {
+          "text": "havaya",
+          "startFrame": 1094,
+          "endFrame": 1106
+        },
+        {
+          "text": "yükselir",
+          "startFrame": 1106,
+          "endFrame": 1122
+        },
+        {
+          "text": "ve",
+          "startFrame": 1122,
+          "endFrame": 1126
+        },
+        {
+          "text": "atmosfer",
+          "startFrame": 1126,
+          "endFrame": 1142
+        },
+        {
+          "text": "uzaya",
+          "startFrame": 1142,
+          "endFrame": 1152
+        },
+        {
+          "text": "doğru",
+          "startFrame": 1152,
+          "endFrame": 1162
+        },
+        {
+          "text": "kaçmaya",
+          "startFrame": 1162,
+          "endFrame": 1176
+        },
+        {
+          "text": "başlar!",
+          "startFrame": 1176,
+          "endFrame": 1190
+        }
+      ]
+    },
+    {
+      "id": "scene_05_crash",
+      "badge": "⚠️ YERÇEKİMİ AÇILDI!",
+      "timer": "00.0 SN",
+      "script": "Ama en büyük felaket, onuncu saniyede yerçekiminin aniden geri gelmesidir! Havaya fırlayan her şey yüz metreden yere çakılır. Neyse ki sadece on saniyeydi... değil mi?",
+      "startFrame": 1218,
+      "endFrame": 1617,
+      "durationFrames": 399,
+      "audioDurationSec": 12.672018,
+      "words": [
+        {
+          "text": "Ama",
+          "startFrame": 1218,
+          "endFrame": 1225
+        },
+        {
+          "text": "en",
+          "startFrame": 1225,
+          "endFrame": 1230
+        },
+        {
+          "text": "büyük",
+          "startFrame": 1230,
+          "endFrame": 1243
+        },
+        {
+          "text": "felaket,",
+          "startFrame": 1243,
+          "endFrame": 1264
+        },
+        {
+          "text": "onuncu",
+          "startFrame": 1264,
+          "endFrame": 1279
+        },
+        {
+          "text": "saniyede",
+          "startFrame": 1279,
+          "endFrame": 1300
+        },
+        {
+          "text": "yerçekiminin",
+          "startFrame": 1300,
+          "endFrame": 1331
+        },
+        {
+          "text": "aniden",
+          "startFrame": 1331,
+          "endFrame": 1346
+        },
+        {
+          "text": "geri",
+          "startFrame": 1346,
+          "endFrame": 1356
+        },
+        {
+          "text": "gelmesidir!",
+          "startFrame": 1356,
+          "endFrame": 1385
+        },
+        {
+          "text": "Havaya",
+          "startFrame": 1385,
+          "endFrame": 1400
+        },
+        {
+          "text": "fırlayan",
+          "startFrame": 1400,
+          "endFrame": 1421
+        },
+        {
+          "text": "her",
+          "startFrame": 1421,
+          "endFrame": 1428
+        },
+        {
+          "text": "şey",
+          "startFrame": 1428,
+          "endFrame": 1435
+        },
+        {
+          "text": "yüz",
+          "startFrame": 1435,
+          "endFrame": 1442
+        },
+        {
+          "text": "metreden",
+          "startFrame": 1442,
+          "endFrame": 1463
+        },
+        {
+          "text": "yere",
+          "startFrame": 1463,
+          "endFrame": 1473
+        },
+        {
+          "text": "çakılır.",
+          "startFrame": 1473,
+          "endFrame": 1494
+        },
+        {
+          "text": "Neyse",
+          "startFrame": 1494,
+          "endFrame": 1507
+        },
+        {
+          "text": "ki",
+          "startFrame": 1507,
+          "endFrame": 1512
+        },
+        {
+          "text": "sadece",
+          "startFrame": 1512,
+          "endFrame": 1527
+        },
+        {
+          "text": "on",
+          "startFrame": 1527,
+          "endFrame": 1532
+        },
+        {
+          "text": "saniyeydi...",
+          "startFrame": 1532,
+          "endFrame": 1563
+        },
+        {
+          "text": "değil",
+          "startFrame": 1563,
+          "endFrame": 1576
+        },
+        {
+          "text": "mi?",
+          "startFrame": 1576,
+          "endFrame": 1583
+        }
+      ]
+    }
+  ]
+}

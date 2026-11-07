@@ -1,0 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-background: #FFF9F7;
+  --color-primary: #A63D57;
+  --color-secondary: #D98EA0;
+  --color-accent: #E8B86D;
+  --color-text: #3A252B;
+  --color-card: #FFFFFF;
+  --color-muted: #8D777D;
+  
+  --font-sans: 'Inter', 'Manrope', sans-serif;
+  --font-serif: 'Playfair Display', serif;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-text font-sans antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif text-text;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-card rounded-2xl p-6 shadow-sm border border-rose-50;
+  }
+  
+  .btn-primary {
+    @apply bg-primary text-white rounded-full px-6 py-3 font-medium transition-all hover:opacity-90 active:scale-95 flex items-center justify-center gap-2;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary/10 text-primary rounded-full px-6 py-3 font-medium transition-all hover:bg-secondary/20 active:scale-95 flex items-center justify-center gap-2;
+  }
+  
+  .input-field {
+    @apply w-full bg-white border border-rose-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all;
+  }
+}

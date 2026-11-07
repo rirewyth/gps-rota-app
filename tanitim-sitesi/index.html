@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rota+ | Advanced 3D GIS Platform</title>
+    
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- GSAP for advanced animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    
+    <!-- Three.js for 3D Terrain -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        mono: ['Share Tech Mono', 'monospace'],
+                        display: ['Syncopate', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: '#FF4B1F',   // Rota+ Orange/Red
+                        surface: 'rgba(10, 12, 15, 0.65)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #050505; color: #fff; overflow-x: hidden; }
+        
+        /* 3D Canvas Background */
+        #webgl-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; }
+        
+        /* Glassmorphism HUD Panels */
+        .hud-panel {
+            background: rgba(15, 17, 21, 0.4);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 75, 31, 0.2);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(255, 75, 31, 0.05);
+            position: relative;
+        }
+        .hud-panel::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 10px; height: 10px;
+            border-top: 2px solid #FF4B1F; border-left: 2px solid #FF4B1F;
+        }
+        .hud-panel::after {
+            content: ''; position: absolute; bottom: 0; right: 0; width: 10px; height: 10px;
+            border-bottom: 2px solid #FF4B1F; border-right: 2px solid #FF4B1F;
+        }
+
+        /* Glitch Effect */
+        .glitch-hover:hover {
+            animation: glitch 0.2s cubic-bezier(.25, .46, .45, .94) both infinite;
+            color: #FF4B1F;
+        }
+        @keyframes glitch {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) }
+            60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) }
+            100% { transform: translate(0) }
+        }
+
+        /* Scanning Line */
+        .scanline {
+            width: 100%; height: 100px;
+            background: linear-gradient(0deg, rgba(255,75,31,0) 0%, rgba(255,75,31,0.1) 50%, rgba(255,75,31,0) 100%);
+            position: fixed; z-index: 999; top: -100px; left: 0; pointer-events: none;
+            animation: scan 4s linear infinite;
+        }
+        @keyframes scan { 0% { top: -100px; } 100% { top: 100vh; } }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #FF4B1F; }
+    </style>
+</head>
+<body class="font-mono antialiased">
+
+    <div class="scanline"></div>
+    <div id="webgl-container"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 p-6 mix-blend-difference">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="font-display text-2xl tracking-[0.3em] font-bold">ROTA<span class="text-brand">+</span></div>
+            <div class="hidden md:flex gap-10 text-xs tracking-[0.2em] uppercase">
+                <a href="#" class="glitch-hover">Topoloji</a>
+                <a href="#" class="glitch-hover">Telemetri</a>
+                <a href="#" class="glitch-hover">Sistemler</a>
+            </div>
+            <div class="w-12 h-12 border border-brand flex items-center justify-center cursor-pointer hover:bg-brand hover:text-black transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Hero Container -->
+    <main class="relative min-h-screen flex flex-col items-center justify-center pt-20 px-4">
+        
+        <!-- Central Typography -->
+        <div class="text-center z-10 mb-16" id="hero-text">
+            <div class="inline-block px-4 py-1 border border-brand/40 bg-brand/10 text-brand text-xs tracking-[0.3em] uppercase mb-6 backdrop-blur-sm">
+                <span class="inline-block w-2 h-2 bg-brand mr-2 animate-pulse"></span> 3D GIS Motoru Aktif
+            </div>
+            <h1 class="font-display text-5xl md:text-7xl lg:text-8xl font-bold tracking-widest uppercase leading-tight mix-blend-screen drop-shadow-[0_0_30px_rgba(255,75,31,0.5)]">
+                Bilinmeyeni <br/> <span class="text-transparent" style="-webkit-text-stroke: 1px #FF4B1F;">Keşfet</span>
+            </h1>
+        </div>
+
+        <!-- HUD Dashboard Panels -->
+        <div class="w-full max-w-7xl grid grid-cols-1 md:grid-cols-3 gap-6 z-10">
+            
+            <!-- Telemetry Panel -->
+            <div class="hud-panel p-6 flex flex-col gap-4 gs-reveal">
+                <h3 class="text-xs text-brand tracking-[0.2em] border-b border-brand/30 pb-2 uppercase">Canlı Telemetri</h3>
+                <div class="flex justify-between items-end">
+                    <span class="text-gray-400 text-xs">YÜKSEKLİK (ALT)</span>
+                    <span class="text-2xl font-display" id="data-alt">3,492m</span>
+                </div>
+                <div class="flex justify-between items-end">
+                    <span class="text-gray-400 text-xs">HIZ (VEL)</span>
+                    <span class="text-2xl font-display" id="data-vel">4.2km/h</span>
+                </div>
+                <div class="flex justify-between items-end">
+                    <span class="text-gray-400 text-xs">NABIZ (BPM)</span>
+                    <span class="text-2xl font-display text-brand animate-pulse" id="data-bpm">124</span>
+                </div>
+            </div>
+
+            <!-- Coordinate Tracker Panel -->
+            <div class="hud-panel p-6 flex flex-col justify-between gs-reveal" style="transition-delay: 0.1s;">
+                <h3 class="text-xs text-brand tracking-[0.2em] border-b border-brand/30 pb-2 uppercase">GPS Kilitlenmesi</h3>
+                <div class="flex-1 flex items-center justify-center relative">
+                    <!-- Targeting Reticle -->
+                    <div class="w-32 h-32 border border-dashed border-gray-600 rounded-full flex items-center justify-center animate-[spin_10s_linear_infinite]">
+                        <div class="w-24 h-24 border border-brand/50 rounded-full animate-[spin_5s_linear_reverse_infinite]"></div>
+                    </div>
+                    <div class="absolute text-center">
+                        <div class="text-[10px] text-brand mb-1">LAT / LNG</div>
+                        <div class="text-sm tracking-widest" id="data-lat">39.9208 N</div>
+                        <div class="text-sm tracking-widest" id="data-lng">32.8541 E</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Status Panel -->
+            <div class="hud-panel p-6 flex flex-col gap-4 gs-reveal" style="transition-delay: 0.2s;">
+                <h3 class="text-xs text-brand tracking-[0.2em] border-b border-brand/30 pb-2 uppercase">Ekip Durumu</h3>
+                <div class="space-y-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-2 h-2 bg-green-500 rounded-full shadow-[0_0_10px_#22c55e]"></div>
+                        <div class="text-xs tracking-wider flex-1">ALPHA TİMİ</div>
+                        <div class="text-xs text-gray-500">GÜVENDE</div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-2 h-2 bg-green-500 rounded-full shadow-[0_0_10px_#22c55e]"></div>
+                        <div class="text-xs tracking-wider flex-1">BRAVO TİMİ</div>
+                        <div class="text-xs text-gray-500">GÜVENDE</div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-2 h-2 bg-brand rounded-full animate-pulse shadow-[0_0_15px_#FF4B1F]"></div>
+                        <div class="text-xs tracking-wider flex-1 text-brand">DELTA TİMİ</div>
+                        <div class="text-xs text-brand">SİNYAL ZAYIF</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts for 3D and Logic -->
+    <script>
+        // --- 1. Three.js 3D Wireframe Terrain (GIS 3D Scene Developer) ---
+        const init3D = () => {
+            const container = document.getElementById('webgl-container');
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x050505, 0.002); // Dark fog to blend edges
+
+            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 30, 100);
+            camera.lookAt(0, 0, 0);
+
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            // Create a plane and distort vertices to make "mountains"
+            const geometry = new THREE.PlaneGeometry(400, 400, 60, 60);
+            
+            // Generate terrain heightmap using simple sine waves
+            const vertices = geometry.attributes.position.array;
+            for (let i = 0; i < vertices.length; i += 3) {
+                const x = vertices[i];
+                const y = vertices[i+1];
+                // Math magic for mountain-like noise
+                const z = Math.sin(x * 0.05) * Math.cos(y * 0.05) * 15 
+                        + Math.sin(x * 0.1) * Math.cos(y * 0.1) * 5;
+                vertices[i+2] = z;
+            }
+            
+            geometry.computeVertexNormals();
+
+            // Rota+ Brand color wireframe
+            const material = new THREE.MeshBasicMaterial({ 
+                color: 0xFF4B1F, 
+                wireframe: true, 
+                transparent: true,
+                opacity: 0.15 
+            });
+
+            const terrain = new THREE.Mesh(geometry, material);
+            terrain.rotation.x = -Math.PI / 2; // Lay flat
+            scene.add(terrain);
+
+            // Animation Loop (Flying effect)
+            let clock = new THREE.Clock();
+            const animate = () => {
+                requestAnimationFrame(animate);
+                const time = clock.getElapsedTime();
+                
+                // Move terrain towards camera to simulate flight
+                terrain.position.z = (time * 10) % 400; // Reset after moving a bit
+                
+                // Very subtle rotation for dynamic feel
+                terrain.rotation.z = Math.sin(time * 0.1) * 0.05;
+
+                renderer.render(scene, camera);
+            };
+            animate();
+
+            // Resize handler
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        };
+
+        // --- 2. Realtime Telemetry Simulation (Realtime Engineer) ---
+        const initTelemetry = () => {
+            let alt = 3492;
+            let bpm = 124;
+            
+            setInterval(() => {
+                // Fluctuate altitude
+                alt += (Math.random() > 0.5 ? 1 : -1) * Math.floor(Math.random() * 3);
+                document.getElementById('data-alt').innerText = alt.toLocaleString() + 'm';
+                
+                // Fluctuate BPM
+                bpm += (Math.random() > 0.5 ? 1 : -1) * Math.floor(Math.random() * 4);
+                if(bpm < 90) bpm = 90; if(bpm > 160) bpm = 160;
+                document.getElementById('data-bpm').innerText = bpm;
+                
+                // Fluctuate Speed
+                const vel = (4.0 + Math.random()).toFixed(1);
+                document.getElementById('data-vel').innerText = vel + 'km/h';
+                
+                // Jitter GPS coordinates
+                const lat = (39.9208 + (Math.random() * 0.0001)).toFixed(5);
+                const lng = (32.8541 + (Math.random() * 0.0001)).toFixed(5);
+                document.getElementById('data-lat').innerText = lat + ' N';
+                document.getElementById('data-lng').innerText = lng + ' E';
+                
+            }, 1000);
+        };
+
+        // --- 3. GSAP Entrance Animations (Whimsy Injector) ---
+        const initAnimations = () => {
+            gsap.from("#hero-text", { duration: 2, y: 50, opacity: 0, ease: "expo.out", delay: 0.5 });
+            gsap.from(".gs-reveal", { 
+                duration: 1.5, 
+                y: 30, 
+                opacity: 0, 
+                stagger: 0.2, 
+                ease: "power3.out", 
+                delay: 1 
+            });
+        };
+
+        // Boot
+        window.onload = () => {
+            init3D();
+            initTelemetry();
+            initAnimations();
+        };
+    </script>
+</body>
+</html>

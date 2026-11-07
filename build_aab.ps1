@@ -1,12 +1,40 @@
-Set-Location "c:\213\mountaineering_app"
-$env:PATH = "C:\flutter\bin;" + $env:PATH
-& "C:\flutter\bin\flutter.bat" build aab --release 2>&1 | Out-String | Write-Host
-Write-Host "Exit code: $LASTEXITCODE"
-# AAB'yi bul ve kopyala
-$aab = Get-ChildItem -Path "c:\213\mountaineering_app\build\app\outputs\bundle\release" -Recurse -Filter "app-release.aab" -ErrorAction SilentlyContinue | Select-Object -First 1
-if ($aab) {
-    Copy-Item $aab.FullName "c:\213\RotaPlus.aab" -Force
-    Write-Host "AAB KOPYALANDI: c:\213\RotaPlus.aab"
+# ROTA+ EMNİYETTEYİM (v1.2.0 Build 145) - Google Play Store AAB Derleme Betiği
+$ErrorActionPreference = "Stop"
+
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+Set-Location "$scriptDir\mountaineering_app"
+
+$env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
+$env:PATH = "C:\gps-rota-app-main\flutter\bin;$env:JAVA_HOME\bin;" + $env:PATH
+
+Write-Host "=========================================" -ForegroundColor Cyan
+Write-Host "ROTA+ EMNİYETTEYİM - GOOGLE PLAY AAB DERLEME" -ForegroundColor Cyan
+Write-Host "Sürüm: 1.2.0 | Build: 145" -ForegroundColor Yellow
+Write-Host "=========================================" -ForegroundColor Cyan
+
+Write-Host "Paketler güncelleniyor (flutter pub get)..."
+& "C:\gps-rota-app-main\flutter\bin\flutter.bat" pub get
+
+Write-Host "Production AAB derleniyor..."
+& "C:\gps-rota-app-main\flutter\bin\flutter.bat" build aab --release
+
+if ($LASTEXITCODE -eq 0) {
+    $aabPath = "$scriptDir\mountaineering_app\build\app\outputs\bundle\release\app-release.aab"
+    if (-not (Test-Path $aabPath)) {
+        $aab = Get-ChildItem -Path "$scriptDir\mountaineering_app\build" -Recurse -Filter "app-release.aab" -ErrorAction SilentlyContinue | Select-Object -First 1
+        if ($aab) { $aabPath = $aab.FullName }
+    }
+
+    if (Test-Path $aabPath) {
+        $dest = "$scriptDir\RotaPlus_v1.2.0_release.aab"
+        Copy-Item $aabPath $dest -Force
+        Write-Host "=========================================" -ForegroundColor Green
+        Write-Host "BAŞARILI: Google Play Store AAB oluşturuldu!" -ForegroundColor Green
+        Write-Host "Konum: $dest" -ForegroundColor Green
+        Write-Host "=========================================" -ForegroundColor Green
+    } else {
+        Write-Warning "AAB üretildi ancak dosya konumu saptanamadı."
+    }
 } else {
-    Write-Host "AAB BULUNAMADI, ciktilara bakiliyor..."
+    Write-Error "AAB derleme işlemi başarısız oldu (Hata Kodu: $LASTEXITCODE)."
 }

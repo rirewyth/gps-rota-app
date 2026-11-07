@@ -1,0 +1,932 @@
+{
+  "totalFrames": 2630,
+  "fps": 30,
+  "durationSec": 87.66666666666667,
+  "scenes": [
+    {
+      "id": "scene_01_hook",
+      "badge": "TARİHİ AFET // 14-15 EKİM",
+      "top_title": "İSTANBUL'DA 84 YILIN REKORU",
+      "glow_title": "1 GÜNDE NASIL SEL OLDU?",
+      "tag": "BEYKOZ & SARIYER: 272 KG/M²",
+      "script": "İstanbul aylarca süren kuraklığın ardından, sadece birkaç saat içinde son 84 yılın en yıkıcı sel felaketiyle sular altında kaldı. Metrekareye tam 272 kilogram yağmur düştü! Peki bu afet tek bir günde nasıl gerçekleşti?",
+      "type": "istanbul_radar",
+      "startFrame": 0,
+      "endFrame": 519,
+      "durationInFrames": 519,
+      "audioDurationSec": 16.776009,
+      "words": [
+        {
+          "text": "İstanbul",
+          "startFrame": 0,
+          "endFrame": 21
+        },
+        {
+          "text": "aylarca",
+          "startFrame": 21,
+          "endFrame": 39
+        },
+        {
+          "text": "süren",
+          "startFrame": 39,
+          "endFrame": 52
+        },
+        {
+          "text": "kuraklığın",
+          "startFrame": 52,
+          "endFrame": 79
+        },
+        {
+          "text": "ardından,",
+          "startFrame": 79,
+          "endFrame": 103
+        },
+        {
+          "text": "sadece",
+          "startFrame": 103,
+          "endFrame": 119
+        },
+        {
+          "text": "birkaç",
+          "startFrame": 119,
+          "endFrame": 135
+        },
+        {
+          "text": "saat",
+          "startFrame": 135,
+          "endFrame": 145
+        },
+        {
+          "text": "içinde",
+          "startFrame": 145,
+          "endFrame": 161
+        },
+        {
+          "text": "son",
+          "startFrame": 161,
+          "endFrame": 169
+        },
+        {
+          "text": "84",
+          "startFrame": 169,
+          "endFrame": 175
+        },
+        {
+          "text": "yılın",
+          "startFrame": 175,
+          "endFrame": 188
+        },
+        {
+          "text": "en",
+          "startFrame": 188,
+          "endFrame": 194
+        },
+        {
+          "text": "yıkıcı",
+          "startFrame": 194,
+          "endFrame": 210
+        },
+        {
+          "text": "sel",
+          "startFrame": 210,
+          "endFrame": 218
+        },
+        {
+          "text": "felaketiyle",
+          "startFrame": 218,
+          "endFrame": 247
+        },
+        {
+          "text": "sular",
+          "startFrame": 247,
+          "endFrame": 260
+        },
+        {
+          "text": "altında",
+          "startFrame": 260,
+          "endFrame": 278
+        },
+        {
+          "text": "kaldı.",
+          "startFrame": 278,
+          "endFrame": 294
+        },
+        {
+          "text": "Metrekareye",
+          "startFrame": 294,
+          "endFrame": 323
+        },
+        {
+          "text": "tam",
+          "startFrame": 323,
+          "endFrame": 331
+        },
+        {
+          "text": "272",
+          "startFrame": 331,
+          "endFrame": 339
+        },
+        {
+          "text": "kilogram",
+          "startFrame": 339,
+          "endFrame": 360
+        },
+        {
+          "text": "yağmur",
+          "startFrame": 360,
+          "endFrame": 376
+        },
+        {
+          "text": "düştü!",
+          "startFrame": 376,
+          "endFrame": 392
+        },
+        {
+          "text": "Peki",
+          "startFrame": 392,
+          "endFrame": 402
+        },
+        {
+          "text": "bu",
+          "startFrame": 402,
+          "endFrame": 408
+        },
+        {
+          "text": "afet",
+          "startFrame": 408,
+          "endFrame": 418
+        },
+        {
+          "text": "tek",
+          "startFrame": 418,
+          "endFrame": 426
+        },
+        {
+          "text": "bir",
+          "startFrame": 426,
+          "endFrame": 434
+        },
+        {
+          "text": "günde",
+          "startFrame": 434,
+          "endFrame": 447
+        },
+        {
+          "text": "nasıl",
+          "startFrame": 447,
+          "endFrame": 460
+        },
+        {
+          "text": "gerçekleşti?",
+          "startFrame": 460,
+          "endFrame": 492
+        }
+      ]
+    },
+    {
+      "id": "scene_02_hydrophobic",
+      "badge": "BİLİMSEL PARADOKS",
+      "top_title": "KURU TOPRAK SUYU ÇEKMEZ!",
+      "glow_title": "HİDROFOBİK TOPRAK ETKİSİ",
+      "tag": "YÜZEY AKIŞI: %92 // EMİLİM: %8",
+      "script": "Çoğu insan kurak toprağın yağmuru hemen emeceğini düşünür; ancak fizik tam tersini söyler! Aylarca kavrulan toprak adeta bir taş gibi fırınlanır ve su geçirmez bir kabuğa dönüşür. Yağan su emilemez, doğrudan dev bir sele dönüşür.",
+      "type": "hydrophobic_soil",
+      "startFrame": 519,
+      "endFrame": 1010,
+      "durationInFrames": 491,
+      "audioDurationSec": 15.84,
+      "words": [
+        {
+          "text": "Çoğu",
+          "startFrame": 519,
+          "endFrame": 528
+        },
+        {
+          "text": "insan",
+          "startFrame": 528,
+          "endFrame": 540
+        },
+        {
+          "text": "kurak",
+          "startFrame": 540,
+          "endFrame": 552
+        },
+        {
+          "text": "toprağın",
+          "startFrame": 552,
+          "endFrame": 571
+        },
+        {
+          "text": "yağmuru",
+          "startFrame": 571,
+          "endFrame": 588
+        },
+        {
+          "text": "hemen",
+          "startFrame": 588,
+          "endFrame": 600
+        },
+        {
+          "text": "emeceğini",
+          "startFrame": 600,
+          "endFrame": 621
+        },
+        {
+          "text": "düşünür;",
+          "startFrame": 621,
+          "endFrame": 640
+        },
+        {
+          "text": "ancak",
+          "startFrame": 640,
+          "endFrame": 652
+        },
+        {
+          "text": "fizik",
+          "startFrame": 652,
+          "endFrame": 664
+        },
+        {
+          "text": "tam",
+          "startFrame": 664,
+          "endFrame": 671
+        },
+        {
+          "text": "tersini",
+          "startFrame": 671,
+          "endFrame": 688
+        },
+        {
+          "text": "söyler!",
+          "startFrame": 688,
+          "endFrame": 705
+        },
+        {
+          "text": "Aylarca",
+          "startFrame": 705,
+          "endFrame": 722
+        },
+        {
+          "text": "kavrulan",
+          "startFrame": 722,
+          "endFrame": 741
+        },
+        {
+          "text": "toprak",
+          "startFrame": 741,
+          "endFrame": 755
+        },
+        {
+          "text": "adeta",
+          "startFrame": 755,
+          "endFrame": 767
+        },
+        {
+          "text": "bir",
+          "startFrame": 767,
+          "endFrame": 774
+        },
+        {
+          "text": "taş",
+          "startFrame": 774,
+          "endFrame": 781
+        },
+        {
+          "text": "gibi",
+          "startFrame": 781,
+          "endFrame": 790
+        },
+        {
+          "text": "fırınlanır",
+          "startFrame": 790,
+          "endFrame": 814
+        },
+        {
+          "text": "ve",
+          "startFrame": 814,
+          "endFrame": 820
+        },
+        {
+          "text": "su",
+          "startFrame": 820,
+          "endFrame": 826
+        },
+        {
+          "text": "geçirmez",
+          "startFrame": 826,
+          "endFrame": 845
+        },
+        {
+          "text": "bir",
+          "startFrame": 845,
+          "endFrame": 852
+        },
+        {
+          "text": "kabuğa",
+          "startFrame": 852,
+          "endFrame": 866
+        },
+        {
+          "text": "dönüşür.",
+          "startFrame": 866,
+          "endFrame": 885
+        },
+        {
+          "text": "Yağan",
+          "startFrame": 885,
+          "endFrame": 897
+        },
+        {
+          "text": "su",
+          "startFrame": 897,
+          "endFrame": 903
+        },
+        {
+          "text": "emilemez,",
+          "startFrame": 903,
+          "endFrame": 924
+        },
+        {
+          "text": "doğrudan",
+          "startFrame": 924,
+          "endFrame": 943
+        },
+        {
+          "text": "dev",
+          "startFrame": 943,
+          "endFrame": 950
+        },
+        {
+          "text": "bir",
+          "startFrame": 950,
+          "endFrame": 957
+        },
+        {
+          "text": "sele",
+          "startFrame": 957,
+          "endFrame": 966
+        },
+        {
+          "text": "dönüşür.",
+          "startFrame": 966,
+          "endFrame": 985
+        }
+      ]
+    },
+    {
+      "id": "scene_03_concrete",
+      "badge": "ŞEHİRLEŞME KRİZİ",
+      "top_title": "KAYBOLAN DERE YATAKLARI",
+      "glow_title": "ASFALT VE BETON TUZAĞI",
+      "tag": "GEÇİRİMSİZ YÜZEY: %80 // KAĞITHANE & AYAZAĞA",
+      "script": "İkinci büyük neden megakentin beton zırhıdır. İstanbul’un tarihi dere yatakları imara açılıp üzeri asfaltla kaplandığı için, milyonlarca ton su gidecek doğal bir yol bulamadı ve sokaklar birer azgın nehre dönüştü.",
+      "type": "concrete_urban",
+      "startFrame": 1010,
+      "endFrame": 1445,
+      "durationInFrames": 435,
+      "audioDurationSec": 13.968005,
+      "words": [
+        {
+          "text": "İkinci",
+          "startFrame": 1010,
+          "endFrame": 1023
+        },
+        {
+          "text": "büyük",
+          "startFrame": 1023,
+          "endFrame": 1034
+        },
+        {
+          "text": "neden",
+          "startFrame": 1034,
+          "endFrame": 1045
+        },
+        {
+          "text": "megakentin",
+          "startFrame": 1045,
+          "endFrame": 1067
+        },
+        {
+          "text": "beton",
+          "startFrame": 1067,
+          "endFrame": 1078
+        },
+        {
+          "text": "zırhıdır.",
+          "startFrame": 1078,
+          "endFrame": 1098
+        },
+        {
+          "text": "İstanbul’un",
+          "startFrame": 1098,
+          "endFrame": 1123
+        },
+        {
+          "text": "tarihi",
+          "startFrame": 1123,
+          "endFrame": 1136
+        },
+        {
+          "text": "dere",
+          "startFrame": 1136,
+          "endFrame": 1145
+        },
+        {
+          "text": "yatakları",
+          "startFrame": 1145,
+          "endFrame": 1165
+        },
+        {
+          "text": "imara",
+          "startFrame": 1165,
+          "endFrame": 1176
+        },
+        {
+          "text": "açılıp",
+          "startFrame": 1176,
+          "endFrame": 1189
+        },
+        {
+          "text": "üzeri",
+          "startFrame": 1189,
+          "endFrame": 1200
+        },
+        {
+          "text": "asfaltla",
+          "startFrame": 1200,
+          "endFrame": 1218
+        },
+        {
+          "text": "kaplandığı",
+          "startFrame": 1218,
+          "endFrame": 1240
+        },
+        {
+          "text": "için,",
+          "startFrame": 1240,
+          "endFrame": 1251
+        },
+        {
+          "text": "milyonlarca",
+          "startFrame": 1251,
+          "endFrame": 1276
+        },
+        {
+          "text": "ton",
+          "startFrame": 1276,
+          "endFrame": 1282
+        },
+        {
+          "text": "su",
+          "startFrame": 1282,
+          "endFrame": 1288
+        },
+        {
+          "text": "gidecek",
+          "startFrame": 1288,
+          "endFrame": 1303
+        },
+        {
+          "text": "doğal",
+          "startFrame": 1303,
+          "endFrame": 1314
+        },
+        {
+          "text": "bir",
+          "startFrame": 1314,
+          "endFrame": 1320
+        },
+        {
+          "text": "yol",
+          "startFrame": 1320,
+          "endFrame": 1326
+        },
+        {
+          "text": "bulamadı",
+          "startFrame": 1326,
+          "endFrame": 1344
+        },
+        {
+          "text": "ve",
+          "startFrame": 1344,
+          "endFrame": 1350
+        },
+        {
+          "text": "sokaklar",
+          "startFrame": 1350,
+          "endFrame": 1368
+        },
+        {
+          "text": "birer",
+          "startFrame": 1368,
+          "endFrame": 1379
+        },
+        {
+          "text": "azgın",
+          "startFrame": 1379,
+          "endFrame": 1390
+        },
+        {
+          "text": "nehre",
+          "startFrame": 1390,
+          "endFrame": 1401
+        },
+        {
+          "text": "dönüştü.",
+          "startFrame": 1401,
+          "endFrame": 1419
+        }
+      ]
+    },
+    {
+      "id": "scene_04_meteorology",
+      "badge": "METEOROLOJİK ÇARPIŞMA",
+      "top_title": "ATMOSFERİK PATLAMA",
+      "glow_title": "SÜPER HÜCRE FIRTINASI!",
+      "tag": "DENİZ SICAKLIĞI: +4°C // BOĞAZ HATTINDA KİLİTLENME",
+      "script": "Meteorolojik tetikleyici ise deniz suyuydu! Akdeniz ve Karadeniz’in aşırı ısınması atmosfere devasa bir nem yükledi. Üst seviyedeki kutup kökenli soğuk hava dalgasıyla çarpışınca, fırtına hücreleri saatlerce Boğaz üzerinde kilitli kaldı.",
+      "type": "supercell_storm",
+      "startFrame": 1445,
+      "endFrame": 1946,
+      "durationInFrames": 501,
+      "audioDurationSec": 16.2,
+      "words": [
+        {
+          "text": "Meteorolojik",
+          "startFrame": 1445,
+          "endFrame": 1473
+        },
+        {
+          "text": "tetikleyici",
+          "startFrame": 1473,
+          "endFrame": 1498
+        },
+        {
+          "text": "ise",
+          "startFrame": 1498,
+          "endFrame": 1505
+        },
+        {
+          "text": "deniz",
+          "startFrame": 1505,
+          "endFrame": 1516
+        },
+        {
+          "text": "suyuydu!",
+          "startFrame": 1516,
+          "endFrame": 1534
+        },
+        {
+          "text": "Akdeniz",
+          "startFrame": 1534,
+          "endFrame": 1550
+        },
+        {
+          "text": "ve",
+          "startFrame": 1550,
+          "endFrame": 1556
+        },
+        {
+          "text": "Karadeniz’in",
+          "startFrame": 1556,
+          "endFrame": 1584
+        },
+        {
+          "text": "aşırı",
+          "startFrame": 1584,
+          "endFrame": 1595
+        },
+        {
+          "text": "ısınması",
+          "startFrame": 1595,
+          "endFrame": 1613
+        },
+        {
+          "text": "atmosfere",
+          "startFrame": 1613,
+          "endFrame": 1634
+        },
+        {
+          "text": "devasa",
+          "startFrame": 1634,
+          "endFrame": 1648
+        },
+        {
+          "text": "bir",
+          "startFrame": 1648,
+          "endFrame": 1655
+        },
+        {
+          "text": "nem",
+          "startFrame": 1655,
+          "endFrame": 1662
+        },
+        {
+          "text": "yükledi.",
+          "startFrame": 1662,
+          "endFrame": 1680
+        },
+        {
+          "text": "Üst",
+          "startFrame": 1680,
+          "endFrame": 1687
+        },
+        {
+          "text": "seviyedeki",
+          "startFrame": 1687,
+          "endFrame": 1710
+        },
+        {
+          "text": "kutup",
+          "startFrame": 1710,
+          "endFrame": 1721
+        },
+        {
+          "text": "kökenli",
+          "startFrame": 1721,
+          "endFrame": 1737
+        },
+        {
+          "text": "soğuk",
+          "startFrame": 1737,
+          "endFrame": 1748
+        },
+        {
+          "text": "hava",
+          "startFrame": 1748,
+          "endFrame": 1757
+        },
+        {
+          "text": "dalgasıyla",
+          "startFrame": 1757,
+          "endFrame": 1780
+        },
+        {
+          "text": "çarpışınca,",
+          "startFrame": 1780,
+          "endFrame": 1805
+        },
+        {
+          "text": "fırtına",
+          "startFrame": 1805,
+          "endFrame": 1821
+        },
+        {
+          "text": "hücreleri",
+          "startFrame": 1821,
+          "endFrame": 1842
+        },
+        {
+          "text": "saatlerce",
+          "startFrame": 1842,
+          "endFrame": 1863
+        },
+        {
+          "text": "Boğaz",
+          "startFrame": 1863,
+          "endFrame": 1874
+        },
+        {
+          "text": "üzerinde",
+          "startFrame": 1874,
+          "endFrame": 1892
+        },
+        {
+          "text": "kilitli",
+          "startFrame": 1892,
+          "endFrame": 1908
+        },
+        {
+          "text": "kaldı.",
+          "startFrame": 1908,
+          "endFrame": 1922
+        }
+      ]
+    },
+    {
+      "id": "scene_05_sponge_city",
+      "badge": "İKLİM KRİZİ & GELECEK",
+      "top_title": "YENİ NORMALE KARŞI",
+      "glow_title": "SÜNGER ŞEHİR MODELİ",
+      "tag": "GEÇİRGEN ASFALT // DOĞAL SU HAFZALARI",
+      "script": "İklim kriziyle bu ani yağışlar artık istisna değil, yeni normalimiz. Şehirlerimizi artık betonla hapsetmek yerine, suyu emen sünger şehirler inşa etmek zorundayız.",
+      "type": "sponge_city",
+      "startFrame": 1946,
+      "endFrame": 2339,
+      "durationInFrames": 393,
+      "audioDurationSec": 12.6,
+      "words": [
+        {
+          "text": "İklim",
+          "startFrame": 1946,
+          "endFrame": 1959
+        },
+        {
+          "text": "kriziyle",
+          "startFrame": 1959,
+          "endFrame": 1980
+        },
+        {
+          "text": "bu",
+          "startFrame": 1980,
+          "endFrame": 1986
+        },
+        {
+          "text": "ani",
+          "startFrame": 1986,
+          "endFrame": 1993
+        },
+        {
+          "text": "yağışlar",
+          "startFrame": 1993,
+          "endFrame": 2014
+        },
+        {
+          "text": "artık",
+          "startFrame": 2014,
+          "endFrame": 2027
+        },
+        {
+          "text": "istisna",
+          "startFrame": 2027,
+          "endFrame": 2045
+        },
+        {
+          "text": "değil,",
+          "startFrame": 2045,
+          "endFrame": 2060
+        },
+        {
+          "text": "yeni",
+          "startFrame": 2060,
+          "endFrame": 2070
+        },
+        {
+          "text": "normalimiz.",
+          "startFrame": 2070,
+          "endFrame": 2099
+        },
+        {
+          "text": "Şehirlerimizi",
+          "startFrame": 2099,
+          "endFrame": 2133
+        },
+        {
+          "text": "artık",
+          "startFrame": 2133,
+          "endFrame": 2146
+        },
+        {
+          "text": "betonla",
+          "startFrame": 2146,
+          "endFrame": 2164
+        },
+        {
+          "text": "hapsetmek",
+          "startFrame": 2164,
+          "endFrame": 2187
+        },
+        {
+          "text": "yerine,",
+          "startFrame": 2187,
+          "endFrame": 2205
+        },
+        {
+          "text": "suyu",
+          "startFrame": 2205,
+          "endFrame": 2215
+        },
+        {
+          "text": "emen",
+          "startFrame": 2215,
+          "endFrame": 2225
+        },
+        {
+          "text": "sünger",
+          "startFrame": 2225,
+          "endFrame": 2240
+        },
+        {
+          "text": "şehirler",
+          "startFrame": 2240,
+          "endFrame": 2261
+        },
+        {
+          "text": "inşa",
+          "startFrame": 2261,
+          "endFrame": 2271
+        },
+        {
+          "text": "etmek",
+          "startFrame": 2271,
+          "endFrame": 2284
+        },
+        {
+          "text": "zorundayız.",
+          "startFrame": 2284,
+          "endFrame": 2313
+        }
+      ]
+    },
+    {
+      "id": "scene_06_outro",
+      "badge": "ROTA BİLİM ANALİZİ",
+      "top_title": "AFETLERE KARŞI BİLİNÇLEN",
+      "glow_title": "BİLİMLE GÜVENDE KAL!",
+      "tag": "ROTA MEDYA // BEĞEN & TAKİP ET",
+      "script": "Doğayı betonla yenemeyiz, onunla uyum içinde yaşamak zorundayız. Afetleri bilimle anlamak ve hayatta kalmak için takipte kalın!",
+      "type": "scientific_outro",
+      "startFrame": 2339,
+      "endFrame": 2630,
+      "durationInFrames": 291,
+      "audioDurationSec": 9.192018,
+      "words": [
+        {
+          "text": "Doğayı",
+          "startFrame": 2339,
+          "endFrame": 2353
+        },
+        {
+          "text": "betonla",
+          "startFrame": 2353,
+          "endFrame": 2370
+        },
+        {
+          "text": "yenemeyiz,",
+          "startFrame": 2370,
+          "endFrame": 2394
+        },
+        {
+          "text": "onunla",
+          "startFrame": 2394,
+          "endFrame": 2408
+        },
+        {
+          "text": "uyum",
+          "startFrame": 2408,
+          "endFrame": 2417
+        },
+        {
+          "text": "içinde",
+          "startFrame": 2417,
+          "endFrame": 2431
+        },
+        {
+          "text": "yaşamak",
+          "startFrame": 2431,
+          "endFrame": 2448
+        },
+        {
+          "text": "zorundayız.",
+          "startFrame": 2448,
+          "endFrame": 2475
+        },
+        {
+          "text": "Afetleri",
+          "startFrame": 2475,
+          "endFrame": 2494
+        },
+        {
+          "text": "bilimle",
+          "startFrame": 2494,
+          "endFrame": 2511
+        },
+        {
+          "text": "anlamak",
+          "startFrame": 2511,
+          "endFrame": 2528
+        },
+        {
+          "text": "ve",
+          "startFrame": 2528,
+          "endFrame": 2534
+        },
+        {
+          "text": "hayatta",
+          "startFrame": 2534,
+          "endFrame": 2551
+        },
+        {
+          "text": "kalmak",
+          "startFrame": 2551,
+          "endFrame": 2565
+        },
+        {
+          "text": "için",
+          "startFrame": 2565,
+          "endFrame": 2574
+        },
+        {
+          "text": "takipte",
+          "startFrame": 2574,
+          "endFrame": 2591
+        },
+        {
+          "text": "kalın!",
+          "startFrame": 2591,
+          "endFrame": 2605
+        }
+      ]
+    }
+  ]
+}

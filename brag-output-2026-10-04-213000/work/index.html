@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Rota+ Tactical 3D Glitch Ad</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Share+Tech+Mono&display=swap');
+  
+  body, html {
+    margin: 0; padding: 0; width: 1920px; height: 1080px; overflow: hidden;
+    background: #050608; color: #E8EDF2;
+    font-family: 'Share Tech Mono', monospace;
+    perspective: 1500px;
+  }
+  
+  .scene {
+    position: absolute; top: 0; left: 0; width: 1920px; height: 1080px;
+    display: none; align-items: center; justify-content: center; flex-direction: column;
+    transform-style: preserve-3d;
+  }
+
+  .grid {
+    position: absolute; top: 0; left: 0; width: 200%; height: 200%;
+    margin-left: -50%; margin-top: -50%;
+    background-image: linear-gradient(#1E2D3D 2px, transparent 2px), linear-gradient(90deg, #1E2D3D 2px, transparent 2px);
+    background-size: 80px 80px; opacity: 0.2;
+    transform: rotateX(60deg) translateY(-200px) translateZ(-300px);
+    animation: gridMove 20s linear infinite;
+  }
+  @keyframes gridMove {
+    0% { transform: rotateX(60deg) translateY(-200px) translateZ(-300px); }
+    100% { transform: rotateX(60deg) translateY(200px) translateZ(-300px); }
+  }
+
+  .scanline {
+    position: absolute; top: 0; left: 0; width: 100%; height: 6px;
+    background: #00E5FF; opacity: 0.5; box-shadow: 0 0 30px #00E5FF;
+    z-index: 1000; pointer-events: none;
+  }
+
+  /* Glitch effect on text */
+  .glitch-text {
+    position: relative; color: white; font-family: 'Barlow Condensed'; font-weight: 900;
+    font-size: 160px; text-transform: uppercase; letter-spacing: 5px; text-align: center;
+  }
+  .glitch-text::before, .glitch-text::after {
+    content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: #050608;
+  }
+  .glitch-text::before { left: 4px; text-shadow: -3px 0 #FF3B1C; clip: rect(24px, 1920px, 90px, 0); animation: glitch-anim 2s infinite linear alternate-reverse; }
+  .glitch-text::after { left: -4px; text-shadow: -3px 0 #00E5FF; clip: rect(85px, 1920px, 140px, 0); animation: glitch-anim 3s infinite linear alternate-reverse; }
+  @keyframes glitch-anim {
+    0% { clip: rect(10px, 1920px, 40px, 0); } 20% { clip: rect(80px, 1920px, 10px, 0); }
+    40% { clip: rect(30px, 1920px, 100px, 0); } 60% { clip: rect(120px, 1920px, 60px, 0); }
+    80% { clip: rect(50px, 1920px, 140px, 0); } 100% { clip: rect(90px, 1920px, 20px, 0); }
+  }
+
+  /* 3D Tactical Cards */
+  .tac-card {
+    border: 3px solid rgba(0, 229, 255, 0.4); background: rgba(10, 15, 20, 0.85);
+    padding: 60px 80px; width: 1200px; text-align: center;
+    box-shadow: 0 0 50px rgba(0, 229, 255, 0.1), inset 0 0 30px rgba(0, 229, 255, 0.05);
+    position: relative; overflow: hidden;
+  }
+  .tac-card::after {
+    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: linear-gradient(45deg, transparent 40%, rgba(0, 229, 255, 0.1) 50%, transparent 60%);
+    animation: sweep 4s infinite linear;
+  }
+  @keyframes sweep { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+  .tac-title { font-size: 90px; color: #00E5FF; margin-bottom: 30px; font-family: 'Barlow Condensed'; letter-spacing: 4px; }
+  .tac-desc { font-size: 50px; color: #8FA3B8; }
+  
+  .highlight-red { color: #FF3B1C; }
+  .highlight-orange { color: #FF8C00; }
+
+  /* Scene 4 SOS button - Centered & Fixed */
+  .sos-container {
+    position: relative; width: 600px; height: 600px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 50px;
+  }
+  .sos-giant {
+    position: absolute; width: 350px; height: 350px; background: #FF3B1C; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 110px; font-weight: 900; font-family: 'Barlow Condensed'; color: white;
+    box-shadow: 0 0 80px #FF3B1C; z-index: 2;
+  }
+  .sos-ring {
+    position: absolute; width: 350px; height: 350px; border: 12px solid #FF3B1C; border-radius: 50%;
+    z-index: 1;
+  }
+
+  /* Badge */
+  .badge-box {
+    display: inline-block; padding: 15px 40px; border: 2px solid #00E5FF; color: #00E5FF;
+    font-size: 45px; font-family: 'Barlow Condensed'; letter-spacing: 3px; background: rgba(0, 229, 255, 0.1);
+    margin: 20px;
+  }
+
+  /* Floating UI elements */
+  .hud-element { position: absolute; font-size: 20px; color: #00E5FF; opacity: 0.5; }
+  .hud-tl { top: 40px; left: 40px; }
+  .hud-tr { top: 40px; right: 40px; text-align: right; }
+  .hud-bl { bottom: 40px; left: 40px; }
+  .hud-br { bottom: 40px; right: 40px; text-align: right; }
+
+</style>
+</head>
+<body>
+
+<div class="hud-element hud-tl">SYS.BOOT.V9.0<br>SYS.TRACKING: ACTIVE</div>
+<div class="hud-element hud-tr">LAT: 39.9207<br>LNG: 32.8541</div>
+<div class="hud-element hud-bl">ROTA+ TACTICAL DB<br>CONNECTION SECURE</div>
+<div class="hud-element hud-br" id="hud-timer">T-00:00:00</div>
+
+<div class="grid"></div>
+<div class="scanline" id="global-scanline"></div>
+
+<!-- SCENE 1 (0-10s) -->
+<div id="scene1" class="scene">
+  <div class="glitch-text" data-text="DOĞA YÜRÜYÜŞÜ, DAĞ, DEPREM..." style="font-size: 110px;" id="s1-t1">DOĞA YÜRÜYÜŞÜ, DAĞ, DEPREM...</div>
+  <div class="glitch-text" data-text="HAYATTA KALMA MODU: AKTİF" style="font-size: 140px; margin-top: 40px; color: #FF3B1C;" id="s1-t2">HAYATTA KALMA MODU: AKTİF</div>
+</div>
+
+<!-- SCENE 2 (10-20s) -->
+<div id="scene2" class="scene">
+  <div class="tac-card" id="s2-card">
+    <div class="tac-title">[ ÇEVRİMDIŞI HARİTA ]</div>
+    <div class="tac-desc">Şebeke Gittiğinde Bile Rotan Cebinde.<br>Uydu Bağlantısı ile Sınırları Aş.</div>
+    <div style="width: 100%; height: 10px; background: #1E2D3D; margin-top: 50px;">
+      <div id="s2-progress" style="width: 0%; height: 100%; background: #00E5FF; box-shadow: 0 0 20px #00E5FF;"></div>
+    </div>
+    <div style="font-size: 30px; margin-top: 20px; color: #00E5FF;" id="s2-status">İNDİRİLİYOR %0</div>
+  </div>
+</div>
+
+<!-- SCENE 3 (20-30s) -->
+<div id="scene3" class="scene">
+  <div class="tac-card" id="s3-card" style="border-color: #FF8C00; box-shadow: 0 0 50px rgba(255,140,0,0.1);">
+    <div class="tac-title" style="color: #FF8C00;">[ CANLI EKİP TAKİBİ ]</div>
+    <div class="tac-desc">Tüm ekip üyelerinin anlık konumu radarında.<br>Kimse geride kalmaz.</div>
+    <div style="font-size: 70px; margin-top: 40px; color: #FFF; font-family: 'Barlow Condensed';">EKİP DURUMU: <span style="color:#22FF7A;">GÜVENDE</span></div>
+  </div>
+</div>
+
+<!-- SCENE 4 (30-40s) SOS -->
+<div id="scene4" class="scene">
+  <div class="sos-container">
+    <div class="sos-ring" id="s4-ring1"></div>
+    <div class="sos-ring" id="s4-ring2"></div>
+    <div class="sos-giant" id="s4-btn">SOS</div>
+  </div>
+  <div class="glitch-text highlight-red" data-text="TEK TUŞLA ACİL YARDIM" style="font-size: 130px; z-index: 10;" id="s4-txt">TEK TUŞLA ACİL YARDIM</div>
+</div>
+
+<!-- SCENE 5 (40-50s) Social Proof -->
+<div id="scene5" class="scene">
+  <div class="glitch-text" data-text="1.000+ KULLANICI" style="font-size: 170px;" id="s5-t1">1.000+ KULLANICI</div>
+  <div class="tac-desc" style="margin-top: 40px; font-size: 70px;" id="s5-t2">Türkiye'nin En Gelişmiş Taktiksel Platformu.</div>
+</div>
+
+<!-- SCENE 6 (50-60s) CTA -->
+<div id="scene6" class="scene">
+  <div class="glitch-text" data-text="ROTA+" style="font-size: 250px; color: #FFF;" id="s6-logo">ROTA<span class="highlight-red">+</span></div>
+  <div id="s6-badges" style="margin-top: 50px; display: flex; gap: 30px;">
+    <div class="badge-box">APP STORE</div>
+    <div class="badge-box">GOOGLE PLAY</div>
+  </div>
+  <div class="glitch-text" data-text="HEMEN İNDİR" style="font-size: 120px; color: #00E5FF; margin-top: 50px;" id="s6-cta">HEMEN İNDİR</div>
+</div>
+
+<script>
+  window.renderFrame = function(t) {
+    document.getElementById('hud-timer').innerText = `T-00:00:${Math.floor(t).toString().padStart(2, '0')}`;
+    document.getElementById('global-scanline').style.top = `${ (t*800) % 1080 }px`;
+    
+    document.querySelectorAll('.scene').forEach(el => el.style.display = 'none');
+
+    // S1 (0-10s)
+    if (t >= 0 && t < 10) {
+      document.getElementById('scene1').style.display = 'flex';
+      let t1 = document.getElementById('s1-t1');
+      let t2 = document.getElementById('s1-t2');
+      
+      t1.style.opacity = t > 0.5 ? 1 : 0;
+      t2.style.opacity = t > 2 ? 1 : 0;
+      
+      // 3D wiggle
+      document.getElementById('scene1').style.transform = `rotateX(${Math.sin(t*2)*10}deg) rotateY(${Math.cos(t*2)*10}deg)`;
+    }
+
+    // S2 (10-20s)
+    if (t >= 10 && t < 20) {
+      let local = t - 10;
+      document.getElementById('scene2').style.display = 'flex';
+      let card = document.getElementById('s2-card');
+      
+      let p = Math.min(local/0.5, 1);
+      card.style.opacity = p;
+      // Fly in 3D
+      card.style.transform = `translateZ(${1000 - p*1000}px) rotateX(${45 - p*45}deg)`;
+
+      if (local > 1) {
+        let pct = Math.min((local-1)/6 * 100, 100);
+        document.getElementById('s2-progress').style.width = `${pct}%`;
+        document.getElementById('s2-status').innerText = pct < 100 ? `İNDİRİLİYOR %${Math.floor(pct)}` : 'SİSTEM HAZIR: ÇEVRİMDIŞI';
+        if (pct >= 100) document.getElementById('s2-status').style.color = '#22FF7A';
+      }
+    }
+
+    // S3 (20-30s)
+    if (t >= 20 && t < 30) {
+      let local = t - 20;
+      document.getElementById('scene3').style.display = 'flex';
+      let card = document.getElementById('s3-card');
+      
+      let p = Math.min(local/0.5, 1);
+      card.style.opacity = p;
+      // 3D slide from right
+      card.style.transform = `translateX(${1000 - p*1000}px) rotateY(${-45 + p*45}deg)`;
+    }
+
+    // S4 (30-40s) SOS
+    if (t >= 30 && t < 40) {
+      let local = t - 30;
+      document.getElementById('scene4').style.display = 'flex';
+      
+      let scale1 = 1 + (local % 1.2) * 2;
+      let op1 = Math.max(0, 1 - (local % 1.2)/1.2);
+      document.getElementById('s4-ring1').style.transform = `scale(${scale1})`;
+      document.getElementById('s4-ring1').style.opacity = op1;
+
+      let scale2 = 1 + ((local+0.6) % 1.2) * 2;
+      let op2 = Math.max(0, 1 - ((local+0.6) % 1.2)/1.2);
+      document.getElementById('s4-ring2').style.transform = `scale(${scale2})`;
+      document.getElementById('s4-ring2').style.opacity = op2;
+
+      let btn = document.getElementById('s4-btn');
+      btn.style.transform = `scale(${1 + Math.sin(local*8)*0.05})`;
+
+      let txt = document.getElementById('s4-txt');
+      txt.style.opacity = local > 1 ? 1 : 0;
+      // 3D pulse
+      document.getElementById('scene4').style.transform = `translateZ(${Math.sin(local*2)*50}px)`;
+    }
+
+    // S5 (40-50s) Social Proof
+    if (t >= 40 && t < 50) {
+      let local = t - 40;
+      document.getElementById('scene5').style.display = 'flex';
+      
+      let t1 = document.getElementById('s5-t1');
+      let t2 = document.getElementById('s5-t2');
+      
+      t1.style.opacity = local > 0.5 ? 1 : 0;
+      t1.style.transform = `scale(${local > 0.5 ? 1 : 2})`; 
+      
+      t2.style.opacity = local > 2.0 ? 1 : 0;
+    }
+
+    // S6 (50-60s) CTA
+    if (t >= 50 && t <= 60) {
+      let local = t - 50;
+      document.getElementById('scene6').style.display = 'flex';
+      
+      document.getElementById('s6-logo').style.opacity = local > 0.5 ? 1 : 0;
+      document.getElementById('s6-badges').style.opacity = local > 1.5 ? 1 : 0;
+      document.getElementById('s6-cta').style.opacity = local > 2.5 ? 1 : 0;
+      
+      if (local > 2.5) {
+        document.getElementById('s6-cta').style.transform = `scale(${1 + Math.sin(local*10)*0.1})`;
+      }
+    }
+  };
+
+  window.renderFrame(0);
+</script>
+</body>
+</html>

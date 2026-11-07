@@ -85,7 +85,11 @@ class EarthquakeService {
         final data = json.decode(response.body);
         if (data['status'] == true) {
           final List list = data['result'];
-          return list.map((e) => EarthquakeModel.fromJson(e)).toList();
+          // ROTA+ EMNİYETTEYİM: Yalnızca 4.0 ve üstü depremler baz alınır
+          return list
+              .map((e) => EarthquakeModel.fromJson(e))
+              .where((q) => q.mag >= 4.0)
+              .toList();
         }
       }
     } catch (e) {
@@ -119,8 +123,11 @@ class EarthquakeService {
         for (var quake in allQuakes) {
           if (quake.date.compareTo(_lastNotifiedDate!) <= 0) break; // Reached already processed quakes
           
+          // ROTA+ EMNİYETTEYİM: 4.0 altındaki mikro depremler elenir
+          if (quake.mag < 4.0) continue;
+
           if (generalEnabled) {
-             _showNotification('Yeni Deprem Verisi', '${quake.location} - M:${quake.mag}');
+             _showNotification('Deprem Uyarısı (M4.0+)', '${quake.location} - M:${quake.mag}');
           }
 
           if (quake.mag >= minMag) {

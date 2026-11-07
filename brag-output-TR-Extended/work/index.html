@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Rota+ Brag Video - Turkish Extended</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Share+Tech+Mono&display=swap');
+  
+  body, html {
+    margin: 0; padding: 0; width: 1920px; height: 1080px; overflow: hidden;
+    background: #0A0C0F; color: #E8EDF2;
+    font-family: 'Share Tech Mono', monospace;
+  }
+  
+  .scene {
+    position: absolute; top: 0; left: 0; width: 1920px; height: 1080px;
+    display: none;
+    align-items: center; justify-content: center; flex-direction: column;
+  }
+
+  /* Grid & Common Elements */
+  .grid {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background-image: linear-gradient(#1E2D3D 2px, transparent 2px), linear-gradient(90deg, #1E2D3D 2px, transparent 2px);
+    background-size: 100px 100px; opacity: 0.3;
+  }
+  .scanline {
+    position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+    background: #22FF7A; opacity: 0.4; box-shadow: 0 0 20px #22FF7A;
+  }
+  .title-bold {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 220px; font-weight: 900;
+    letter-spacing: 15px; color: #FFFFFF; text-transform: uppercase;
+  }
+
+  /* Scene 1: Hook */
+  .s1-tag {
+    font-size: 60px; color: #FF8C00; margin-top: 20px; font-weight: bold;
+    letter-spacing: 10px; text-shadow: 0 0 20px rgba(255,140,0,0.5);
+  }
+
+  /* Scene 2: Offline Maps */
+  .map-card {
+    border: 4px solid #00E5FF; background: rgba(0,229,255,0.05);
+    padding: 80px; width: 1100px; text-align: center;
+  }
+  .map-title { font-size: 70px; color: #00E5FF; margin-bottom: 40px; letter-spacing: 5px; }
+  .progress-bar-bg { width: 100%; height: 40px; background: #1E2D3D; margin-top: 30px; position: relative; }
+  .progress-bar-fill { height: 100%; background: #00E5FF; width: 0%; box-shadow: 0 0 20px #00E5FF; }
+  .map-status { font-size: 40px; color: #E8EDF2; margin-top: 30px; }
+
+  /* Scene 3: Tactical GPS */
+  .tac-panel {
+    border: 4px solid #1E2D3D; background: rgba(22,28,37,0.9);
+    padding: 60px; text-align: left; width: 1100px; position: relative;
+  }
+  .coord { font-size: 70px; color: #E8EDF2; margin-bottom: 25px; }
+  .coord span { color: #FF8C00; }
+  .team-btn {
+    display: inline-block; padding: 25px 50px; font-size: 55px; font-weight: bold;
+    background: rgba(255,59,28,0.2); border: 4px solid #FF3B1C; color: #FF3B1C;
+    margin-top: 50px;
+  }
+  .team-btn.sent {
+    background: rgba(34,255,122,0.2); border-color: #22FF7A; color: #22FF7A;
+  }
+  .cursor {
+    position: absolute; width: 60px; height: 60px;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="white"><path d="M7 2l12 11.2-5.8.5 3.3 7.3-2.2.9-3.2-7.4-4.4 4.7z"/></svg>');
+    background-size: cover; z-index: 100;
+  }
+
+  /* Scene 4: Morse Code / SOS */
+  .sos-pulse {
+    position: absolute; width: 80px; height: 80px; background: #FF3B1C; border-radius: 50%;
+    box-shadow: 0 0 60px #FF3B1C;
+  }
+  .sos-ring {
+    position: absolute; width: 80px; height: 80px; border: 6px solid #FF3B1C; border-radius: 50%;
+  }
+  .morse-icon { font-size: 130px; color: #FF3B1C; margin-top: 180px; margin-bottom: 50px; font-family: 'Barlow Condensed'; font-weight: 900; }
+  .morse-code { display: flex; gap: 25px; justify-content: center; }
+  .morse-dot { width: 40px; height: 40px; background: #FF3B1C; border-radius: 50%; opacity: 0; box-shadow: 0 0 20px #FF3B1C; }
+  .morse-dash { width: 120px; height: 40px; background: #FF3B1C; border-radius: 8px; opacity: 0; box-shadow: 0 0 20px #FF3B1C; }
+
+  /* Scene 5: Outro */
+  .outro-logo { font-family: 'Barlow Condensed', sans-serif; font-size: 220px; font-weight: 900; color: #fff; }
+  .outro-logo span { color: #FF3B1C; }
+  .outro-tag { font-size: 60px; color: #8FA3B8; margin-top: 30px; }
+  .outro-sub { font-size: 40px; color: #FF8C00; margin-top: 40px; opacity: 0; }
+
+</style>
+</head>
+<body>
+
+<div id="scene1" class="scene">
+  <div class="grid" id="s1-grid"></div>
+  <div class="scanline" id="s1-scanline"></div>
+  <div class="title-bold" id="s1-title" style="opacity: 0; transform: scale(1.5);">ROTA<span>+</span></div>
+  <div class="s1-tag" id="s1-tag" style="opacity: 0;">DOĞADA İZİNİ KAYBETME</div>
+</div>
+
+<div id="scene2" class="scene">
+  <div class="grid" style="opacity:0.1"></div>
+  <div class="map-card" id="s2-card" style="opacity:0; transform: scale(0.9);">
+    <div class="map-title">ÇEVRİMDIŞI HARİTA</div>
+    <div style="font-size:35px; color:#8FA3B8;">Bağlantı kopsa bile rotan cebinde.</div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="s2-fill"></div>
+    </div>
+    <div class="map-status" id="s2-status">İNDİRİLİYOR... 0%</div>
+  </div>
+</div>
+
+<div id="scene3" class="scene">
+  <div class="grid" style="opacity:0.15"></div>
+  <div class="tac-panel" id="s3-panel" style="opacity:0; transform: translateX(-100px);">
+    <div style="font-size:40px; color:#8FA3B8; margin-bottom:30px;">[ CANLI TAKİP SİSTEMİ ]</div>
+    <div class="coord" id="coord1"><span>ENLEM :</span> 39.920770</div>
+    <div class="coord" id="coord2"><span>BOYLAM:</span> 32.854110</div>
+    <div class="coord" id="coord3"><span>RAKIM :</span> 2,450 M</div>
+    <div class="team-btn" id="s3-btn">EKİP ALARMI VER</div>
+  </div>
+  <div class="cursor" id="s3-cursor" style="left: 1500px; top: 900px; opacity:0;"></div>
+</div>
+
+<div id="scene4" class="scene">
+  <div class="sos-ring" id="s4-ring1"></div>
+  <div class="sos-ring" id="s4-ring2"></div>
+  <div class="sos-pulse" id="s4-pulse"></div>
+  <div class="morse-icon" id="s4-icon" style="opacity:0;">ACİL DURUM SİNYALİ</div>
+  <div class="morse-code">
+    <div class="morse-dot" id="m1"></div>
+    <div class="morse-dot" id="m2"></div>
+    <div class="morse-dot" id="m3"></div>
+    <div style="width:30px"></div>
+    <div class="morse-dash" id="m4"></div>
+    <div class="morse-dash" id="m5"></div>
+    <div class="morse-dash" id="m6"></div>
+    <div style="width:30px"></div>
+    <div class="morse-dot" id="m7"></div>
+    <div class="morse-dot" id="m8"></div>
+    <div class="morse-dot" id="m9"></div>
+  </div>
+</div>
+
+<div id="scene5" class="scene">
+  <div class="outro-logo" id="s5-logo" style="opacity:0;">ROTA<span>+</span></div>
+  <div class="outro-tag" id="s5-tag" style="opacity:0;">Trekking & Doğa Navigasyon Platformu</div>
+  <div class="outro-sub" id="s5-sub">App Store ve Google Play'de</div>
+</div>
+
+<script>
+  window.renderFrame = function(t) {
+    document.querySelectorAll('.scene').forEach(el => el.style.display = 'none');
+
+    // Scene 1: Hook (0 - 6s)
+    if (t >= 0 && t < 6) {
+      document.getElementById('scene1').style.display = 'flex';
+      
+      document.getElementById('s1-grid').style.backgroundPosition = `0px ${ (t*40)%100 }px`;
+      document.getElementById('s1-scanline').style.top = `${ (t*400) % 1080 }px`;
+
+      let title = document.getElementById('s1-title');
+      let tag = document.getElementById('s1-tag');
+      
+      if (t > 1) {
+        let p = Math.min((t - 1) / 0.3, 1);
+        title.style.opacity = p;
+        title.style.transform = `scale(${ 1.5 - p*0.5 })`;
+      } else { title.style.opacity = 0; }
+      
+      if (t > 2.5) {
+        let tp = Math.min((t - 2.5) / 0.5, 1);
+        tag.style.opacity = tp;
+        tag.style.transform = `translateY(${ 20 - tp*20 }px)`;
+      } else { tag.style.opacity = 0; }
+    }
+
+    // Scene 2: Offline Maps (6 - 14s)
+    if (t >= 6 && t < 14) {
+      let localT = t - 6;
+      document.getElementById('scene2').style.display = 'flex';
+      
+      let card = document.getElementById('s2-card');
+      let cp = Math.min(localT / 0.6, 1);
+      card.style.opacity = cp;
+      card.style.transform = `scale(${ 0.9 + cp*0.1 })`;
+
+      let fill = document.getElementById('s2-fill');
+      let status = document.getElementById('s2-status');
+      
+      if (localT > 1.5) {
+        let pct = Math.min((localT - 1.5) / 4 * 100, 100); // Takes 4 seconds to download
+        fill.style.width = `${pct}%`;
+        if (pct < 100) {
+          status.innerText = `HARİTA İNDİRİLİYOR... %${Math.floor(pct)}`;
+          status.style.color = '#E8EDF2';
+        } else {
+          status.innerText = `İNDİRME TAMAMLANDI - ÇEVRİMDIŞI HAZIR`;
+          status.style.color = '#22FF7A';
+          fill.style.background = '#22FF7A';
+          fill.style.boxShadow = '0 0 20px #22FF7A';
+          document.querySelector('.map-card').style.borderColor = '#22FF7A';
+        }
+      } else {
+        fill.style.width = '0%';
+        status.innerText = 'BAĞLANTI BEKLENİYOR...';
+      }
+    }
+
+    // Scene 3: Tactical GPS (14 - 22s)
+    if (t >= 14 && t < 22) {
+      let localT = t - 14;
+      document.getElementById('scene3').style.display = 'flex';
+      
+      let panel = document.getElementById('s3-panel');
+      let pp = Math.min(localT / 0.5, 1);
+      panel.style.opacity = pp;
+      panel.style.transform = `translateX(${ -100 + pp*100 }px)`;
+
+      if (localT > 1) {
+        document.getElementById('coord1').innerHTML = `<span>ENLEM :</span> ${(39.920770 + localT*0.002).toFixed(6)}`;
+        document.getElementById('coord3').innerHTML = `<span>RAKIM :</span> ${ Math.floor(2450 + localT*15) } M`;
+      }
+
+      let cursor = document.getElementById('s3-cursor');
+      if (localT > 2 && localT < 3.5) {
+        let cp = (localT - 2) / 1.5;
+        cursor.style.opacity = 1;
+        cursor.style.left = `${ 1500 - cp*570 }px`;
+        cursor.style.top = `${ 900 - cp*230 }px`;
+      } else if (localT >= 3.5) {
+        cursor.style.left = `930px`;
+        cursor.style.top = `670px`;
+        cursor.style.transform = localT > 3.5 && localT < 3.8 ? 'scale(0.8)' : 'scale(1)';
+      } else { cursor.style.opacity = 0; }
+
+      let btn = document.getElementById('s3-btn');
+      if (localT >= 3.7) {
+        btn.className = "team-btn sent";
+        btn.innerText = "EKİBE BİLDİRİLDİ!";
+      } else {
+        btn.className = "team-btn";
+        btn.innerText = "EKİP ALARMI VER";
+      }
+    }
+
+    // Scene 4: SOS (22 - 29s)
+    if (t >= 22 && t < 29) {
+      let localT = t - 22;
+      document.getElementById('scene4').style.display = 'flex';
+      
+      let scale = 1 + (localT % 1.5) * 3;
+      let opacity = Math.max(0, 1 - (localT % 1.5)/1.5);
+      document.getElementById('s4-ring1').style.transform = `scale(${scale})`;
+      document.getElementById('s4-ring1').style.opacity = opacity;
+
+      let icon = document.getElementById('s4-icon');
+      let ip = Math.min(localT / 0.5, 1);
+      icon.style.opacity = ip;
+      
+      if (localT > 0.5) {
+        icon.style.opacity = Math.floor(localT * 6) % 2 === 0 ? 1 : 0.6;
+      }
+
+      let morseT = localT - 1.5;
+      let delay = 0;
+      const step = 0.25;
+      for (let i = 1; i <= 9; i++) {
+        let m = document.getElementById('m' + i);
+        if (morseT > delay) {
+           if (morseT < delay + 0.2) m.style.opacity = 1;
+           else m.style.opacity = 0.1;
+        } else { m.style.opacity = 0; }
+        delay += step;
+      }
+    }
+
+    // Scene 5: Outro (29 - 35s)
+    if (t >= 29 && t <= 35) {
+      let localT = t - 29;
+      document.getElementById('scene5').style.display = 'flex';
+      
+      let logo = document.getElementById('s5-logo');
+      let tag = document.getElementById('s5-tag');
+      let sub = document.getElementById('s5-sub');
+      
+      logo.style.opacity = Math.min(localT / 1, 1);
+      tag.style.opacity = Math.max(0, Math.min((localT - 1) / 1, 1));
+      
+      if (localT > 2) {
+        let sp = Math.min((localT - 2) / 1, 1);
+        sub.style.opacity = sp;
+        sub.style.transform = `translateY(${ 20 - sp*20 }px)`;
+      }
+    }
+  };
+
+  // Init
+  window.renderFrame(0);
+</script>
+</body>
+</html>

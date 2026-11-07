@@ -1,0 +1,26 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: MainHeader, Arial, 42, &H0000FFFF, &H00000000, &H00000000, &HD00A0A0A, 1, 0, 0, 0, 100, 100, 1, 0, 3, 3, 0, 8, 40, 40, 150, 1
+Style: StepBadge, Arial, 38, &H00FFFFFF, &H00000000, &H00202020, &HD0202060, 1, 0, 0, 0, 100, 100, 1, 0, 3, 3, 0, 8, 50, 50, 230, 1
+Style: Subtitle, Arial, 52, &H00FFFFFF, &H00000000, &H00000000, &HE00A0A0A, 1, 0, 0, 0, 100, 100, 1, 0, 3, 4, 0, 2, 70, 70, 260, 1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.00,0:00:56.47,MainHeader,,0,0,0,,💳 BANKAMATİK NASIL ÇALIŞIR?
+Dialogue: 0,0:00:00.00,0:00:08.91,StepBadge,,0,0,0,,ADIM 1: KART VE ÇİP OKUMA
+Dialogue: 0,0:00:00.00,0:00:08.91,Subtitle,,0,0,0,,Kartınızı taktığınızda mikroçipteki\nşifreli veriler anında taranır.
+Dialogue: 0,0:00:08.91,0:00:18.52,StepBadge,,0,0,0,,ADIM 2: PIN ŞİFRELEME (HSM)
+Dialogue: 0,0:00:08.91,0:00:18.52,Subtitle,,0,0,0,,Girdiğiniz 4 haneli PIN şifresi\ndonanımsal modülle şifrelenir.
+Dialogue: 0,0:00:18.52,0:00:26.84,StepBadge,,0,0,0,,ADIM 3: BANKA MERKEZİ ONAYI
+Dialogue: 0,0:00:18.52,0:00:26.84,Subtitle,,0,0,0,,ATM, güvenli ağdan bankaya bağlanıp\nbakiyenizi ve limitinizi doğrular.
+Dialogue: 0,0:00:26.84,0:00:36.52,StepBadge,,0,0,0,,ADIM 4: ZIRHLI KASA VE KASETLER
+Dialogue: 0,0:00:26.84,0:00:36.52,Subtitle,,0,0,0,,Zırhlı kasadaki para kasetleri devreye girer,\nbanknotlar tek tek çekilir.
+Dialogue: 0,0:00:36.52,0:00:46.14,StepBadge,,0,0,0,,ADIM 5: OPTİK & SAHTE PARA KONTROLÜ
+Dialogue: 0,0:00:36.52,0:00:46.14,Subtitle,,0,0,0,,Optik ve manyetik sensörler sahte\nve yapışık paraları anında ayırır.
+Dialogue: 0,0:00:46.14,0:00:56.47,StepBadge,,0,0,0,,ADIM 6: TESLİMAT & 30 SANİYE KURALI
+Dialogue: 0,0:00:46.14,0:00:56.47,Subtitle,,0,0,0,,Paranız sunulur! 30 saniyede almazsanız\ngüvenlik için kasaya geri çeker!

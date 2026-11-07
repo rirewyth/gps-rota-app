@@ -1,6 +1,6 @@
 workflows:
   build-ios:
-    name: Build iOS App
+    name: Build iOS App (App Store & TestFlight)
     working_directory: mountaineering_app
     instance_type: mac_mini_m2
     integrations:
@@ -62,3 +62,23 @@ workflows:
       app_store_connect:
         auth: integration
         submit_to_testflight: true
+
+  build-android:
+    name: Build Android App Bundle (Google Play Store)
+    working_directory: mountaineering_app
+    instance_type: mac_mini_m2
+    environment:
+      flutter: default
+      java: 21
+    scripts:
+      - name: Get Flutter packages
+        script: flutter packages pub get
+      - name: Build Android AAB
+        script: flutter build aab --release
+    artifacts:
+      - build/app/outputs/bundle/release/*.aab
+      - build/app/outputs/flutter-apk/*.apk
+    publishing:
+      email:
+        recipients:
+          - user_email@example.com

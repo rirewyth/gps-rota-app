@@ -1,6 +1,6 @@
 {
-  "name": "213",
-  "version": "1.0.0",
+  "name": "rotaplus-emniyetteyim",
+  "version": "1.2.0",
   "description": "",
   "main": "app.js",
   "scripts": {
@@ -20,9 +20,15 @@
     "@capacitor/push-notifications": "^8.1.2",
     "@react-three/drei": "^10.7.8",
     "@react-three/fiber": "^9.7.0",
+    "@types/maplibre-gl": "^1.13.2",
+    "autoprefixer": "^10.5.4",
+    "axios": "^1.19.0",
     "gsap": "^3.15.0",
     "lucide-react": "^1.31.0",
+    "maplibre-gl": "^6.5.0",
+    "postcss": "^8.5.26",
     "react-helmet-async": "^3.0.0",
+    "tailwindcss": "^4.3.3",
     "three": "^0.185.1"
   },
   "devDependencies": {

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rota+ | Enterprise OS (Multi-Module)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    colors: {
+                        dark: '#0B0F19', surface: '#111827', surface2: '#1F2937',
+                        border: '#374151', brand: '#FF4B1F', cyber: '#00E5FF', sec: '#10B981'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background: #0B0F19; color: #E5E7EB; overflow: hidden; }
+        .page { display: none; height: 100vh; overflow-y: auto; padding-bottom: 2rem; }
+        .page.active { display: block; animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .nav-item { transition: all 0.2s; border-left: 3px solid transparent; }
+        .nav-item.active { background: #1F2937; border-left-color: #FF4B1F; color: white; }
+        .nav-item:hover:not(.active) { background: #111827; }
+        
+        .card { background: #111827; border: 1px solid #374151; border-radius: 0.5rem; }
+        
+        /* SecOps Glitch */
+        .threat-alert { border-left: 4px solid #EF4444; background: rgba(239, 68, 68, 0.1); }
+        .console-text { font-family: 'JetBrains Mono'; font-size: 0.75rem; color: #00E5FF; }
+
+        /* Custom scroll */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0B0F19; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
+    </style>
+</head>
+<body class="flex h-screen w-screen">
+
+    <!-- Sidebar (Multi-page Navigation) -->
+    <aside class="w-64 bg-dark border-r border-border flex flex-col h-full z-20 shrink-0">
+        <div class="h-16 flex items-center px-6 border-b border-border">
+            <span class="text-xl font-bold tracking-wider text-white">ROTA<span class="text-brand">+</span> <span class="text-[10px] text-gray-500 font-mono tracking-normal">ENT.OS</span></span>
+        </div>
+        
+        <nav class="flex-1 py-4 flex flex-col gap-1">
+            <button class="nav-item active flex items-center gap-3 px-6 py-3 text-sm font-medium text-gray-400 w-full text-left" data-target="dashboard">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                Yönetim & FinOps
+            </button>
+            <button class="nav-item flex items-center gap-3 px-6 py-3 text-sm font-medium text-gray-400 w-full text-left" data-target="gis">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                GeoAI & 3D Mapping
+            </button>
+            <button class="nav-item flex items-center gap-3 px-6 py-3 text-sm font-medium text-gray-400 w-full text-left" data-target="secops">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                SecOps (Güvenlik)
+            </button>
+            <button class="nav-item flex items-center gap-3 px-6 py-3 text-sm font-medium text-gray-400 w-full text-left" data-target="streaming">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                Drone Stream (Video)
+            </button>
+            <button class="nav-item flex items-center gap-3 px-6 py-3 text-sm font-medium text-gray-400 w-full text-left" data-target="compliance">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                Legal / Compliance
+            </button>
+        </nav>
+        
+        <div class="p-6 border-t border-border">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-brand flex items-center justify-center text-white font-bold text-xs">AG</div>
+                <div class="flex flex-col">
+                    <span class="text-xs text-white">Antigravity Ajanları</span>
+                    <span class="text-[10px] text-sec flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-sec"></span> Tüm Modüller Aktif</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 bg-dark relative">
+        
+        <!-- ========================================== -->
+        <!-- PAGE 1: DASHBOARD (Support & Executive)    -->
+        <!-- ========================================== -->
+        <div id="dashboard" class="page active px-8 py-6">
+            <header class="mb-8">
+                <h1 class="text-2xl font-bold text-white">Yönetim ve FinOps Özeti</h1>
+                <p class="text-sm text-gray-400">Executive Summary Generator & FinOps Engineer tarafından hazırlanmıştır.</p>
+            </header>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                <div class="card p-6 border-brand/50">
+                    <h3 class="text-xs font-mono text-brand mb-1 uppercase">Cloud Maliyeti (AWS/GCP)</h3>
+                    <div class="text-3xl font-bold text-white mb-2">$4,250 <span class="text-sm text-sec font-medium">-%12 optimize</span></div>
+                    <p class="text-xs text-gray-400">FinOps Ajanı gereksiz EC2 ve S3 bucket'ları rightsizing (boyutlandırma) ile kapattı.</p>
+                </div>
+                <div class="card p-6">
+                    <h3 class="text-xs font-mono text-gray-400 mb-1 uppercase">Aktif Rota Verisi</h3>
+                    <div class="text-3xl font-bold text-white mb-2">1.2 TB</div>
+                    <p class="text-xs text-gray-400">Data Engineer: Delta Lakehouse üzerinde %99.9 erişilebilirlik.</p>
+                </div>
+                <div class="card p-6">
+                    <h3 class="text-xs font-mono text-gray-400 mb-1 uppercase">Acil Durum (Son 24s)</h3>
+                    <div class="text-3xl font-bold text-white mb-2">3 Vaka <span class="text-sm text-sec font-medium">Çözüldü</span></div>
+                    <p class="text-xs text-gray-400">Incident Response Commander tarafından yönetildi.</p>
+                </div>
+            </div>
+
+            <div class="card p-6">
+                <h3 class="text-lg font-semibold text-white mb-4">Sistem Performansı ve Kullanım Analizi</h3>
+                <canvas id="analyticsChart" height="80"></canvas>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- PAGE 2: GeoAI & 3D Mapping (GIS Skills)    -->
+        <!-- ========================================== -->
+        <div id="gis" class="page px-8 py-6">
+            <header class="mb-8">
+                <h1 class="text-2xl font-bold text-white">GeoAI ve Konumsal (Spatial) Analiz</h1>
+                <p class="text-sm text-gray-400">Drone Reality Mapping & Spatial ML Engineer modülü.</p>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[600px]">
+                <!-- Drone Reality Mapping -->
+                <div class="card flex flex-col overflow-hidden relative">
+                    <div class="p-4 border-b border-border bg-surface2 flex justify-between items-center">
+                        <span class="text-sm font-semibold text-white">Drone Fotogrametri (Ortomozaik)</span>
+                        <span class="text-[10px] bg-brand text-white px-2 py-0.5 rounded font-mono">İŞLENİYOR %78</span>
+                    </div>
+                    <div class="flex-1 bg-[url('https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')] bg-cover bg-center relative">
+                        <!-- AI Analysis Overlay -->
+                        <div class="absolute inset-0 bg-cyber/10"></div>
+                        <!-- Bounding boxes -->
+                        <div class="absolute top-1/4 left-1/4 border-2 border-sec w-24 h-24 bg-sec/20 flex items-start">
+                            <span class="text-[9px] bg-sec text-black font-bold px-1">GÜVENLİ BÖLGE (99%)</span>
+                        </div>
+                        <div class="absolute bottom-1/3 right-1/4 border-2 border-red-500 w-16 h-16 bg-red-500/20 flex items-start">
+                            <span class="text-[9px] bg-red-500 text-white font-bold px-1">YANGIN RİSKİ (84%)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Spatial Data Pipeline Console -->
+                <div class="card p-4 flex flex-col bg-[#050505]">
+                    <div class="text-xs font-mono text-gray-500 mb-4 uppercase">Spatial Data Engineer Pipeline</div>
+                    <div class="flex-1 font-mono text-xs text-gray-400 space-y-2 overflow-y-auto">
+                        <div class="text-sec">[OK] GeoTIFF formatına çevrildi.</div>
+                        <div class="text-sec">[OK] CRS EPSG:4326 projeksiyonu ayarlandı.</div>
+                        <div>[INFO] Model Builder süreci başladı...</div>
+                        <div>[INFO] Terra shapefile verileri normalize ediliyor.</div>
+                        <div class="text-brand">[WARN] Nitelik (attribute) tablosunda boş değerler bulundu, dolduruluyor...</div>
+                        <div class="text-sec">[OK] PostGIS veritabanına aktarıldı.</div>
+                        <div class="mt-4 text-cyber animate-pulse">>>> GeoAI ML Engineer: Feature Extraction yapılıyor...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- PAGE 3: SecOps Center (Security Skills)    -->
+        <!-- ========================================== -->
+        <div id="secops" class="page px-8 py-6">
+            <header class="mb-8">
+                <h1 class="text-2xl font-bold text-white">Security Operations Center (SOC)</h1>
+                <p class="text-sm text-gray-400">Penetration Tester & Cloud Security Architect tarafından yönetilen aktif savunma.</p>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+                <div class="card p-4 border-l-4 border-sec bg-sec/5">
+                    <div class="text-sm text-gray-400">Zero-Trust Durumu</div>
+                    <div class="text-xl font-bold text-sec">Aktif / Zorunlu</div>
+                </div>
+                <div class="card p-4 border-l-4 border-sec bg-sec/5">
+                    <div class="text-sm text-gray-400">Secrets (API Key) Sızıntısı</div>
+                    <div class="text-xl font-bold text-sec">0 Tespit</div>
+                </div>
+                <div class="card p-4 border-l-4 border-brand bg-brand/5">
+                    <div class="text-sm text-gray-400">Engellenen DDOS/Bot</div>
+                    <div class="text-xl font-bold text-brand">14,204</div>
+                </div>
+                <div class="card p-4 border-l-4 border-yellow-500 bg-yellow-500/5">
+                    <div class="text-sm text-gray-400">Açık Portlar</div>
+                    <div class="text-xl font-bold text-yellow-500">Uyarı: Port 8080</div>
+                </div>
+            </div>
+
+            <div class="card overflow-hidden">
+                <div class="p-4 border-b border-border bg-surface2">
+                    <h3 class="text-sm font-semibold text-white">Canlı Tehdit Algılama (Threat Detection)</h3>
+                </div>
+                <div class="p-0">
+                    <table class="w-full text-sm text-left text-gray-400">
+                        <thead class="text-xs text-gray-500 uppercase bg-surface">
+                            <tr>
+                                <th class="px-6 py-3">Zaman</th>
+                                <th class="px-6 py-3">Olay (MITRE ATT&CK)</th>
+                                <th class="px-6 py-3">Kaynak IP</th>
+                                <th class="px-6 py-3">Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-border threat-alert">
+                                <td class="px-6 py-4 font-mono">10:42:01</td>
+                                <td class="px-6 py-4 text-white">SQL Injection Denemesi (T1190)</td>
+                                <td class="px-6 py-4 font-mono">185.12.X.X</td>
+                                <td class="px-6 py-4 text-brand font-bold">WAF Blokladı</td>
+                            </tr>
+                            <tr class="border-b border-border bg-surface2/50">
+                                <td class="px-6 py-4 font-mono">10:39:15</td>
+                                <td class="px-6 py-4 text-white">Geçersiz JWT Token (AppSec)</td>
+                                <td class="px-6 py-4 font-mono">88.242.X.X</td>
+                                <td class="px-6 py-4 text-yellow-500">Reddedildi</td>
+                            </tr>
+                            <tr class="bg-surface2/50">
+                                <td class="px-6 py-4 font-mono">10:15:00</td>
+                                <td class="px-6 py-4 text-white">Otomatik DAST Taraması Tamamlandı</td>
+                                <td class="px-6 py-4 font-mono">İç Sistem</td>
+                                <td class="px-6 py-4 text-sec">Temiz</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- PAGE 4: STREAMING & RAG (Engineering)      -->
+        <!-- ========================================== -->
+        <div id="streaming" class="page px-8 py-6">
+            <header class="mb-8">
+                <h1 class="text-2xl font-bold text-white">Drone HLS Video & LLM Arama</h1>
+                <p class="text-sm text-gray-400">Video Streaming Engineer & RAG Pipeline Engineer altyapısı.</p>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Video Stream -->
+                <div class="card p-4">
+                    <h3 class="text-sm font-semibold text-white mb-4 flex justify-between">
+                        <span>Canlı Arazi Kamerası</span>
+                        <span class="text-xs text-brand animate-pulse">● LIVE (Adaptive Bitrate)</span>
+                    </h3>
+                    <div class="aspect-video bg-black rounded flex items-center justify-center border border-border relative overflow-hidden">
+                        <div class="absolute top-2 left-2 text-[10px] font-mono bg-black/50 px-2 py-1 text-sec">HLS / CMAF / 1080p 60fps</div>
+                        <svg class="w-16 h-16 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        <div class="absolute bottom-2 left-0 w-full px-2">
+                            <div class="h-1 w-full bg-gray-800 rounded-full"><div class="h-full bg-brand w-1/3 rounded-full relative"><div class="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full"></div></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RAG Query Interface -->
+                <div class="card p-4 flex flex-col">
+                    <h3 class="text-sm font-semibold text-white mb-2">Kurumsal Bilgi Bankası (RAG Sistemi)</h3>
+                    <p class="text-xs text-gray-400 mb-4">Acil durum prosedürlerini semantik olarak arayın. (Pinecone Vector DB + LLM)</p>
+                    
+                    <div class="flex gap-2 mb-4">
+                        <input type="text" value="Yangın anında tahliye prosedürü nedir?" class="flex-1 bg-surface border border-border rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-brand" readonly>
+                        <button class="bg-brand text-white px-4 py-2 rounded text-sm font-medium">Sor</button>
+                    </div>
+                    
+                    <div class="flex-1 bg-surface border border-border rounded p-4 text-sm text-gray-300 leading-relaxed relative">
+                        <div class="absolute top-2 right-2 text-[9px] text-gray-500 font-mono">Retrieved context: 4 chunks</div>
+                        <strong>Yapay Zeka Yanıtı:</strong><br><br>
+                        Orman yangını tahliye prosedürüne (Belge ID: YNG-204) göre: Ekipler rüzgarın ters yönünde, önceden belirlenmiş toplanma alanlarına (Koordinat: Bölge B) intikal etmelidir. Drone streaming üzerinden termal izleme aktif edilmiştir.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- PAGE 5: COMPLIANCE (Support/Legal)         -->
+        <!-- ========================================== -->
+        <div id="compliance" class="page px-8 py-6">
+            <header class="mb-8">
+                <h1 class="text-2xl font-bold text-white">Hukuk ve Veri Gizliliği Uyumluluğu</h1>
+                <p class="text-sm text-gray-400">Legal Compliance Checker & Data Privacy Officer onayı.</p>
+            </header>
+
+            <div class="max-w-3xl">
+                <div class="card p-6 mb-6 border-l-4 border-sec">
+                    <h3 class="text-lg font-semibold text-white mb-2">GDPR / KVKK Konum Verisi İhlal Durumu</h3>
+                    <p class="text-sm text-gray-400 mb-4">Uygulamanın topladığı GPS verilerinin işlenme ve saklanma protokolleri global standartlara uygundur.</p>
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-3 text-sm text-gray-300">
+                            <svg class="w-5 h-5 text-sec" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Kullanıcı açık rızası (Consent Management) modülü devrede.
+                        </li>
+                        <li class="flex items-center gap-3 text-sm text-gray-300">
+                            <svg class="w-5 h-5 text-sec" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Konum verileri veritabanında (GaussDB) şifreli tutulmaktadır.
+                        </li>
+                        <li class="flex items-center gap-3 text-sm text-gray-300">
+                            <svg class="w-5 h-5 text-sec" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Eski GPS dataları 90 gün sonunda otomatik anonimleştirilmektedir (Data Remediation Engineer).
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- Navigation Logic ---
+        const buttons = document.querySelectorAll('.nav-item');
+        const pages = document.querySelectorAll('.page');
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Update buttons
+                buttons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Update pages
+                const target = btn.getAttribute('data-target');
+                pages.forEach(p => p.classList.remove('active'));
+                document.getElementById(target).classList.add('active');
+            });
+        });
+
+        // --- Chart.js Setup for Dashboard ---
+        const ctx = document.getElementById('analyticsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'],
+                datasets: [{
+                    label: 'Aktif Sistem Kullanıcıları',
+                    data: [1200, 1900, 1500, 2200, 1800, 3500, 4200], // Weekend spike for trekking
+                    borderColor: '#FF4B1F',
+                    backgroundColor: 'rgba(255, 75, 31, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: '#374151' }, ticks: { color: '#9CA3AF' } },
+                    x: { grid: { color: '#374151' }, ticks: { color: '#9CA3AF' } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

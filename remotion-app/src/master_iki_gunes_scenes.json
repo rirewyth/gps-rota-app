@@ -1,0 +1,727 @@
+{
+  "totalFrames": 2080,
+  "fps": 30,
+  "durationSec": 69.33333333333333,
+  "scenes": [
+    {
+      "id": "scene_01_hook",
+      "badge": "KOZMİK SİMÜLASYON",
+      "top_title": "GÖKYÜZÜNDE 2 GÜNEŞ",
+      "glow_title": "OLSAYDI NE OLURDU?",
+      "tag": "İKİLİ YILDIZ SİSTEMİ // BARYCENTER",
+      "script": "Gökyüzüne baktığınızda tek bir Güneş yerine iki devasa yıldız görseydiniz ne olurdu? Bilim kurgudaki Tatooine gibi huzurlu mu, yoksa tam bir kıyamet mi?",
+      "type": "binary_stars",
+      "startFrame": 0,
+      "endFrame": 335,
+      "durationInFrames": 335,
+      "audioDurationSec": 10.656009,
+      "words": [
+        {
+          "text": "Gökyüzüne",
+          "startFrame": 0,
+          "endFrame": 22
+        },
+        {
+          "text": "baktığınızda",
+          "startFrame": 22,
+          "endFrame": 51
+        },
+        {
+          "text": "tek",
+          "startFrame": 51,
+          "endFrame": 58
+        },
+        {
+          "text": "bir",
+          "startFrame": 58,
+          "endFrame": 65
+        },
+        {
+          "text": "Güneş",
+          "startFrame": 65,
+          "endFrame": 77
+        },
+        {
+          "text": "yerine",
+          "startFrame": 77,
+          "endFrame": 91
+        },
+        {
+          "text": "iki",
+          "startFrame": 91,
+          "endFrame": 98
+        },
+        {
+          "text": "devasa",
+          "startFrame": 98,
+          "endFrame": 112
+        },
+        {
+          "text": "yıldız",
+          "startFrame": 112,
+          "endFrame": 126
+        },
+        {
+          "text": "görseydiniz",
+          "startFrame": 126,
+          "endFrame": 152
+        },
+        {
+          "text": "ne",
+          "startFrame": 152,
+          "endFrame": 158
+        },
+        {
+          "text": "olurdu?",
+          "startFrame": 158,
+          "endFrame": 175
+        },
+        {
+          "text": "Bilim",
+          "startFrame": 175,
+          "endFrame": 187
+        },
+        {
+          "text": "kurgudaki",
+          "startFrame": 187,
+          "endFrame": 209
+        },
+        {
+          "text": "Tatooine",
+          "startFrame": 209,
+          "endFrame": 228
+        },
+        {
+          "text": "gibi",
+          "startFrame": 228,
+          "endFrame": 237
+        },
+        {
+          "text": "huzurlu",
+          "startFrame": 237,
+          "endFrame": 254
+        },
+        {
+          "text": "mu,",
+          "startFrame": 254,
+          "endFrame": 261
+        },
+        {
+          "text": "yoksa",
+          "startFrame": 261,
+          "endFrame": 273
+        },
+        {
+          "text": "tam",
+          "startFrame": 273,
+          "endFrame": 280
+        },
+        {
+          "text": "bir",
+          "startFrame": 280,
+          "endFrame": 287
+        },
+        {
+          "text": "kıyamet",
+          "startFrame": 287,
+          "endFrame": 304
+        },
+        {
+          "text": "mi?",
+          "startFrame": 304,
+          "endFrame": 311
+        }
+      ]
+    },
+    {
+      "id": "scene_02_orbit",
+      "badge": "KÜTLEÇEKİM KRİZİ",
+      "top_title": "ÜÇ CİSİM PROBLEMİ",
+      "glow_title": "YÖRÜNGE PARÇALANIR!",
+      "tag": "KAOTİK ORBİTAL ÇEKİM // 2X GRAVİTE",
+      "script": "İlk büyük tehlike kütleçekimdir. Fizikteki üç cisim problemi yüzünden Dünya’nın kararlı yörüngesi bozulur; ya uzayın derinliklerine fırlar ya da Güneş'e çarpardık!",
+      "type": "orbital_chaos",
+      "startFrame": 335,
+      "endFrame": 726,
+      "durationInFrames": 391,
+      "audioDurationSec": 12.504014,
+      "words": [
+        {
+          "text": "İlk",
+          "startFrame": 335,
+          "endFrame": 342
+        },
+        {
+          "text": "büyük",
+          "startFrame": 342,
+          "endFrame": 355
+        },
+        {
+          "text": "tehlike",
+          "startFrame": 355,
+          "endFrame": 373
+        },
+        {
+          "text": "kütleçekimdir.",
+          "startFrame": 373,
+          "endFrame": 409
+        },
+        {
+          "text": "Fizikteki",
+          "startFrame": 409,
+          "endFrame": 432
+        },
+        {
+          "text": "üç",
+          "startFrame": 432,
+          "endFrame": 438
+        },
+        {
+          "text": "cisim",
+          "startFrame": 438,
+          "endFrame": 451
+        },
+        {
+          "text": "problemi",
+          "startFrame": 451,
+          "endFrame": 471
+        },
+        {
+          "text": "yüzünden",
+          "startFrame": 471,
+          "endFrame": 491
+        },
+        {
+          "text": "Dünya’nın",
+          "startFrame": 491,
+          "endFrame": 514
+        },
+        {
+          "text": "kararlı",
+          "startFrame": 514,
+          "endFrame": 532
+        },
+        {
+          "text": "yörüngesi",
+          "startFrame": 532,
+          "endFrame": 555
+        },
+        {
+          "text": "bozulur;",
+          "startFrame": 555,
+          "endFrame": 575
+        },
+        {
+          "text": "ya",
+          "startFrame": 575,
+          "endFrame": 581
+        },
+        {
+          "text": "uzayın",
+          "startFrame": 581,
+          "endFrame": 596
+        },
+        {
+          "text": "derinliklerine",
+          "startFrame": 596,
+          "endFrame": 632
+        },
+        {
+          "text": "fırlar",
+          "startFrame": 632,
+          "endFrame": 647
+        },
+        {
+          "text": "ya",
+          "startFrame": 647,
+          "endFrame": 653
+        },
+        {
+          "text": "da",
+          "startFrame": 653,
+          "endFrame": 659
+        },
+        {
+          "text": "Güneş'e",
+          "startFrame": 659,
+          "endFrame": 677
+        },
+        {
+          "text": "çarpardık!",
+          "startFrame": 677,
+          "endFrame": 703
+        }
+      ]
+    },
+    {
+      "id": "scene_03_daynight",
+      "badge": "BİYOLOJİK İFLAS",
+      "top_title": "GECE KAVRAMI SİLİNİR",
+      "glow_title": "24 SAAT ARALIKSIZ GÜNDÜZ!",
+      "tag": "SİRKADİYEN RİTİM ÇÖKÜŞÜ // 0 LUX KARANLIK",
+      "script": "Eğer iki güneş gökyüzünde zıt yönlerde olsaydı, Dünya'da gece kavramı tamamen yok olurdu. 24 saat süren aralıksız gündüz, bitkileri ve tüm yaşamı yok ederdi.",
+      "type": "daynight_loss",
+      "startFrame": 726,
+      "endFrame": 1126,
+      "durationInFrames": 400,
+      "audioDurationSec": 12.816009,
+      "words": [
+        {
+          "text": "Eğer",
+          "startFrame": 726,
+          "endFrame": 737
+        },
+        {
+          "text": "iki",
+          "startFrame": 737,
+          "endFrame": 745
+        },
+        {
+          "text": "güneş",
+          "startFrame": 745,
+          "endFrame": 759
+        },
+        {
+          "text": "gökyüzünde",
+          "startFrame": 759,
+          "endFrame": 787
+        },
+        {
+          "text": "zıt",
+          "startFrame": 787,
+          "endFrame": 795
+        },
+        {
+          "text": "yönlerde",
+          "startFrame": 795,
+          "endFrame": 817
+        },
+        {
+          "text": "olsaydı,",
+          "startFrame": 817,
+          "endFrame": 839
+        },
+        {
+          "text": "Dünya'da",
+          "startFrame": 839,
+          "endFrame": 861
+        },
+        {
+          "text": "gece",
+          "startFrame": 861,
+          "endFrame": 872
+        },
+        {
+          "text": "kavramı",
+          "startFrame": 872,
+          "endFrame": 892
+        },
+        {
+          "text": "tamamen",
+          "startFrame": 892,
+          "endFrame": 912
+        },
+        {
+          "text": "yok",
+          "startFrame": 912,
+          "endFrame": 920
+        },
+        {
+          "text": "olurdu.",
+          "startFrame": 920,
+          "endFrame": 940
+        },
+        {
+          "text": "24",
+          "startFrame": 940,
+          "endFrame": 946
+        },
+        {
+          "text": "saat",
+          "startFrame": 946,
+          "endFrame": 957
+        },
+        {
+          "text": "süren",
+          "startFrame": 957,
+          "endFrame": 971
+        },
+        {
+          "text": "aralıksız",
+          "startFrame": 971,
+          "endFrame": 996
+        },
+        {
+          "text": "gündüz,",
+          "startFrame": 996,
+          "endFrame": 1016
+        },
+        {
+          "text": "bitkileri",
+          "startFrame": 1016,
+          "endFrame": 1041
+        },
+        {
+          "text": "ve",
+          "startFrame": 1041,
+          "endFrame": 1047
+        },
+        {
+          "text": "tüm",
+          "startFrame": 1047,
+          "endFrame": 1055
+        },
+        {
+          "text": "yaşamı",
+          "startFrame": 1055,
+          "endFrame": 1072
+        },
+        {
+          "text": "yok",
+          "startFrame": 1072,
+          "endFrame": 1080
+        },
+        {
+          "text": "ederdi.",
+          "startFrame": 1080,
+          "endFrame": 1100
+        }
+      ]
+    },
+    {
+      "id": "scene_04_temperature",
+      "badge": "TERMAL ÇÖKÜŞ",
+      "top_title": "KÜRESEL ISI 85 DERECE",
+      "glow_title": "OKYANUSLAR KAYNAR!",
+      "tag": "TERMAL ALARM // SU KAYBI %70",
+      "script": "İki kat güneş ışınımı, gezegenin sıcaklığını anında 80 derecenin üzerine çıkarırdı. Göller buharlaşır, nehirler kurur ve okyanuslar kaynamaya başlardı.",
+      "type": "thermal_collapse",
+      "startFrame": 1126,
+      "endFrame": 1469,
+      "durationInFrames": 343,
+      "audioDurationSec": 10.920249,
+      "words": [
+        {
+          "text": "İki",
+          "startFrame": 1126,
+          "endFrame": 1133
+        },
+        {
+          "text": "kat",
+          "startFrame": 1133,
+          "endFrame": 1140
+        },
+        {
+          "text": "güneş",
+          "startFrame": 1140,
+          "endFrame": 1152
+        },
+        {
+          "text": "ışınımı,",
+          "startFrame": 1152,
+          "endFrame": 1171
+        },
+        {
+          "text": "gezegenin",
+          "startFrame": 1171,
+          "endFrame": 1193
+        },
+        {
+          "text": "sıcaklığını",
+          "startFrame": 1193,
+          "endFrame": 1220
+        },
+        {
+          "text": "anında",
+          "startFrame": 1220,
+          "endFrame": 1234
+        },
+        {
+          "text": "80",
+          "startFrame": 1234,
+          "endFrame": 1240
+        },
+        {
+          "text": "derecenin",
+          "startFrame": 1240,
+          "endFrame": 1262
+        },
+        {
+          "text": "üzerine",
+          "startFrame": 1262,
+          "endFrame": 1279
+        },
+        {
+          "text": "çıkarırdı.",
+          "startFrame": 1279,
+          "endFrame": 1303
+        },
+        {
+          "text": "Göller",
+          "startFrame": 1303,
+          "endFrame": 1317
+        },
+        {
+          "text": "buharlaşır,",
+          "startFrame": 1317,
+          "endFrame": 1344
+        },
+        {
+          "text": "nehirler",
+          "startFrame": 1344,
+          "endFrame": 1363
+        },
+        {
+          "text": "kurur",
+          "startFrame": 1363,
+          "endFrame": 1375
+        },
+        {
+          "text": "ve",
+          "startFrame": 1375,
+          "endFrame": 1381
+        },
+        {
+          "text": "okyanuslar",
+          "startFrame": 1381,
+          "endFrame": 1405
+        },
+        {
+          "text": "kaynamaya",
+          "startFrame": 1405,
+          "endFrame": 1427
+        },
+        {
+          "text": "başlardı.",
+          "startFrame": 1427,
+          "endFrame": 1449
+        }
+      ]
+    },
+    {
+      "id": "scene_05_radiation",
+      "badge": "RADYASYON BOMBARDIMANI",
+      "top_title": "MANYETİK KALKAN EZİLİR",
+      "glow_title": "ÖLÜMCÜL SOLAR FIRTINA!",
+      "tag": "UV İNDEKSİ: 30+ // KORUYUCU OZON KAYBI",
+      "script": "Çifte güneş rüzgarları Dünya'nın manyetik kalkanını ezer ve yeryüzünü ultraviyole radyasyon fırınına çevirerek tüm canlı hücreleri dakikalar içinde parçalardı.",
+      "type": "radiation_storm",
+      "startFrame": 1469,
+      "endFrame": 1785,
+      "durationInFrames": 316,
+      "audioDurationSec": 10.008005,
+      "words": [
+        {
+          "text": "Çifte",
+          "startFrame": 1469,
+          "endFrame": 1479
+        },
+        {
+          "text": "güneş",
+          "startFrame": 1479,
+          "endFrame": 1489
+        },
+        {
+          "text": "rüzgarları",
+          "startFrame": 1489,
+          "endFrame": 1510
+        },
+        {
+          "text": "Dünya'nın",
+          "startFrame": 1510,
+          "endFrame": 1529
+        },
+        {
+          "text": "manyetik",
+          "startFrame": 1529,
+          "endFrame": 1546
+        },
+        {
+          "text": "kalkanını",
+          "startFrame": 1546,
+          "endFrame": 1565
+        },
+        {
+          "text": "ezer",
+          "startFrame": 1565,
+          "endFrame": 1573
+        },
+        {
+          "text": "ve",
+          "startFrame": 1573,
+          "endFrame": 1579
+        },
+        {
+          "text": "yeryüzünü",
+          "startFrame": 1579,
+          "endFrame": 1598
+        },
+        {
+          "text": "ultraviyole",
+          "startFrame": 1598,
+          "endFrame": 1621
+        },
+        {
+          "text": "radyasyon",
+          "startFrame": 1621,
+          "endFrame": 1640
+        },
+        {
+          "text": "fırınına",
+          "startFrame": 1640,
+          "endFrame": 1657
+        },
+        {
+          "text": "çevirerek",
+          "startFrame": 1657,
+          "endFrame": 1676
+        },
+        {
+          "text": "tüm",
+          "startFrame": 1676,
+          "endFrame": 1682
+        },
+        {
+          "text": "canlı",
+          "startFrame": 1682,
+          "endFrame": 1692
+        },
+        {
+          "text": "hücreleri",
+          "startFrame": 1692,
+          "endFrame": 1711
+        },
+        {
+          "text": "dakikalar",
+          "startFrame": 1711,
+          "endFrame": 1730
+        },
+        {
+          "text": "içinde",
+          "startFrame": 1730,
+          "endFrame": 1742
+        },
+        {
+          "text": "parçalardı.",
+          "startFrame": 1742,
+          "endFrame": 1765
+        }
+      ]
+    },
+    {
+      "id": "scene_06_outro",
+      "badge": "BİLİMSEL GERÇEK",
+      "top_title": "MÜKEMMEL DENGEDEYİZ",
+      "glow_title": "TEK GÜNEŞİMİZ MUCİZE!",
+      "tag": "ROTA BİLİM // ABONE OL & KEŞFET",
+      "script": "Evrende milyarlarca çift yıldız var; ancak hayatın var olabilmesi, gökyüzündeki o tek ve mükemmel Güneş’e borçlu olduğumuz eşsiz bir mucizedir!",
+      "type": "scientific_outro",
+      "startFrame": 1785,
+      "endFrame": 2080,
+      "durationInFrames": 295,
+      "audioDurationSec": 9.312018,
+      "words": [
+        {
+          "text": "Evrende",
+          "startFrame": 1785,
+          "endFrame": 1800
+        },
+        {
+          "text": "milyarlarca",
+          "startFrame": 1800,
+          "endFrame": 1824
+        },
+        {
+          "text": "çift",
+          "startFrame": 1824,
+          "endFrame": 1833
+        },
+        {
+          "text": "yıldız",
+          "startFrame": 1833,
+          "endFrame": 1846
+        },
+        {
+          "text": "var;",
+          "startFrame": 1846,
+          "endFrame": 1855
+        },
+        {
+          "text": "ancak",
+          "startFrame": 1855,
+          "endFrame": 1866
+        },
+        {
+          "text": "hayatın",
+          "startFrame": 1866,
+          "endFrame": 1881
+        },
+        {
+          "text": "var",
+          "startFrame": 1881,
+          "endFrame": 1887
+        },
+        {
+          "text": "olabilmesi,",
+          "startFrame": 1887,
+          "endFrame": 1911
+        },
+        {
+          "text": "gökyüzündeki",
+          "startFrame": 1911,
+          "endFrame": 1938
+        },
+        {
+          "text": "o",
+          "startFrame": 1938,
+          "endFrame": 1944
+        },
+        {
+          "text": "tek",
+          "startFrame": 1944,
+          "endFrame": 1950
+        },
+        {
+          "text": "ve",
+          "startFrame": 1950,
+          "endFrame": 1956
+        },
+        {
+          "text": "mükemmel",
+          "startFrame": 1956,
+          "endFrame": 1974
+        },
+        {
+          "text": "Güneş’e",
+          "startFrame": 1974,
+          "endFrame": 1989
+        },
+        {
+          "text": "borçlu",
+          "startFrame": 1989,
+          "endFrame": 2002
+        },
+        {
+          "text": "olduğumuz",
+          "startFrame": 2002,
+          "endFrame": 2022
+        },
+        {
+          "text": "eşsiz",
+          "startFrame": 2022,
+          "endFrame": 2033
+        },
+        {
+          "text": "bir",
+          "startFrame": 2033,
+          "endFrame": 2039
+        },
+        {
+          "text": "mucizedir!",
+          "startFrame": 2039,
+          "endFrame": 2061
+        }
+      ]
+    }
+  ]
+}
