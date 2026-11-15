@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,11 +10,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
 import '../storage_helper.dart';
 import 'users_screen.dart';
+import '../services/tactical_styles.dart';
 
-const Color kOrange = Color(0xFFFF6B00);
-const Color kBackground = Color(0xFF0A0A0A);
-const Color kCardBg = Color(0xFF141414);
-const Color kGreen = Color(0xFF62FF4C);
+const Color kOrange = TacticalStyles.kPrimaryContainer;
+const Color kBackground = TacticalStyles.kSurface;
+const Color kCardBg = TacticalStyles.kSurfaceLow;
+const Color kGreen = TacticalStyles.kTertiary;
 
 class MessagingScreen extends StatefulWidget {
   const MessagingScreen({Key? key}) : super(key: key);
@@ -165,7 +166,7 @@ class _MessagingScreenState extends State<MessagingScreen> with SingleTickerProv
       backgroundColor: kBackground,
       appBar: AppBar(
         title: const Text('EKİBİM', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.black,
+        backgroundColor: TacticalStyles.kSurfaceLowest,
         actions: [
           IconButton(
             icon: const Icon(Icons.people, color: Colors.white),
@@ -202,7 +203,7 @@ class _MessagingScreenState extends State<MessagingScreen> with SingleTickerProv
                       const SizedBox(height: 2),
                       Text(
                         _teamId!, 
-                        style: GoogleFonts.shareTechMono(color: kOrange, fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kOrange, fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -249,7 +250,7 @@ class _MessagingScreenState extends State<MessagingScreen> with SingleTickerProv
       backgroundColor: kBackground,
       appBar: AppBar(
         title: const Text('EKİP', style: TextStyle(color: kOrange, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.black,
+        backgroundColor: TacticalStyles.kSurfaceLowest,
         elevation: 0,
       ),
       body: Center(
@@ -264,7 +265,7 @@ class _MessagingScreenState extends State<MessagingScreen> with SingleTickerProv
                 child: const Icon(Icons.group_add_rounded, size: 50, color: kOrange),
               ),
               const SizedBox(height: 24),
-              Text('Bir Ekibe Dahil Değilsiniz', style: GoogleFonts.outfit(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+              Text('Bir Ekibe Dahil Değilsiniz', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
               const Text('Doğa yürüyüşlerinde ve dağ maceralarında arkadaşlarınızla konum paylaşın ve grupta kalın.', 
                 textAlign: TextAlign.center, style: TextStyle(color: Colors.white54, height: 1.5)),
@@ -276,7 +277,7 @@ class _MessagingScreenState extends State<MessagingScreen> with SingleTickerProv
                 decoration: BoxDecoration(
                   color: kCardBg,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.white12),
+                  border: Border.all(color: TacticalStyles.kOutlineVariant),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -285,12 +286,12 @@ class _MessagingScreenState extends State<MessagingScreen> with SingleTickerProv
                     const SizedBox(height: 16),
                     TextField(
                       controller: _teamIdController,
-                      style: GoogleFonts.shareTechMono(color: kOrange, fontSize: 18),
+                      style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kOrange, fontSize: 18, fontWeight: FontWeight.bold),
                       decoration: InputDecoration(
                         hintText: 'Davet Kodunu Yapıştır',
                         hintStyle: const TextStyle(color: Colors.white24),
                         filled: true,
-                        fillColor: Colors.black,
+                        fillColor: TacticalStyles.kSurfaceLowest,
                         prefixIcon: const Icon(Icons.tag, color: kOrange),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
                         focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: kOrange)),
@@ -387,7 +388,7 @@ class _MessagingScreenState extends State<MessagingScreen> with SingleTickerProv
         ),
         Container(
           padding: const EdgeInsets.all(12),
-          color: Colors.black,
+          color: TacticalStyles.kSurfaceLowest,
           child: Row(
             children: [
               Expanded(

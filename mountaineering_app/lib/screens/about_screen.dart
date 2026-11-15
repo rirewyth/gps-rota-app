@@ -1,15 +1,16 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'legal_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import '../services/tactical_styles.dart';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({Key? key}) : super(key: key);
 
-  static const Color kOrange = Color(0xFFFF6B00);
-  static const Color kBackground = Color(0xFF0A0A0A);
-  static const Color kCardBg = Color(0xFF141414);
+  static const Color kOrange = TacticalStyles.kPrimaryContainer;
+  static const Color kBackground = TacticalStyles.kSurface;
+  static const Color kCardBg = TacticalStyles.kSurfaceLow;
 
   Future<void> _launchEmail() async {
     final Uri emailLaunchUri = Uri(
@@ -29,13 +30,14 @@ class AboutScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: kBackground,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: TacticalStyles.kSurfaceLowest,
         elevation: 0,
+        centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: kOrange, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text('Hakkında', style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: TacticalStyles.appBarPill('HAKKINDA', icon: Icons.info_outline_rounded),
       ),
       body: Column(
         children: [
@@ -57,8 +59,8 @@ class AboutScreen extends StatelessWidget {
                   child: ClipOval(child: Image.asset('assets/icon/tactical_logo.png', fit: BoxFit.cover)),
                 ),
                 const SizedBox(height: 20),
-                Text('ROTA+', style: GoogleFonts.outfit(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900, letterSpacing: 4)),
-                Text('Acil Durum & SOS Rehberi', style: GoogleFonts.shareTechMono(color: Colors.white38, fontSize: 12)),
+                Text('ROTA+', style: TacticalStyles.displayHero(color: TacticalStyles.kOnSurface, size: 32).copyWith(letterSpacing: 4)),
+                Text('Acil Durum & SOS Rehberi', style: TacticalStyles.body(color: TacticalStyles.kOnSurfaceVariant, size: 12)),
               ],
             ),
           ),
@@ -78,17 +80,17 @@ class AboutScreen extends StatelessWidget {
                     return _buildInfoTile('Versiyon', version, showArrow: false);
                   },
                 ),
-                const Divider(color: Colors.white12, height: 1),
+                const Divider(color: TacticalStyles.kOutlineVariant, height: 1),
                 _buildInfoTile('Kullanım Koşulları', '', onTap: () {
                   Navigator.push(context, MaterialPageRoute(builder: (_) => const LegalScreen(type: LegalType.terms)));
                 }),
-                const Divider(color: Colors.white12, height: 1),
+                const Divider(color: TacticalStyles.kOutlineVariant, height: 1),
                 _buildInfoTile('Gizlilik Politikası', '', onTap: () {
                   Navigator.push(context, MaterialPageRoute(builder: (_) => const LegalScreen(type: LegalType.privacy)));
                 }),
-                const Divider(color: Colors.white12, height: 1),
+                const Divider(color: TacticalStyles.kOutlineVariant, height: 1),
                 _buildInfoTile('Bize Ulaşın', '', onTap: _launchEmail),
-                const Divider(color: Colors.white12, height: 1),
+                const Divider(color: TacticalStyles.kOutlineVariant, height: 1),
               ],
             ),
           ),
@@ -97,7 +99,7 @@ class AboutScreen extends StatelessWidget {
           // Footer
           Padding(
             padding: const EdgeInsets.only(bottom: 30),
-            child: Text('© 2026 Rota+. Tüm hakları saklıdır.', style: GoogleFonts.shareTechMono(color: Colors.white12, fontSize: 10)),
+            child: Text('© 2026 Rota+. Tüm hakları saklıdır.', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurfaceVariant.withOpacity(0.6), fontSize: 10)),
           ),
         ],
       ),
@@ -108,16 +110,16 @@ class AboutScreen extends StatelessWidget {
     return ListTile(
       onTap: onTap,
       contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      title: Text(title, style: GoogleFonts.outfit(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w500)),
+      title: Text(title, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurface, fontSize: 15, fontWeight: FontWeight.w500)),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (trailing.isNotEmpty)
-            Text(trailing, style: GoogleFonts.shareTechMono(color: Colors.white38, fontSize: 13)),
+            Text(trailing, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurfaceVariant, fontSize: 13)),
           if (showArrow)
             const Padding(
               padding: EdgeInsets.only(left: 8),
-              child: Icon(Icons.chevron_right, color: Colors.white24, size: 20),
+              child: Icon(Icons.chevron_right, color: TacticalStyles.kOnSurfaceVariant, size: 20),
             ),
         ],
       ),

@@ -1,7 +1,7 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-// import 'package:camera/camera.dart';
+import 'package:camera/camera.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:sensors_plus/sensors_plus.dart';
@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../models/peak_model.dart';
 import '../services/overpass_service.dart';
+import '../services/tactical_styles.dart';
 
 class PeakARScreen extends StatefulWidget {
   const PeakARScreen({Key? key}) : super(key: key);
@@ -18,8 +19,8 @@ class PeakARScreen extends StatefulWidget {
 }
 
 class _PeakARScreenState extends State<PeakARScreen> {
-  // CameraController? _cameraController;
-  // List<CameraDescription>? _cameras;
+  CameraController? _cameraController;
+  List<CameraDescription>? _cameras;
 
   // Sensör verileri
   double _heading = 0.0;
@@ -45,18 +46,20 @@ class _PeakARScreenState extends State<PeakARScreen> {
   Future<void> _initAll() async {
     // 1. Kamera Başlat
     try {
-      /*
       _cameras = await availableCameras();
       if (_cameras != null && _cameras!.isNotEmpty) {
+        final backCam = _cameras!.firstWhere(
+          (c) => c.lensDirection == CameraLensDirection.back,
+          orElse: () => _cameras!.first,
+        );
         _cameraController = CameraController(
-          _cameras!.first,
-          ResolutionPreset.high,
+          backCam,
+          ResolutionPreset.medium,
           enableAudio: false,
         );
         await _cameraController!.initialize();
       }
-      */setState(() {});
-      
+      if (mounted) setState(() {});
     } catch (e) {
       debugPrint("Kamera hatası: $e");
     }
@@ -120,7 +123,7 @@ class _PeakARScreenState extends State<PeakARScreen> {
 
   @override
   void dispose() {
-    // _cameraController?.dispose();
+    _cameraController?.dispose();
     _compassSub?.cancel();
     _accelSub?.cancel();
     super.dispose();
@@ -139,27 +142,36 @@ class _PeakARScreenState extends State<PeakARScreen> {
     final Size screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: TacticalStyles.kSurface,
       body: Stack(
         children: [
           // Kamera Görüntüsü
           SizedBox(
             width: screenSize.width,
             height: screenSize.height,
-            child: Container(color: Colors.black),
+            child: _cameraController != null && _cameraController!.value.isInitialized
+                ? FittedBox(
+                    fit: BoxFit.cover,
+                    child: SizedBox(
+                      width: _cameraController!.value.previewSize?.height ?? screenSize.width,
+                      height: _cameraController!.value.previewSize?.width ?? screenSize.height,
+                      child: CameraPreview(_cameraController!),
+                    ),
+                  )
+                : Container(color: TacticalStyles.kSurface),
           ),
 
           // Nişangah (Merkez)
           Center(
             child: Container(
               width: 2, height: 20,
-              color: Colors.orange.withOpacity(0.5),
+              color: TacticalStyles.kPrimaryContainer.withOpacity(0.5),
             ),
           ),
           Center(
             child: Container(
               width: 20, height: 2,
-              color: Colors.orange.withOpacity(0.5),
+              color: TacticalStyles.kPrimaryContainer.withOpacity(0.5),
             ),
           ),
 
@@ -207,33 +219,54 @@ class _PeakARScreenState extends State<PeakARScreen> {
               double y = (screenSize.height / 2) - (vDiff / (_fovVertical / 2)) * (screenSize.height / 2);
 
               return Positioned(
-                left: x - 60, // Ortalama için
-                top: y - 20,
+                left: x - 72,
+                top: y - 28,
                 child: Column(
                   children: [
-                    Text(
-                      '⛰ ${peak.name}',
-                      style: GoogleFonts.shareTechMono(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        shadows: const [Shadow(color: Colors.black, blurRadius: 4)],
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: TacticalStyles.glassCardDecoration(
+                        radius: 12,
+                        borderColor: TacticalStyles.kSecondary.withOpacity(0.55),
                       ),
-                      textAlign: TextAlign.center,
-                    ),
-                    Text(
-                      '${peak.elevation}m • ${(distance / 1000).toStringAsFixed(1)}km',
-                      style: GoogleFonts.shareTechMono(
-                        color: Colors.orangeAccent,
-                        fontSize: 10,
-                        shadows: const [Shadow(color: Colors.black, blurRadius: 4)],
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '⛰ ${peak.name}',
+                            style: TacticalStyles.headline(
+                              color: TacticalStyles.kOnSurface,
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w700,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '${peak.elevation}m • ${(distance / 1000).toStringAsFixed(1)}km',
+                            style: TacticalStyles.labelMicro(
+                              color: TacticalStyles.kPrimary,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
-                      textAlign: TextAlign.center,
                     ),
                     Container(
-                      width: 2, height: 10,
-                      color: Colors.white.withOpacity(0.5),
-                    )
+                      width: 2,
+                      height: 12,
+                      color: TacticalStyles.kSecondary.withOpacity(0.75),
+                    ),
+                    Container(
+                      width: 6,
+                      height: 6,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: TacticalStyles.kSecondary,
+                      ),
+                    ),
                   ],
                 ),
               );
@@ -249,20 +282,20 @@ class _PeakARScreenState extends State<PeakARScreen> {
                   onTap: () => Navigator.pop(context),
                   child: Container(
                     padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8)),
-                    child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
+                    decoration: BoxDecoration(color: TacticalStyles.kSurfaceLow, borderRadius: BorderRadius.circular(10), border: Border.all(color: TacticalStyles.kOutlineVariant)),
+                    child: const Icon(Icons.arrow_back_ios_new, color: TacticalStyles.kOnSurface, size: 18),
                   ),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    color: Colors.black54,
+                    color: TacticalStyles.kSurfaceLow,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.orange.withOpacity(0.5)),
+                    border: Border.all(color: TacticalStyles.kPrimaryContainer.withOpacity(0.5)),
                   ),
                   child: Text(
                     'Pusula: ${_heading.toStringAsFixed(0)}°',
-                    style: GoogleFonts.shareTechMono(color: Colors.orange, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kPrimaryContainer, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
@@ -275,17 +308,18 @@ class _PeakARScreenState extends State<PeakARScreen> {
               bottom: 40, left: 0, right: 0,
               child: Center(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   decoration: BoxDecoration(
-                    color: Colors.black87,
-                    borderRadius: BorderRadius.circular(8),
+                    color: TacticalStyles.kSurfaceLow,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: TacticalStyles.kOutlineVariant),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.orange, strokeWidth: 2)),
+                      const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: TacticalStyles.kPrimaryContainer, strokeWidth: 2)),
                       const SizedBox(width: 12),
-                      Text('Çevredeki Zirveler Taranıyor...', style: GoogleFonts.shareTechMono(color: Colors.white)),
+                      Text('Çevredeki Zirveler Taranıyor...', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurface)),
                     ],
                   ),
                 ),
@@ -300,10 +334,11 @@ class _PeakARScreenState extends State<PeakARScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    color: Colors.black54,
+                    color: TacticalStyles.kSurfaceLow,
                     borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: TacticalStyles.kOutlineVariant),
                   ),
-                  child: Text('${_peaks.length} Dağ/Tepe Tespit Edildi', style: GoogleFonts.shareTechMono(color: Colors.white38, fontSize: 12)),
+                  child: Text('${_peaks.length} Dağ/Tepe Tespit Edildi', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurfaceVariant, fontSize: 12, fontWeight: FontWeight.w500)),
                 ),
               ),
             ),

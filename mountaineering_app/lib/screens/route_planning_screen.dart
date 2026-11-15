@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:mountaineering_app/screens/route_flyover_screen.dart';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
@@ -20,14 +20,16 @@ import '../database_helper.dart';
 import '../utils/location_permission_helper.dart';
 import '../data/mountain_database.dart';
 import '../services/routing_service.dart';
+import '../services/gpx_service.dart';
 import '../services/premium_service.dart';
+import '../services/tactical_styles.dart';
 import '../main.dart';
 import 'dart:math';
 
-const Color kOrange = Color(0xFFFF6B00);
-const Color kBackground = Color(0xFF0A0A0A);
-const Color kCardBg = Color(0xFF141414);
-const Color kGreen = Color(0xFF62FF4C);
+const Color kOrange = TacticalStyles.kPrimaryContainer;
+const Color kBackground = TacticalStyles.kSurface;
+const Color kCardBg = TacticalStyles.kSurfaceLow;
+const Color kGreen = TacticalStyles.kTertiary;
 
 class RoutePlanningScreen extends StatefulWidget {
   const RoutePlanningScreen({Key? key}) : super(key: key);
@@ -334,9 +336,9 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
               style: const TextStyle(color: Colors.white),
               decoration: const InputDecoration(
                 filled: true,
-                fillColor: Color(0xFF0A0A0A),
-                border: OutlineInputBorder(borderSide: BorderSide(color: Colors.white12)),
-                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white12)),
+                fillColor: TacticalStyles.kSurfaceLowest,
+                border: OutlineInputBorder(borderSide: BorderSide(color: TacticalStyles.kOutlineVariant)),
+                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: TacticalStyles.kOutlineVariant)),
                 focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: kOrange)),
               ),
             ),
@@ -393,7 +395,7 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
               _notify('✓ "$isim" rotasi kaydedildi!');
             },
             child: const Text('KAYDET',
-                style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -677,7 +679,7 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
                 Container(
                   padding: const EdgeInsets.fromLTRB(16, 14, 8, 14),
                   decoration: BoxDecoration(
-                    color: Colors.black,
+                    color: TacticalStyles.kSurfaceLowest,
                     border: Border(
                       bottom: BorderSide(
                         color: _secilenIndex == 0 ? kGreen : (_secilenIndex == _waypoints.length - 1 ? Colors.redAccent : kOrange),
@@ -705,18 +707,18 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
                         children: [
                           Text(
                             _secilenIndex == 0 ? 'BAŞLANGIÇ NOKTASI' : (_secilenIndex == _waypoints.length - 1 ? 'HEDEF NOKTA' : 'ARA NOKTA ${_secilenIndex}'),
-                            style: const TextStyle(
-                              color: Colors.white38,
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1.5,
+                            style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                              color: TacticalStyles.kTextSecondary,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.5,
                             ),
                           ),
                           Text(
                             _secilenIndex == 0 ? 'Nereden çıkacaksınız?' : 'Hedefiniz neresi?',
-                            style: TextStyle(
+                            style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
                               color: _secilenIndex == 0 ? kGreen : (_secilenIndex == _waypoints.length - 1 ? Colors.redAccent : kOrange),
-                              fontWeight: FontWeight.w900,
+                              fontWeight: FontWeight.w700,
                               fontSize: 14,
                             ),
                           ),
@@ -734,15 +736,15 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
                 // ── Arama Çubuğu ────────────────────────────────────
                 Container(
                   padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-                  color: const Color(0xFF111111),
+                  color: TacticalStyles.kSurfaceLow,
                   child: Row(
                     children: [
                       Expanded(
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.black,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: kOrange.withOpacity(0.4)),
+                            color: TacticalStyles.kSurfaceLowest,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: TacticalStyles.kOutlineVariant),
                           ),
                           child: TextField(
                             controller: _aramaController,
@@ -768,7 +770,7 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
                             },
                             decoration: InputDecoration(
                               hintText: 'Dağ, zirve, köy veya konum ara...',
-                              hintStyle: const TextStyle(color: Colors.white24, fontSize: 13),
+                              hintStyle: const TextStyle(color: Colors.white38, fontSize: 13),
                               prefixIcon: _aramaYukleniyor
                                   ? const Padding(
                                       padding: EdgeInsets.all(12),
@@ -801,7 +803,7 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
                 if (_aramaSonuclari.isNotEmpty)
                   Container(
                     height: 40,
-                    color: const Color(0xFF111111),
+                    color: TacticalStyles.kSurfaceLow,
                     padding: const EdgeInsets.only(bottom: 8),
                     child: ListView(
                       scrollDirection: Axis.horizontal,
@@ -1112,42 +1114,145 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: kBackground,
+      backgroundColor: TacticalStyles.kSurface,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        centerTitle: true,
-        title: RichText(
-          text: const TextSpan(
-            children: [
-              TextSpan(
-                text: 'ROTA+ ',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 20, letterSpacing: 1),
+        backgroundColor: TacticalStyles.kSurfaceLowest,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: false,
+        titleSpacing: 16,
+        title: Row(
+          children: [
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: TacticalStyles.kPrimaryContainer.withOpacity(0.16),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: TacticalStyles.kPrimaryContainer.withOpacity(0.35),
+                ),
               ),
-              TextSpan(
-                text: 'ROTA PLANLAMA',
-                style: TextStyle(color: kOrange, fontWeight: FontWeight.w900, fontSize: 20, fontStyle: FontStyle.italic, letterSpacing: 2),
+              child: const Icon(
+                Icons.alt_route_rounded,
+                color: TacticalStyles.kPrimary,
+                size: 18,
               ),
-            ],
+            ),
+            const SizedBox(width: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      'ROTA+',
+                      style: TacticalStyles.headline(
+                        color: TacticalStyles.kOnSurface,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: TacticalStyles.kPrimary.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text(
+                        'ROTA PLANLAMA',
+                        style: TacticalStyles.labelMicro(
+                          color: TacticalStyles.kPrimary,
+                          fontSize: 8.5,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.8,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Text(
+                  'Topografik Navigasyon & Waypoint',
+                  style: TacticalStyles.labelCaps(
+                    color: TacticalStyles.kOnSurfaceVariant,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(54),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(12, 2, 12, 8),
+            child: Container(
+              height: 42,
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: TacticalStyles.kSurfaceLow.withOpacity(0.92),
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: TacticalStyles.kGlassBorder),
+              ),
+              child: TabBar(
+                controller: _tabController,
+                dividerColor: Colors.transparent,
+                indicatorSize: TabBarIndicatorSize.tab,
+                indicator: BoxDecoration(
+                  color: TacticalStyles.kPrimaryContainer,
+                  borderRadius: BorderRadius.circular(999),
+                  boxShadow: [
+                    BoxShadow(
+                      color: TacticalStyles.kPrimaryContainer.withOpacity(0.32),
+                      blurRadius: 14,
+                    ),
+                  ],
+                ),
+                labelColor: TacticalStyles.kSurfaceLowest,
+                unselectedLabelColor: TacticalStyles.kOnSurfaceVariant,
+                labelStyle: TacticalStyles.labelCaps(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 10.5,
+                  letterSpacing: 0.7,
+                ),
+                unselectedLabelStyle: TacticalStyles.labelCaps(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 10.5,
+                  letterSpacing: 0.6,
+                ),
+                tabs: const [
+                  Tab(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.add_location_alt_rounded, size: 14),
+                        SizedBox(width: 6),
+                        Text('YENİ ROTA'),
+                      ],
+                    ),
+                  ),
+                  Tab(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.bookmarks_rounded, size: 14),
+                        SizedBox(width: 6),
+                        Text('KAYITLI ROTALAR'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
       body: Column(
         children: [
-          // Tab bar
-          Container(
-            color: Colors.black,
-            child: TabBar(
-              controller: _tabController,
-              indicatorColor: kOrange,
-              labelColor: kOrange,
-              unselectedLabelColor: Colors.white38,
-              labelStyle: const TextStyle(fontWeight: FontWeight.w900, fontSize: 11),
-              tabs: const [
-                Tab(icon: Icon(Icons.add_location_alt, size: 18), text: 'YENİ ROTA'),
-                Tab(icon: Icon(Icons.list_alt, size: 18), text: 'KAYITLI ROTALAR'),
-              ],
-            ),
-          ),
           Expanded(
             child: TabBarView(
               controller: _tabController,
@@ -1177,7 +1282,7 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
       children: [
         // ── Rota Planlama Paneli ─────────────────────────────────
         Container(
-          color: const Color(0xFF0E0E0E),
+          color: TacticalStyles.kSurfaceLow,
           child: Column(
             children: [
               for (int i = 0; i < _waypoints.length; i++) ...[
@@ -1485,10 +1590,10 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
         // ── Alt Aksiyon Paneli ────────────────────────────────────
         if (rotaHazir)
           Container(
-            color: const Color(0xFF0E0E0E),
+            color: TacticalStyles.kSurfaceLow,
             child: Column(
               children: [
-                const Divider(height: 1, color: Colors.white10),
+                const Divider(height: 1, color: TacticalStyles.kOutlineVariant),
                 Padding(
                   padding: const EdgeInsets.all(12),
                   child: Row(
@@ -1501,7 +1606,7 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(color: kOrange),
                             backgroundColor: kOrange.withOpacity(0.1),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
                           child: const Icon(Icons.analytics_outlined, color: kOrange, size: 20),
@@ -1515,13 +1620,13 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
                           onPressed: _rotaKaydet,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: kOrange,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          icon: const Icon(Icons.save_outlined, color: Colors.black, size: 20),
-                          label: const Text('KAYDET',
-                              style: TextStyle(color: Colors.black,
-                                  fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 0.5)),
+                          icon: const Icon(Icons.save_outlined, color: Colors.white, size: 20),
+                          label: Text('KAYDET',
+                              style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white,
+                                  fontWeight: FontWeight.w700, fontSize: 13, letterSpacing: 0.4)),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -1544,11 +1649,11 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
                             });
                           },
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Colors.white24),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            side: const BorderSide(color: TacticalStyles.kOutlineVariant),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          child: const Icon(Icons.delete_outline, color: Colors.white38, size: 20),
+                          child: const Icon(Icons.delete_outline, color: Colors.white54, size: 20),
                         ),
                       ),
                     ],
@@ -1655,11 +1760,11 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
         width: 36,
         height: 36,
         decoration: BoxDecoration(
-          color: Colors.black87,
-          borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: Colors.white12),
+          color: TacticalStyles.kSurfaceLow.withOpacity(0.95),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: TacticalStyles.kOutlineVariant),
         ),
-        child: Icon(ikon, color: renk ?? Colors.white54, size: 18),
+        child: Icon(ikon, color: renk ?? TacticalStyles.kTextPrimary, size: 18),
       ),
     );
   }
@@ -1765,6 +1870,35 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
     );
   }
 
+  Future<void> _importGpxKmlRoute() async {
+    try {
+      final imported = await GpxService.pickAndParseRouteFile();
+      if (imported == null) return;
+      await DatabaseHelper.instance.rotaKaydet(
+        imported.name,
+        imported.points,
+        baslangicAdi: 'GPX/KML İçe Aktarım',
+        bitisAdi: '${imported.points.length} Nokta',
+        source: 'gpx_import',
+      );
+      await _rotaListesiYukle();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('"${imported.name}" (${imported.points.length} nokta) içe aktarıldı!'),
+            backgroundColor: TacticalStyles.kTertiary,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('GPX/KML okuma hatası: $e')),
+        );
+      }
+    }
+  }
+
   Widget _buildKayitliRotalarTab() {
     if (_rotaYukleniyor) {
       return const Center(child: CircularProgressIndicator(color: kOrange));
@@ -1778,15 +1912,43 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
             const SizedBox(height: 16),
             const Text('Henüz kaydedilmiş rota bulunamadı.',
                 style: TextStyle(color: Colors.white30)),
+            const SizedBox(height: 16),
+            OutlinedButton.icon(
+              onPressed: _importGpxKmlRoute,
+              icon: const Icon(Icons.file_upload_outlined, color: kOrange),
+              label: const Text('GPX / KML DOSYASI İÇE AKTAR', style: TextStyle(color: kOrange)),
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: kOrange.withValues(alpha: 0.55)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
           ],
         ),
       );
     }
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: _kayitliRotalar.length,
-      itemBuilder: (ctx, i) {
-        final r = _kayitliRotalar[i];
+      itemCount: _kayitliRotalar.length + 1,
+      itemBuilder: (ctx, idx) {
+        if (idx == 0) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 14),
+            child: OutlinedButton.icon(
+              onPressed: _importGpxKmlRoute,
+              icon: const Icon(Icons.file_upload_outlined, size: 18, color: kOrange),
+              label: Text(
+                'GPX / KML ROTA İÇE AKTAR',
+                style: TacticalStyles.labelCaps(color: kOrange, size: 11, weight: FontWeight.w800),
+              ),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                side: BorderSide(color: kOrange.withValues(alpha: 0.45)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+          );
+        }
+        final r = _kayitliRotalar[idx - 1];
         final aktif = r['aktif'] == true;
         final baslangicAdi = (r['baslangic_adi'] as String? ?? '');
         final bitisAdi = (r['bitis_adi'] as String? ?? '');
@@ -1802,16 +1964,15 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
             color: kCardBg,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: aktif ? kOrange.withOpacity(0.5) : Colors.white10,
-              width: aktif ? 1.5 : 1,
+              color: aktif ? kOrange.withOpacity(0.5) : TacticalStyles.kOutlineVariant,
+              width: 1,
             ),
             boxShadow: [
-              if (aktif)
-                BoxShadow(
-                  color: kOrange.withOpacity(0.1),
-                  blurRadius: 12,
-                  spreadRadius: 2,
-                ),
+              BoxShadow(
+                color: Colors.black.withOpacity(0.22),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
             ],
           ),
           child: Column(
@@ -1841,9 +2002,9 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
                         children: [
                           Text(
                             r['isim'] as String,
-                            style: TextStyle(
-                              color: aktif ? kOrange : Colors.white,
-                              fontWeight: FontWeight.bold,
+                            style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                              color: aktif ? kOrange : TacticalStyles.kTextPrimary,
+                              fontWeight: FontWeight.w700,
                               fontSize: 16,
                             ),
                             maxLines: 1,
@@ -1852,8 +2013,8 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
                           const SizedBox(height: 4),
                           Text(
                             '${noktalar.length} nokta  ·  ${baslangicAdi.isNotEmpty ? baslangicAdi : "Belirsiz Başlangıç"}',
-                            style: const TextStyle(
-                              color: Colors.white38,
+                            style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                              color: TacticalStyles.kTextSecondary,
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
                             ),
@@ -1865,7 +2026,7 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
                             if (distM > 0) _buildMiniStatChip(
                               Icons.straighten,
                               distM >= 1000 ? '${(distM/1000).toStringAsFixed(1)} km' : '${distM.toInt()} m',
-                              const Color(0xFF62FF4C),
+                              kGreen,
                             ),
                             if (durSec > 0) _buildMiniStatChip(
                               Icons.timer_outlined,
@@ -1875,12 +2036,12 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
                             if (elevGain > 0) _buildMiniStatChip(
                               Icons.trending_up,
                               '+${elevGain.toInt()} m',
-                              Colors.lightBlueAccent,
+                              TacticalStyles.kSecondaryContainer,
                             ),
                             if (maxAlt > 0) _buildMiniStatChip(
                               Icons.landscape,
                               '${maxAlt.toInt()} m',
-                              Colors.deepPurpleAccent,
+                              TacticalStyles.kSecondary,
                             ),
                           ])],
                         ],
@@ -1890,16 +2051,16 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: kOrange.withOpacity(0.2),
+                          color: kOrange.withOpacity(0.18),
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: const Text(
+                        child: Text(
                           'AKTİF',
-                          style: TextStyle(
+                          style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
                             color: kOrange,
                             fontSize: 10,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.5,
                           ),
                         ),
                       ),
@@ -1914,8 +2075,9 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
                   child: Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Colors.black26,
-                      borderRadius: BorderRadius.circular(8),
+                      color: TacticalStyles.kSurfaceLowest,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: TacticalStyles.kOutlineVariant),
                     ),
                     child: Row(
                       children: [
@@ -1924,24 +2086,23 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
                         Expanded(
                           child: Text(
                             '$baslangicAdi → $bitisAdi',
-                            style: const TextStyle(
-                              color: Colors.white60,
+                            style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                              color: TacticalStyles.kTextSecondary,
                               fontSize: 11,
-                              fontStyle: FontStyle.italic,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         const SizedBox(width: 4),
-                        const Icon(Icons.flag_rounded, color: Colors.redAccent, size: 12),
+                        const Icon(Icons.flag_rounded, color: TacticalStyles.kError, size: 12),
                       ],
                     ),
                   ),
                 ),
 
               const SizedBox(height: 16),
-              const Divider(height: 1, color: Colors.white10),
+              const Divider(height: 1, color: TacticalStyles.kOutlineVariant),
 
               // Alt Bölüm: Butonlar
               Padding(
@@ -1975,23 +2136,49 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
                               );
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: kGreen,
-                              foregroundColor: Colors.black,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              backgroundColor: TacticalStyles.kTertiaryContainer,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               elevation: 0,
                             ),
                             icon: const Icon(Icons.play_arrow_rounded, size: 20),
-                            label: const Text(
+                            label: Text(
                               'TAKİBİ BAŞLAT',
-                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900),
+                              style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], fontSize: 12, fontWeight: FontWeight.w700),
                             ),
                           ),
                         ),
-                        const SizedBox(width: 10),
+                        const SizedBox(width: 8),
+                        // GPX DIŞA AKTAR
+                        Tooltip(
+                          message: 'GPX Olarak Paylaş',
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: () async {
+                              final pts = noktalar
+                                  .whereType<Map>()
+                                  .map((e) => Map<String, dynamic>.from(e))
+                                  .toList();
+                              await GpxService.exportAndShareGpx(
+                                (r['isim'] as String?) ?? 'Rota+',
+                                pts,
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+                              decoration: TacticalStyles.glassCardDecoration(
+                                radius: 12,
+                                borderColor: kOrange.withValues(alpha: 0.45),
+                              ),
+                              child: const Icon(Icons.ios_share_rounded, color: kOrange, size: 18),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
                         // SİL
                         SizedBox(
-                          width: 100,
+                          width: 84,
                           child: OutlinedButton.icon(
                             onPressed: () async {
                               final confirm = await showDialog<bool>(
@@ -2012,7 +2199,7 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
                                     TextButton(
                                       onPressed: () => Navigator.pop(dialogCtx, true),
                                       child: const Text('SİL',
-                                          style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+                                          style: TextStyle(color: TacticalStyles.kError, fontWeight: FontWeight.bold)),
                                     ),
                                   ],
                                 ),
@@ -2020,15 +2207,15 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
                               if (confirm == true) _rotaSil(r['id'] as int);
                             },
                             style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: Colors.redAccent, width: 1.5),
-                              foregroundColor: Colors.redAccent,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              side: BorderSide(color: TacticalStyles.kError.withOpacity(0.5), width: 1),
+                              foregroundColor: TacticalStyles.kError,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                               padding: const EdgeInsets.symmetric(vertical: 12),
                             ),
                             icon: const Icon(Icons.delete_outline_rounded, size: 18),
-                            label: const Text(
+                            label: Text(
                               'SİL',
-                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                              style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], fontSize: 12, fontWeight: FontWeight.w700),
                             ),
                           ),
                         ),
@@ -2050,17 +2237,17 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
                           ),
                         )),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF1A1A2E),
-                          foregroundColor: Colors.cyanAccent,
-                          side: const BorderSide(color: Colors.cyanAccent, width: 1.2),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          backgroundColor: TacticalStyles.kSurfaceHigh,
+                          foregroundColor: TacticalStyles.kSecondaryContainer,
+                          side: BorderSide(color: TacticalStyles.kSecondaryContainer.withOpacity(0.45), width: 1),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           elevation: 0,
                         ),
                         icon: const Icon(Icons.play_circle_outline_rounded, size: 20),
-                        label: const Text(
+                        label: Text(
                           'ROTA OYNATICI (FLYOVER)',
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 0.5),
+                          style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 0.3),
                         ),
                       ),
                     ),
@@ -2071,16 +2258,16 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
                       child: OutlinedButton.icon(
                         onPressed: () => _shareRouteToFeed(r),
                         style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: kGreen.withOpacity(0.5)),
+                          side: BorderSide(color: kGreen.withOpacity(0.45)),
                           foregroundColor: kGreen,
-                          backgroundColor: kGreen.withOpacity(0.05),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          backgroundColor: kGreen.withOpacity(0.06),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
                         icon: const Icon(Icons.share_outlined, size: 18),
-                        label: const Text(
+                        label: Text(
                           'ROTAYI EKİP AKIŞINDA PAYLAŞ',
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                          style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 0.3),
                         ),
                       ),
                     ),
@@ -2106,7 +2293,7 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         Icon(icon, color: color, size: 11),
         const SizedBox(width: 4),
-        Text(label, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold)),
+        Text(label, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: color, fontSize: 11, fontWeight: FontWeight.w600)),
       ]),
     );
   }
@@ -2114,9 +2301,9 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
   Widget _buildTacticalStat(String label, String value) {
     return Column(
       children: [
-        Text(label, style: GoogleFonts.shareTechMono(color: Colors.white38, fontSize: 10, letterSpacing: 1)),
+        Text(label, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kTextSecondary, fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 0.3)),
         const SizedBox(height: 4),
-        Text(value, style: GoogleFonts.shareTechMono(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+        Text(value, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kTextPrimary, fontSize: 16, fontWeight: FontWeight.w700)),
       ],
     );
   }

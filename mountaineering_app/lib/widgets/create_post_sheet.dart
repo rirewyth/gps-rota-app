@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/ad_service.dart';
+import '../services/tactical_styles.dart';
 
 class CreatePostSheet extends StatefulWidget {
   final Map<String, dynamic>? routeData;
@@ -16,9 +17,9 @@ class CreatePostSheet extends StatefulWidget {
 }
 
 class _CreatePostSheetState extends State<CreatePostSheet> {
-  static const Color kOrange = Color(0xFFFF6B00);
-  static const Color kCardBg = Color(0xFF141414);
-  static const Color kBackground = Color(0xFF0A0A0A);
+  static const Color kOrange = TacticalStyles.kPrimaryContainer;
+  static const Color kCardBg = TacticalStyles.kSurfaceLow;
+  static const Color kBackground = TacticalStyles.kSurfaceLowest;
 
   final ImagePicker _picker = ImagePicker();
   final TextEditingController _postDescController = TextEditingController();
@@ -118,16 +119,16 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                 children: [
                   const Icon(Icons.add_box_outlined, color: kOrange, size: 22),
                   const SizedBox(width: 8),
-                  Text('Yeni Gönderi', style: GoogleFonts.outfit(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                  Text('Yeni Gönderi', style: GoogleFonts.plusJakartaSans(color: TacticalStyles.kOnSurface, fontSize: 19, fontWeight: FontWeight.w700)),
                   const Spacer(),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: kOrange.withOpacity(0.1),
+                      color: kOrange.withOpacity(0.14),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: kOrange.withOpacity(0.3)),
+                      border: Border.all(color: kOrange.withOpacity(0.35)),
                     ),
-                    child: const Text('Fotoğraf isteğe bağlı', style: TextStyle(color: kOrange, fontSize: 10)),
+                    child: Text('Fotoğraf isteğe bağlı', style: GoogleFonts.inter(color: kOrange, fontSize: 11, fontWeight: FontWeight.w600)),
                   ),
                 ],
               ),
@@ -139,10 +140,10 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                   height: _selectedImage != null ? 200 : 130,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Colors.black,
+                    color: kBackground,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: _selectedImage != null ? kOrange : Colors.white12,
+                      color: _selectedImage != null ? kOrange : TacticalStyles.kOutlineVariant,
                       width: _selectedImage != null ? 2 : 1,
                     ),
                   ),
@@ -153,15 +154,15 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                             Container(
                               width: 56, height: 56,
                               decoration: BoxDecoration(
-                                color: kOrange.withOpacity(0.1),
+                                color: kOrange.withOpacity(0.14),
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(Icons.add_a_photo_outlined, color: kOrange, size: 28),
                             ),
                             const SizedBox(height: 10),
-                            const Text('Fotoğraf Seç', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                            Text('Fotoğraf Seç', style: GoogleFonts.plusJakartaSans(color: TacticalStyles.kOnSurface, fontWeight: FontWeight.w700, fontSize: 14)),
                             const SizedBox(height: 4),
-                            const Text('Galeriden seç', style: TextStyle(color: Colors.white38, fontSize: 12)),
+                            Text('Galeriden seç', style: GoogleFonts.inter(color: TacticalStyles.kOnSurfaceVariant, fontSize: 12)),
                           ],
                         )
                       : Stack(
@@ -189,18 +190,18 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
               const SizedBox(height: 16),
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.black,
+                  color: kBackground,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.white12),
+                  border: Border.all(color: TacticalStyles.kOutlineVariant),
                 ),
                 child: TextField(
                   controller: _postDescController,
-                  style: const TextStyle(color: Colors.white, fontSize: 15),
-                  decoration: const InputDecoration(
+                  style: GoogleFonts.inter(color: TacticalStyles.kOnSurface, fontSize: 15),
+                  decoration: InputDecoration(
                     hintText: 'Ne paylaşmak istiyorsunuz?',
-                    hintStyle: TextStyle(color: Colors.white38),
+                    hintStyle: GoogleFonts.inter(color: TacticalStyles.kOutline),
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.all(16),
+                    contentPadding: const EdgeInsets.all(16),
                   ),
                   maxLines: 4,
                 ),
@@ -219,14 +220,14 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                   child: _isUploading
                       ? const SizedBox(
                           height: 22, width: 22,
-                          child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2),
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                         )
                       : Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(Icons.send_rounded, color: Colors.black, size: 20),
+                            const Icon(Icons.send_rounded, color: Colors.white, size: 20),
                             const SizedBox(width: 8),
-                            Text('PAYLAŞ', style: GoogleFonts.outfit(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 1)),
+                            Text('Paylaş', style: GoogleFonts.plusJakartaSans(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16)),
                           ],
                         ),
                 ),

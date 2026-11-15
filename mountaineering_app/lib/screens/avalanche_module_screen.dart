@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,6 +8,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:nearby_connections/nearby_connections.dart';
 import '../storage_helper.dart';
+import '../services/tactical_styles.dart';
 
 enum AvalancheMode {
   transceiver, // Verici / Kazazede Modu (Düşük Enerjili Duyulabilir Ses + BLE)
@@ -23,10 +24,10 @@ class AvalancheModuleScreen extends StatefulWidget {
 
 class _AvalancheModuleScreenState extends State<AvalancheModuleScreen> with SingleTickerProviderStateMixin {
   // Alpine Safety Palette (Cyan & Snow White & Warning Amber)
-  static const Color kAlpineCyan = Color(0xFF00E5FF);
-  static const Color kWarningOrange = Color(0xFFFF6B00);
-  static const Color kBg = Color(0xFF0A0F1D);
-  static const Color kCardBg = Color(0xFF10192D);
+  static const Color kAlpineCyan = TacticalStyles.kSecondaryContainer;
+  static const Color kWarningOrange = TacticalStyles.kPrimaryContainer;
+  static const Color kBg = TacticalStyles.kSurface;
+  static const Color kCardBg = TacticalStyles.kSurfaceLow;
 
   AvalancheMode _currentMode = AvalancheMode.transceiver;
   bool _isActive = false;
@@ -224,15 +225,41 @@ class _AvalancheModuleScreenState extends State<AvalancheModuleScreen> with Sing
     return Scaffold(
       backgroundColor: kBg,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: TacticalStyles.kSurfaceLowest,
         elevation: 0,
-        title: Text(
-          'ROTA+ ÇIĞ GÜVENLİK (ARVA)',
-          style: GoogleFonts.shareTechMono(color: kAlpineCyan, fontWeight: FontWeight.bold, fontSize: 16),
+        centerTitle: true,
+        title: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: TacticalStyles.glassCardDecoration(
+            radius: 999,
+            borderColor: kAlpineCyan.withValues(alpha: 0.4),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  color: kAlpineCyan,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'ROTA+ ÇIĞ & ARVA',
+                style: TacticalStyles.labelCaps(
+                  color: kAlpineCyan,
+                  size: 11,
+                  weight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.info_outline, color: Colors.white70),
+            icon: const Icon(Icons.info_outline, color: TacticalStyles.kOnSurfaceVariant),
             onPressed: _showInfoDialog,
           )
         ],
@@ -243,7 +270,7 @@ class _AvalancheModuleScreenState extends State<AvalancheModuleScreen> with Sing
           Container(
             padding: const EdgeInsets.all(4),
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.white12)),
+            decoration: TacticalStyles.recessedDecoration(radius: 999),
             child: Row(
               children: [
                 Expanded(
@@ -256,13 +283,13 @@ class _AvalancheModuleScreenState extends State<AvalancheModuleScreen> with Sing
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
                         color: _currentMode == AvalancheMode.transceiver ? kWarningOrange : Colors.transparent,
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       alignment: Alignment.center,
                       child: Text(
                         'TRANSCEIVER (VERİCİ)',
-                        style: GoogleFonts.shareTechMono(
-                          color: _currentMode == AvalancheMode.transceiver ? Colors.white : Colors.white60,
+                        style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                          color: _currentMode == AvalancheMode.transceiver ? Colors.white : TacticalStyles.kOnSurfaceVariant,
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
                         ),
@@ -280,13 +307,13 @@ class _AvalancheModuleScreenState extends State<AvalancheModuleScreen> with Sing
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
                         color: _currentMode == AvalancheMode.receiver ? kAlpineCyan : Colors.transparent,
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       alignment: Alignment.center,
                       child: Text(
                         'RECEIVER (ALICI / ARAYAN)',
-                        style: GoogleFonts.shareTechMono(
-                          color: _currentMode == AvalancheMode.receiver ? Colors.black : Colors.white60,
+                        style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                          color: _currentMode == AvalancheMode.receiver ? TacticalStyles.kSurfaceLowest : TacticalStyles.kOnSurfaceVariant,
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
                         ),
@@ -320,10 +347,10 @@ class _AvalancheModuleScreenState extends State<AvalancheModuleScreen> with Sing
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: kCardBg,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: _isActive ? kWarningOrange : Colors.white24, width: 2),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: _isActive ? kWarningOrange : TacticalStyles.kOutlineVariant, width: _isActive ? 2 : 1),
               boxShadow: _isActive
-                  ? [BoxShadow(color: kWarningOrange.withValues(alpha: 0.3), blurRadius: 20, spreadRadius: 2)]
+                  ? [BoxShadow(color: kWarningOrange.withValues(alpha: 0.2), blurRadius: 16, spreadRadius: 1)]
                   : [],
             ),
             child: Column(
@@ -331,13 +358,13 @@ class _AvalancheModuleScreenState extends State<AvalancheModuleScreen> with Sing
                 Icon(
                   _isActive ? Icons.radar : Icons.power_settings_new,
                   size: 64,
-                  color: _isActive ? kWarningOrange : Colors.white38,
+                  color: _isActive ? kWarningOrange : TacticalStyles.kOnSurfaceVariant,
                 ),
                 const SizedBox(height: 12),
                 Text(
                   _isActive ? 'ÇIĞ SİNYALİ YAYINLANIYOR' : 'VERİCİ STANDBY (KAPALI)',
-                  style: GoogleFonts.shareTechMono(
-                    color: _isActive ? kWarningOrange : Colors.white70,
+                  style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                    color: _isActive ? kWarningOrange : TacticalStyles.kOnSurface,
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
@@ -348,15 +375,16 @@ class _AvalancheModuleScreenState extends State<AvalancheModuleScreen> with Sing
                       ? 'BLE + 2.6 kHz Akustik Arama Sinyali Gönderiliyor'
                       : 'Çığ tehlikesi olan bölgeye girerken başlatınız.',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white54, fontSize: 12),
+                  style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurfaceVariant, fontSize: 12),
                 ),
                 const SizedBox(height: 20),
 
                 // Aç / Kapat Butonu
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _isActive ? Colors.redAccent : kWarningOrange,
+                    backgroundColor: _isActive ? TacticalStyles.kErrorContainer : kWarningOrange,
                     padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   onPressed: () {
                     if (_isActive) {
@@ -367,7 +395,7 @@ class _AvalancheModuleScreenState extends State<AvalancheModuleScreen> with Sing
                   },
                   child: Text(
                     _isActive ? 'SİNYAL YAYININI DURDUR' : 'SİNYAL YAYINLAMAYI BAŞLAT',
-                    style: GoogleFonts.shareTechMono(color: Colors.white, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontWeight: FontWeight.bold),
                   ),
                 )
               ],
@@ -379,7 +407,7 @@ class _AvalancheModuleScreenState extends State<AvalancheModuleScreen> with Sing
           // DUYULABİLİR SES YAYINLA SEÇENEĞİ (USER REQUEST!)
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: kCardBg, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.white12)),
+            decoration: BoxDecoration(color: kCardBg, borderRadius: BorderRadius.circular(16), border: Border.all(color: TacticalStyles.kOutlineVariant)),
             child: Row(
               children: [
                 const Icon(Icons.volume_up, color: kAlpineCyan, size: 28),
@@ -390,12 +418,12 @@ class _AvalancheModuleScreenState extends State<AvalancheModuleScreen> with Sing
                     children: [
                       Text(
                         'Düşük Enerjili Duyulabilir Ses Yayını',
-                        style: GoogleFonts.shareTechMono(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                        style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurface, fontWeight: FontWeight.bold, fontSize: 13),
                       ),
                       const SizedBox(height: 4),
-                      const Text(
+                      Text(
                         'İnsan kulağının duyabileceği 2.6 kHz frekansta arama sesi yayarak kurtarma köpeği ve ekiplerinin sizi duymasını sağlar.',
-                        style: TextStyle(color: Colors.white54, fontSize: 11),
+                        style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurfaceVariant, fontSize: 11),
                       ),
                     ],
                   ),
@@ -428,10 +456,10 @@ class _AvalancheModuleScreenState extends State<AvalancheModuleScreen> with Sing
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: kCardBg,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: _isActive ? kAlpineCyan : Colors.white24, width: 2),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: _isActive ? kAlpineCyan : TacticalStyles.kOutlineVariant, width: _isActive ? 2 : 1),
               boxShadow: _isActive
-                  ? [BoxShadow(color: kAlpineCyan.withValues(alpha: 0.25), blurRadius: 24, spreadRadius: 2)]
+                  ? [BoxShadow(color: kAlpineCyan.withValues(alpha: 0.2), blurRadius: 16, spreadRadius: 1)]
                   : [],
             ),
             child: Column(
@@ -439,30 +467,30 @@ class _AvalancheModuleScreenState extends State<AvalancheModuleScreen> with Sing
                 // Mesafe İbresi
                 Text(
                   _isActive ? '${_estimatedDistance.toStringAsFixed(1)} m' : '-- m',
-                  style: GoogleFonts.shareTechMono(
-                    color: _estimatedDistance < 3 ? Colors.redAccent : kAlpineCyan,
-                    fontWeight: FontWeight.w900,
+                  style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                    color: _estimatedDistance < 3 ? TacticalStyles.kError : kAlpineCyan,
+                    fontWeight: FontWeight.w800,
                     fontSize: 48,
                   ),
                 ),
                 Text(
                   _discoveredBeaconName,
-                  style: GoogleFonts.shareTechMono(color: Colors.white70, fontSize: 11, letterSpacing: 1),
+                  style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurface, fontSize: 11, letterSpacing: 0.5),
                 ),
                 Text(
                   'TAHMİNİ MESAFE (KAZAZEDEYE UZAKLIK)',
-                  style: GoogleFonts.shareTechMono(color: Colors.white38, fontSize: 9, letterSpacing: 1),
+                  style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurfaceVariant, fontSize: 10, letterSpacing: 0.5),
                 ),
 
                 const SizedBox(height: 20),
 
                 // Yakınlık Barı (Progress)
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(6),
                   child: LinearProgressIndicator(
                     value: math.max(0.05, 1.0 - (_estimatedDistance / 35.0)),
-                    backgroundColor: Colors.black,
-                    color: _estimatedDistance < 3 ? Colors.redAccent : kAlpineCyan,
+                    backgroundColor: TacticalStyles.kSurfaceLowest,
+                    color: _estimatedDistance < 3 ? TacticalStyles.kError : kAlpineCyan,
                     minHeight: 12,
                   ),
                 ),
@@ -473,13 +501,13 @@ class _AvalancheModuleScreenState extends State<AvalancheModuleScreen> with Sing
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('DEDEKTÖR SESİ:', style: GoogleFonts.shareTechMono(color: Colors.white70, fontSize: 11)),
+                    Text('DEDEKTÖR SESİ:', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurfaceVariant, fontSize: 11)),
                     Text(
                       _isActive
                           ? (_estimatedDistance < 2 ? 'SÜREKLİ BİİİP (ÇOK YAKIN)' : '${(1000 / _beepIntervalMs).toStringAsFixed(1)} Bip / sn')
                           : 'KAPALI',
-                      style: GoogleFonts.shareTechMono(
-                        color: _estimatedDistance < 2 ? Colors.redAccent : kAlpineCyan,
+                      style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                        color: _estimatedDistance < 2 ? TacticalStyles.kError : kAlpineCyan,
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
                       ),
@@ -492,8 +520,9 @@ class _AvalancheModuleScreenState extends State<AvalancheModuleScreen> with Sing
                 // Başlat / Durdur
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _isActive ? Colors.redAccent : kAlpineCyan,
+                    backgroundColor: _isActive ? TacticalStyles.kErrorContainer : kAlpineCyan,
                     padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   onPressed: () {
                     if (_isActive) {
@@ -504,21 +533,21 @@ class _AvalancheModuleScreenState extends State<AvalancheModuleScreen> with Sing
                   },
                   child: Text(
                     _isActive ? 'ARAMAYI DURDUR' : 'ÇIĞ ARAMASINI BAŞLAT (RECEIVER)',
-                    style: GoogleFonts.shareTechMono(color: Colors.black, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: _isActive ? Colors.white : TacticalStyles.kSurfaceLowest, fontWeight: FontWeight.bold),
                   ),
                 ),
 
                 // Test Yaklaşma Simülatörü Slider (Kullanıcı kolayca test edebilsin diye)
                 if (_isActive) ...[
                   const SizedBox(height: 20),
-                  const Divider(color: Colors.white12),
-                  Text('MESAFE TEST SİMÜLASYONU (KAZAZEDEYE YAKLAŞ)', style: GoogleFonts.shareTechMono(color: Colors.white54, fontSize: 10)),
+                  const Divider(color: TacticalStyles.kOutlineVariant),
+                  Text('MESAFE TEST SİMÜLASYONU (KAZAZEDEYE YAKLAŞ)', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurfaceVariant, fontSize: 10)),
                   Slider(
                     value: _estimatedDistance,
                     min: 0.5,
                     max: 35.0,
                     activeColor: kAlpineCyan,
-                    inactiveColor: Colors.black,
+                    inactiveColor: TacticalStyles.kSurfaceLowest,
                     onChanged: (val) {
                       setState(() => _estimatedDistance = val);
                       _startProximityBeeping();
@@ -537,13 +566,13 @@ class _AvalancheModuleScreenState extends State<AvalancheModuleScreen> with Sing
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF141414),
-        title: Text('ÇIĞ VE ARVA SİSTEMİ', style: GoogleFonts.shareTechMono(color: kAlpineCyan, fontWeight: FontWeight.bold)),
-        content: const Text(
+        backgroundColor: kCardBg,
+        title: Text('ÇIĞ VE ARVA SİSTEMİ', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kAlpineCyan, fontWeight: FontWeight.bold)),
+        content: Text(
           'Bu modül, profesyonel ARVA / Çığ Dedektörleri mantığıyla çalışır.\n\n'
           '• TRANSCEIVER: Kazazede modudur. Düşük enerjili BLE ve insan kulağının duyabileceği frekansta akustik piezo ses yayını yapar.\n\n'
           '• RECEIVER: Arama modudur. Kazazedeye yaklaştıkça dedektör sesi sıklaşır ve 1 metre mesafede sürekli öterek yer tespiti sağlar.',
-          style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
+          style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurfaceVariant, fontSize: 13, height: 1.4),
         ),
         actions: [
           TextButton(

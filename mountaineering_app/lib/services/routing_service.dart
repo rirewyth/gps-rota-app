@@ -106,24 +106,99 @@ class RoutingService {
     'construction', 'ruins',
   };
 
-  /// Yer Araması — Mapbox, Google, Yandex ve Nominatim hibrit arama
+  /// Yer Araması — Mapbox, Photon (OSM), Nominatim ve Google paralel hibrit arama
   static Future<List<LocationSearchResult>> searchLocation(String query) async {
-    if (query.trim().isEmpty) return [];
-    
-    // 1. ÖNCE MAPBOX (Türkiye köyleri ve yerel detaylar için en iyisi)
-    final mapboxResults = await _searchMapbox(query);
-    if (mapboxResults.isNotEmpty) return mapboxResults;
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) return [];
 
-    // 2. GOOGLE (İşletmeler ve genel mekanlar için kaliteli veri)
-    final googleResults = await _searchGoogle(query);
-    if (googleResults.isNotEmpty) return googleResults;
+    // Tüm kaynakları paralel sorgula ki hiçbir adres/köy/dağ/işletme kaçmasın
+    final results = await Future.wait<List<LocationSearchResult>>([
+      _searchMapbox(trimmed),
+      _searchPhoton(trimmed),
+      _searchNominatim(trimmed),
+      _searchGoogle(trimmed),
+    ]);
 
-    // 3. YANDEX (Yedek kaliteli veri)
-    final yandexResults = await _searchYandex(query);
-    if (yandexResults.isNotEmpty) return yandexResults;
+    final combined = <LocationSearchResult>[];
+    for (final list in results) {
+      for (final item in list) {
+        if (item.displayName.trim().isEmpty) continue;
+        final isDup = combined.any((existing) {
+          final dLat = (existing.lat - item.lat).abs();
+          final dLon = (existing.lon - item.lon).abs();
+          return dLat < 0.0012 &&
+              dLon < 0.0012 &&
+              existing.displayName.toLowerCase().split(',').first.trim() ==
+                  item.displayName.toLowerCase().split(',').first.trim();
+        });
+        if (!isDup) combined.add(item);
+      }
+    }
 
-    // 4. OSM (Son çare ücretsiz veri)
-    return _searchNominatim(query);
+    final qLower = trimmed.toLowerCase();
+    combined.sort((a, b) {
+      final aName = a.displayName.toLowerCase();
+      final bName = b.displayName.toLowerCase();
+      final aExact = aName.startsWith(qLower);
+      final bExact = bName.startsWith(qLower);
+      if (aExact != bExact) return aExact ? -1 : 1;
+
+      final aContains = aName.contains(qLower);
+      final bContains = bName.contains(qLower);
+      if (aContains != bContains) return aContains ? -1 : 1;
+
+      final aTr = aName.contains('türkiye') || aName.contains('turkey');
+      final bTr = bName.contains('türkiye') || bName.contains('turkey');
+      if (aTr != bTr) return aTr ? -1 : 1;
+
+      return 0;
+    });
+
+    return combined.take(35).toList();
+  }
+
+  static Future<List<LocationSearchResult>> _searchPhoton(String query) async {
+    try {
+      final uri = Uri.parse(
+        'https://photon.komoot.io/api/'
+        '?q=${Uri.encodeComponent(query)}'
+        '&limit=15',
+      );
+      final response = await http
+          .get(uri, headers: {'User-Agent': _userAgent})
+          .timeout(const Duration(seconds: 5));
+      if (response.statusCode != 200) return [];
+
+      final data = json.decode(response.body);
+      final List<dynamic> features = data['features'] ?? [];
+      final List<LocationSearchResult> items = [];
+      for (final f in features) {
+        final coords = f['geometry']?['coordinates'];
+        if (coords is! List || coords.length < 2) continue;
+        final props = f['properties'] as Map<String, dynamic>? ?? {};
+        final parts = <String>[
+          if ((props['name'] ?? '').toString().isNotEmpty) props['name'].toString(),
+          if ((props['street'] ?? '').toString().isNotEmpty) props['street'].toString(),
+          if ((props['district'] ?? '').toString().isNotEmpty) props['district'].toString(),
+          if ((props['city'] ?? '').toString().isNotEmpty) props['city'].toString(),
+          if ((props['state'] ?? '').toString().isNotEmpty) props['state'].toString(),
+          if ((props['country'] ?? '').toString().isNotEmpty) props['country'].toString(),
+        ];
+        final display = parts.toSet().join(', ');
+        if (display.isEmpty) continue;
+        items.add(LocationSearchResult(
+          displayName: display,
+          lat: (coords[1] as num).toDouble(),
+          lon: (coords[0] as num).toDouble(),
+          type: (props['osm_value'] ?? props['type'] ?? 'place').toString(),
+          category: 'photon',
+        ));
+      }
+      return items;
+    } catch (e) {
+      debugPrint('Photon search error: $e');
+      return [];
+    }
   }
 
   static Future<List<LocationSearchResult>> _searchMapbox(String query) async {
@@ -133,7 +208,8 @@ class RoutingService {
         'https://api.mapbox.com/geocoding/v5/mapbox.places/'
         '${Uri.encodeComponent(query)}.json'
         '?access_token=$mapboxToken'
-        '&country=tr'
+        '&autocomplete=true'
+        '&fuzzyMatch=true'
         '&language=tr'
         '&limit=10'
       );
@@ -245,18 +321,17 @@ class RoutingService {
       final uri = Uri.parse(
         'https://nominatim.openstreetmap.org/search'
         '?q=${Uri.encodeComponent(query)}'
-        '&countrycodes=tr'
         '&format=jsonv2'
         '&addressdetails=1'
         '&extratags=1'
         '&namedetails=1'
-        '&limit=80',
+        '&limit=25',
       );
 
       final response = await http.get(uri, headers: {
         'User-Agent': _userAgent,
         'Accept-Language': 'tr',
-      });
+      }).timeout(const Duration(seconds: 5));
 
       if (response.statusCode != 200) return [];
 

@@ -30,9 +30,11 @@ import 'package:mountaineering_app/services/earthquake_service.dart';
 import 'package:geolocator/geolocator.dart';
 import 'services/ad_service.dart';
 import 'services/background_monitor_service.dart';
+import 'services/tactical_styles.dart';
 import 'screens/critical_alert_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-const Color kOrange = Color(0xFFFF6B00);
+const Color kOrange = Color(0xFFFF5708);
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 @pragma('vm:entry-point')
@@ -40,6 +42,31 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  // Data-only mesajlarda da uygulama kapalıyken bildirim düşsün
+  if (message.notification == null && message.data.isNotEmpty) {
+    final title = message.data['title']?.toString() ?? 'ROTA+ Bildirim';
+    final body = message.data['body']?.toString() ??
+        message.data['message']?.toString() ??
+        '';
+    if (body.isNotEmpty) {
+      final plugin = FlutterLocalNotificationsPlugin();
+      const initAndroid = AndroidInitializationSettings('ic_notification');
+      await plugin.initialize(const InitializationSettings(android: initAndroid));
+      await plugin.show(
+        message.hashCode,
+        title,
+        body,
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'rota_plus_fcm_channel',
+            'Rota+ Mesajlar ve Uyarılar',
+            importance: Importance.max,
+            priority: Priority.high,
+          ),
+        ),
+      );
+    }
+  }
   debugPrint("Handling a background message: ${message.messageId}");
 }
 
@@ -188,34 +215,52 @@ class MountaineeringApp extends StatelessWidget {
                   title: 'Rota+ / Deprem ve Trekking',
                   navigatorKey: navigatorKey,
                   debugShowCheckedModeBanner: false,
-                  themeMode: currentThemeMode,
+                  themeMode: ThemeMode.dark,
                   locale: currentLocale,
                   theme: ThemeData(
                     useMaterial3: true,
-                    scaffoldBackgroundColor: Colors.white,
-                    appBarTheme: const AppBarTheme(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.black,
-                      elevation: 0,
+                    fontFamily: TacticalStyles.kHelveticaFont,
+                    fontFamilyFallback: TacticalStyles.kHelveticaFallback,
+                    scaffoldBackgroundColor: TacticalStyles.kSurface,
+                    textTheme: ThemeData.dark().textTheme.apply(
+                      fontFamily: TacticalStyles.kHelveticaFont,
+                      fontFamilyFallback: TacticalStyles.kHelveticaFallback,
                     ),
-                    colorScheme: ColorScheme.fromSeed(
-                      seedColor: kOrange,
-                      brightness: Brightness.light,
-                      surface: Colors.grey.shade100,
-                    ),
-                  ),
-                  darkTheme: ThemeData(
-                    useMaterial3: true,
-                    scaffoldBackgroundColor: const Color(0xFF0A0A0A),
                     appBarTheme: const AppBarTheme(
-                      backgroundColor: Colors.black,
-                      foregroundColor: Colors.white,
+                      backgroundColor: TacticalStyles.kSurface,
+                      foregroundColor: TacticalStyles.kOnSurface,
                       elevation: 0,
                     ),
                     colorScheme: ColorScheme.fromSeed(
                       seedColor: kOrange,
                       brightness: Brightness.dark,
-                      surface: const Color(0xFF141414),
+                      primary: TacticalStyles.kPrimary,
+                      secondary: TacticalStyles.kSecondaryContainer,
+                      tertiary: TacticalStyles.kTertiary,
+                      surface: TacticalStyles.kSurfaceContainer,
+                    ),
+                  ),
+                  darkTheme: ThemeData(
+                    useMaterial3: true,
+                    fontFamily: TacticalStyles.kHelveticaFont,
+                    fontFamilyFallback: TacticalStyles.kHelveticaFallback,
+                    scaffoldBackgroundColor: TacticalStyles.kSurface,
+                    textTheme: ThemeData.dark().textTheme.apply(
+                      fontFamily: TacticalStyles.kHelveticaFont,
+                      fontFamilyFallback: TacticalStyles.kHelveticaFallback,
+                    ),
+                    appBarTheme: const AppBarTheme(
+                      backgroundColor: TacticalStyles.kSurface,
+                      foregroundColor: TacticalStyles.kOnSurface,
+                      elevation: 0,
+                    ),
+                    colorScheme: ColorScheme.fromSeed(
+                      seedColor: kOrange,
+                      brightness: Brightness.dark,
+                      primary: TacticalStyles.kPrimary,
+                      secondary: TacticalStyles.kSecondaryContainer,
+                      tertiary: TacticalStyles.kTertiary,
+                      surface: TacticalStyles.kSurfaceContainer,
                     ),
                   ),
                   initialRoute: '/',
@@ -377,6 +422,8 @@ class _MainAppScreenState extends State<MainAppScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: TacticalStyles.kSurface,
+      extendBody: false,
       body: IndexedStack(
         index: _currentIndex,
         children: _screens,
@@ -386,50 +433,138 @@ class _MainAppScreenState extends State<MainAppScreen> {
   }
 
   Widget _buildBottomNav() {
-    const selectedStyle = TextStyle(color: kOrange, fontSize: 9, fontWeight: FontWeight.bold);
-    const unselectedStyle = TextStyle(color: Colors.white54, fontSize: 9);
-    return BottomNavigationBar(
-      currentIndex: _currentIndex,
-      onTap: (idx) => setState(() => _currentIndex = idx),
-      backgroundColor: Colors.black,
-      type: BottomNavigationBarType.fixed,
-      selectedFontSize: 9,
-      unselectedFontSize: 9,
-      selectedItemColor: kOrange,
-      unselectedItemColor: Colors.white38,
-      showUnselectedLabels: true,
-      items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.explore_outlined, size: 22),
-          activeIcon: Icon(Icons.explore, size: 22, color: kOrange),
-          label: 'Keşfet',
+    final navItems = [
+      {'icon': Icons.explore_outlined, 'activeIcon': Icons.explore_rounded, 'label': 'Keşfet', 'dot': false},
+      {'icon': Icons.sensors_rounded, 'activeIcon': Icons.sensors_rounded, 'label': 'Akış', 'dot': false},
+      {'icon': Icons.location_searching_rounded, 'activeIcon': Icons.my_location_rounded, 'label': 'Takip', 'dot': false},
+      {'icon': Icons.alt_route_rounded, 'activeIcon': Icons.alt_route_rounded, 'label': 'Rota', 'dot': false},
+      {'icon': Icons.shield_outlined, 'activeIcon': Icons.shield_rounded, 'label': 'Ekip', 'dot': true},
+      {'icon': Icons.person_outline_rounded, 'activeIcon': Icons.person_rounded, 'label': 'Profil', 'dot': false},
+    ];
+
+    return Container(
+      color: TacticalStyles.kSurface,
+      padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
+      child: SafeArea(
+        top: false,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(999),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 28, sigmaY: 28),
+            child: Container(
+              height: 62,
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    const Color(0xCC22222A),
+                    const Color(0xE60D0D12),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.16),
+                  width: 0.9,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: TacticalStyles.kPrimary.withOpacity(0.08),
+                    blurRadius: 18,
+                    spreadRadius: 0,
+                  ),
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.65),
+                    blurRadius: 28,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: List.generate(navItems.length, (idx) {
+                  final item = navItems[idx];
+                  final isSelected = _currentIndex == idx;
+                  final showDot = item['dot'] == true;
+
+                  return Expanded(
+                    child: TacticalPressable(
+                      pressedScale: 0.92,
+                      onTap: () => setState(() => _currentIndex = idx),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              AnimatedContainer(
+                                duration: const Duration(milliseconds: 180),
+                                width: 32,
+                                height: 32,
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? TacticalStyles.kPrimaryContainer.withOpacity(0.20)
+                                      : Colors.transparent,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  isSelected
+                                      ? (item['activeIcon'] as IconData)
+                                      : (item['icon'] as IconData),
+                                  size: 20,
+                                  color: isSelected
+                                      ? TacticalStyles.kPrimary
+                                      : TacticalStyles.kOnSurfaceVariant,
+                                ),
+                              ),
+                              if (showDot)
+                                Positioned(
+                                  top: 3,
+                                  right: 3,
+                                  child: Container(
+                                    width: 6,
+                                    height: 6,
+                                    decoration: const BoxDecoration(
+                                      color: TacticalStyles.kTertiary,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            item['label'] as String,
+                            style: TacticalStyles.labelMicro(
+                              fontSize: 9.5,
+                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                              color: isSelected
+                                  ? TacticalStyles.kPrimary
+                                  : TacticalStyles.kOnSurfaceVariant,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 180),
+                            width: isSelected ? 4 : 0,
+                            height: isSelected ? 4 : 0,
+                            decoration: const BoxDecoration(
+                              color: TacticalStyles.kPrimary,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ),
+          ),
         ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home_outlined, size: 22),
-          activeIcon: Icon(Icons.home_filled, size: 22, color: kOrange),
-          label: 'Akış',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.map_outlined, size: 22),
-          activeIcon: Icon(Icons.map, size: 22, color: kOrange),
-          label: 'Takip',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.navigation_outlined, size: 22),
-          activeIcon: Icon(Icons.navigation, size: 22, color: kOrange),
-          label: 'Rota',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.groups_outlined, size: 22),
-          activeIcon: Icon(Icons.groups, size: 22, color: kOrange),
-          label: 'Ekip',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person_outline, size: 22),
-          activeIcon: Icon(Icons.person, size: 22, color: kOrange),
-          label: 'Profil',
-        ),
-      ],
+      ),
     );
   }
 

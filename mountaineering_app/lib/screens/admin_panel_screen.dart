@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -6,6 +6,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'profile_screen.dart';
 import '../services/routing_service.dart';
+import '../services/tactical_styles.dart';
 
 class AdminPanelScreen extends StatefulWidget {
   const AdminPanelScreen({Key? key}) : super(key: key);
@@ -16,10 +17,10 @@ class AdminPanelScreen extends StatefulWidget {
 
 class _AdminPanelScreenState extends State<AdminPanelScreen>
     with SingleTickerProviderStateMixin {
-  static const Color kOrange = Color(0xFFFF6B00);
-  static const Color kBackground = Color(0xFF0A0A0A);
-  static const Color kCardBg = Color(0xFF141414);
-  static const Color kGreen = Color(0xFF62FF4C);
+  static const Color kOrange = TacticalStyles.kPrimaryContainer;
+  static const Color kBackground = TacticalStyles.kSurface;
+  static const Color kCardBg = TacticalStyles.kSurfaceLow;
+  static const Color kGreen = TacticalStyles.kTertiary;
 
   late TabController _tabController;
 
@@ -159,13 +160,13 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
     return Scaffold(
       backgroundColor: kBackground,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: TacticalStyles.kSurfaceLowest,
         title: Text('ROTA+ ADMİN',
-            style: GoogleFonts.outfit(
-                fontWeight: FontWeight.w900, fontSize: 16, color: kOrange)),
+            style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                fontWeight: FontWeight.w800, fontSize: 16, color: kOrange)),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.white),
+            icon: const Icon(Icons.refresh, color: TacticalStyles.kOnSurface),
             onPressed: _loadAll,
             tooltip: 'Yenile',
           ),
@@ -182,15 +183,15 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                   child: Column(
                     children: [
                       Row(children: [
-                        _buildStatCard('KULLANICI', _totalUsers.toString(), Icons.people, Colors.blue),
+                        _buildStatCard('KULLANICI', _totalUsers.toString(), Icons.people, TacticalStyles.kSecondaryContainer),
                         const SizedBox(width: 10),
                         _buildStatCard('PREMİUM', _premiumUsers.toString(), Icons.star, Colors.amber),
                       ]),
                       const SizedBox(height: 10),
                       Row(children: [
-                        _buildStatCard('GÖNDERI', _totalPosts.toString(), Icons.article, Colors.green),
+                        _buildStatCard('GÖNDERI', _totalPosts.toString(), Icons.article, kGreen),
                         const SizedBox(width: 10),
-                        _buildStatCard('CANLI', _liveMarkers.where((m) => m['is_online'] == true).length.toString(), Icons.location_on, Colors.redAccent),
+                        _buildStatCard('CANLI', _liveMarkers.where((m) => m['is_online'] == true).length.toString(), Icons.location_on, TacticalStyles.kError),
                       ]),
                     ],
                   ),
@@ -198,12 +199,12 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
 
                 // TabBar
                 Container(
-                  color: Colors.black,
+                  color: TacticalStyles.kSurfaceLowest,
                   child: TabBar(
                     controller: _tabController,
                     indicatorColor: kOrange,
                     labelColor: kOrange,
-                    unselectedLabelColor: Colors.white38,
+                    unselectedLabelColor: TacticalStyles.kOnSurfaceVariant,
                     isScrollable: true,
                     labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
                     tabs: const [
@@ -343,8 +344,8 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                         ),
                       ),
                       PopupMenuButton<String>(
-                        color: const Color(0xFF1A1A1A),
-                        icon: const Icon(Icons.more_vert, color: Colors.white38, size: 20),
+                        color: TacticalStyles.kSurfaceHigh,
+                        icon: const Icon(Icons.more_vert, color: TacticalStyles.kOnSurfaceVariant, size: 20),
                         onSelected: (v) => _userAction(doc.id, v, isPremium, isAdmin, name),
                         itemBuilder: (ctx) => [
                           PopupMenuItem(value: 'premium', child: Row(children: [Icon(isPremium ? Icons.star_border : Icons.star, color: Colors.amber, size: 18), const SizedBox(width: 8), Text(isPremium ? "Premium'u Kaldır" : 'Premium Yap', style: const TextStyle(color: Colors.white))])),
@@ -629,7 +630,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
           Row(children: [
             Container(width: 10, height: 10, decoration: BoxDecoration(color: m['is_online'] == true ? Colors.greenAccent : Colors.white38, shape: BoxShape.circle)),
             const SizedBox(width: 8),
-            Text(m['name'], style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+            Text(m['name'], style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(width: 8),
             if (m['is_premium'] == true) _badge('PREMIUM', Colors.amber),
           ]),
@@ -730,13 +731,13 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: Colors.black,
-        title: Text(name + ' - Sertifika', style: const TextStyle(color: Colors.white, fontSize: 14)),
+        backgroundColor: kCardBg,
+        title: Text(name + ' - Sertifika', style: const TextStyle(color: TacticalStyles.kOnSurface, fontSize: 14)),
         content: SizedBox(
           width: double.maxFinite,
           height: 400,
           child: isPdf
-              ? const Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Icon(Icons.picture_as_pdf, color: Colors.redAccent, size: 64), SizedBox(height: 16), Text('PDF içeriği burada gösterilecek (PDF Viewer entegrasyonu gerekir)', style: TextStyle(color: Colors.white54, fontSize: 12), textAlign: TextAlign.center)]))
+              ? const Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Icon(Icons.picture_as_pdf, color: TacticalStyles.kError, size: 64), SizedBox(height: 16), Text('PDF içeriği burada gösterilecek (PDF Viewer entegrasyonu gerekir)', style: TextStyle(color: TacticalStyles.kOnSurfaceVariant, fontSize: 12), textAlign: TextAlign.center)]))
               : InteractiveViewer(child: Image.memory(bytes)),
         ),
         actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('KAPAT'))],
@@ -788,7 +789,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                     const Icon(Icons.campaign, color: kOrange, size: 20),
                     const SizedBox(width: 8),
                     Text('Yeni Duyuru',
-                        style: GoogleFonts.outfit(
+                        style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
                             color: kOrange, fontWeight: FontWeight.w900, fontSize: 15)),
                   ],
                 ),
@@ -796,12 +797,12 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                 // Başlık
                 TextField(
                   controller: _duyuruBaslikCtrl,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: TacticalStyles.kOnSurface),
                   decoration: InputDecoration(
                     hintText: 'Duyuru başlığı...',
-                    hintStyle: const TextStyle(color: Colors.white38, fontSize: 13),
+                    hintStyle: const TextStyle(color: TacticalStyles.kOnSurfaceVariant, fontSize: 13),
                     filled: true,
-                    fillColor: Colors.black,
+                    fillColor: TacticalStyles.kSurfaceLowest,
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
                     focusedBorder: OutlineInputBorder(
@@ -815,13 +816,13 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                 // İçerik
                 TextField(
                   controller: _duyuruIcerikCtrl,
-                  style: const TextStyle(color: Colors.white, fontSize: 13),
+                  style: const TextStyle(color: TacticalStyles.kOnSurface, fontSize: 13),
                   maxLines: 3,
                   decoration: InputDecoration(
                     hintText: 'Duyuru içeriği...',
-                    hintStyle: const TextStyle(color: Colors.white38, fontSize: 13),
+                    hintStyle: const TextStyle(color: TacticalStyles.kOnSurfaceVariant, fontSize: 13),
                     filled: true,
-                    fillColor: Colors.black,
+                    fillColor: TacticalStyles.kSurfaceLowest,
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
                     focusedBorder: OutlineInputBorder(
@@ -890,7 +891,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                         : const Icon(Icons.send, color: Colors.black, size: 18),
                     label: Text(
                       _duyuruGonderiyor ? 'GÖNDERİLİYOR...' : 'DUYURUYU YAYINLA',
-                      style: GoogleFonts.outfit(
+                      style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
                           color: Colors.black, fontWeight: FontWeight.w900, fontSize: 13),
                     ),
                     onPressed: _duyuruGonderiyor ? null : () => _duyuruYayinla(setS),
@@ -909,7 +910,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
               const Icon(Icons.list_alt, color: Colors.white38, size: 14),
               const SizedBox(width: 6),
               Text('Mevcut Duyurular',
-                  style: GoogleFonts.outfit(
+                  style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
                       color: Colors.white38, fontSize: 12, fontWeight: FontWeight.bold)),
             ],
           ),
@@ -1074,7 +1075,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
         children: [
           Padding(
             padding: const EdgeInsets.all(14),
-            child: Text(title, style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+            child: Text(title, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
           ),
           const Divider(height: 1, color: Colors.white10),
           ...children,
@@ -1145,7 +1146,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(msg),
-      backgroundColor: error ? Colors.red.shade900 : const Color(0xFF1E1E1E),
+      backgroundColor: error ? TacticalStyles.kErrorContainer : TacticalStyles.kSurfaceHigh,
       duration: const Duration(seconds: 2),
     ));
   }
@@ -1295,7 +1296,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('YENİ YANGIN BİLDİRİMİ', style: GoogleFonts.outfit(color: kOrange, fontSize: 18, fontWeight: FontWeight.bold)),
+          Text('YENİ YANGIN BİLDİRİMİ', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kOrange, fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 16),
           Row(
             children: [
@@ -1456,7 +1457,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
             ),
           ),
           const SizedBox(height: 32),
-          Text('MEVCUT YANGINLAR', style: GoogleFonts.outfit(color: kOrange, fontSize: 18, fontWeight: FontWeight.bold)),
+          Text('MEVCUT YANGINLAR', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kOrange, fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 16),
           StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance.collection('fires').snapshots(),
@@ -1510,8 +1511,8 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                       title: Text(name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                       subtitle: Text('Durum: $status\nKonum: ${lat.toStringAsFixed(4)}, ${lng.toStringAsFixed(4)}', style: const TextStyle(color: Colors.white70, fontSize: 12)),
                       trailing: PopupMenuButton<String>(
-                        color: const Color(0xFF1A1A1A),
-                        icon: const Icon(Icons.edit, color: Colors.white54),
+                        color: TacticalStyles.kSurfaceHigh,
+                        icon: const Icon(Icons.edit, color: TacticalStyles.kOnSurfaceVariant),
                         onSelected: (val) async {
                           if (val == 'delete') {
                             await FirebaseFirestore.instance.collection('fires').doc(doc.id).delete();
@@ -1589,11 +1590,11 @@ class _AdminMapPickerScreenState extends State<_AdminMapPickerScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Haritadan Konum Seç'),
-        backgroundColor: Colors.black,
+        backgroundColor: TacticalStyles.kSurfaceLowest,
         actions: [
           if (_selectedPoint != null)
             IconButton(
-              icon: const Icon(Icons.check, color: Colors.green),
+              icon: const Icon(Icons.check, color: TacticalStyles.kTertiary),
               onPressed: () => Navigator.pop(context, _selectedPoint),
             )
         ],

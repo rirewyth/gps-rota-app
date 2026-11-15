@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -13,6 +13,7 @@ import 'premium_screen.dart';
 import '../services/premium_service.dart';
 import '../services/cloud_sync_service.dart';
 import '../services/ad_service.dart';
+import '../services/tactical_styles.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({Key? key}) : super(key: key);
@@ -22,9 +23,10 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  static const Color kOrange = Color(0xFFFF6B00);
-  static const Color kBackground = Color(0xFF0F0F13);
-  static const Color kCardBg = Color(0xFF17171C);
+  static const Color kOrange = TacticalStyles.kPrimaryContainer;
+  static const Color kBackground = TacticalStyles.kSurface;
+  static const Color kCardBg = TacticalStyles.kSurfaceLow;
+  static const Color kGreen = TacticalStyles.kTertiary;
   
   bool _isLoading = true;
   String _userId = '';
@@ -112,13 +114,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         builder: (ctx, setDialogState) => AlertDialog(
           backgroundColor: kCardBg,
           shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(0),
-              side: const BorderSide(color: kOrange, width: 1)),
+              borderRadius: BorderRadius.circular(16),
+              side: const BorderSide(color: TacticalStyles.kOutlineVariant, width: 1)),
           title: Row(
             children: [
               const Icon(Icons.edit, color: kOrange, size: 20),
               const SizedBox(width: 8),
-              Text('PROFİLİ DÜZENLE', style: GoogleFonts.shareTechMono(color: kOrange, fontWeight: FontWeight.bold)),
+              Text('PROFİLİ DÜZENLE', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kOrange, fontWeight: FontWeight.bold)),
             ],
           ),
           content: SingleChildScrollView(
@@ -134,7 +136,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       children: [
                         const Icon(Icons.error_outline, color: Colors.red, size: 16),
                         const SizedBox(width: 8),
-                        Expanded(child: Text(errorMessage!, style: GoogleFonts.shareTechMono(color: Colors.red, fontSize: 12))),
+                        Expanded(child: Text(errorMessage!, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.red, fontSize: 12))),
                       ],
                     ),
                   ),
@@ -148,8 +150,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
-                    color: Colors.black,
-                    border: Border.all(color: Colors.white12),
+                    color: TacticalStyles.kSurfaceLowest,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: TacticalStyles.kOutlineVariant),
                   ),
                   child: Row(
                     children: [
@@ -159,8 +162,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('E-posta Görülebilirliği', style: GoogleFonts.shareTechMono(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
-                            Text('Diğerleri e-postanızı görebilir', style: GoogleFonts.shareTechMono(color: Colors.white38, fontSize: 11)),
+                            Text('E-posta Görülebilirliği', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+                            Text('Diğerleri e-postanızı görebilir', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white38, fontSize: 11)),
                           ],
                         ),
                       ),
@@ -176,9 +179,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: Text('İPTAL', style: GoogleFonts.shareTechMono(color: Colors.white54))),
+            TextButton(onPressed: () => Navigator.pop(ctx), child: Text('İPTAL', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white54))),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: kOrange, shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero)),
+              style: ElevatedButton.styleFrom(backgroundColor: kOrange, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
               onPressed: () async {
                 String newName = nameCtrl.text.trim();
                 String newBio = bioCtrl.text.trim();
@@ -222,7 +225,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 });
                 if (ctx.mounted) Navigator.pop(ctx);
               },
-              child: Text('KAYDET', style: GoogleFonts.shareTechMono(color: Colors.black, fontWeight: FontWeight.bold)),
+              child: Text('KAYDET', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.black, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -234,15 +237,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return TextField(
       controller: ctrl,
       maxLines: maxLines,
-      style: GoogleFonts.shareTechMono(color: Colors.white),
+      style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: GoogleFonts.shareTechMono(color: Colors.white38),
+        labelStyle: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white38),
         prefixIcon: Icon(icon, color: Colors.white24, size: 18),
         filled: true,
-        fillColor: Colors.black,
-        border: const OutlineInputBorder(borderSide: BorderSide(color: Colors.white12)),
-        enabledBorder: const OutlineInputBorder(borderSide: BorderSide(color: Colors.white12)),
+        fillColor: TacticalStyles.kSurfaceLowest,
+        border: const OutlineInputBorder(borderSide: BorderSide(color: TacticalStyles.kOutlineVariant)),
+        enabledBorder: const OutlineInputBorder(borderSide: BorderSide(color: TacticalStyles.kOutlineVariant)),
         focusedBorder: const OutlineInputBorder(borderSide: BorderSide(color: kOrange)),
       ),
     );
@@ -261,7 +264,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       builder: (ctx) => AlertDialog(
         backgroundColor: kCardBg,
         shape: RoundedRectangleBorder(side: const BorderSide(color: kOrange), borderRadius: BorderRadius.zero),
-        title: Text('KİŞİSEL BİLGİLER', style: GoogleFonts.shareTechMono(color: kOrange, fontWeight: FontWeight.bold)),
+        title: Text('KİŞİSEL BİLGİLER', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kOrange, fontWeight: FontWeight.bold)),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -277,7 +280,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           )
         ),
         actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: Text('İPTAL', style: GoogleFonts.shareTechMono(color: Colors.white54))),
+            TextButton(onPressed: () => Navigator.pop(ctx), child: Text('İPTAL', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white54))),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: kOrange, shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero)),
               onPressed: () async {
@@ -306,7 +309,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   });
                   if (ctx.mounted) Navigator.pop(ctx);
               },
-              child: Text('KAYDET', style: GoogleFonts.shareTechMono(color: Colors.black, fontWeight: FontWeight.bold)),
+              child: Text('KAYDET', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.black, fontWeight: FontWeight.bold)),
             ),
         ],
       )
@@ -324,9 +327,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
-              backgroundColor: const Color(0xFF141414),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Color(0xFFFF6B00), width: 1)),
-              title: const Text('Kurum / Kuruluş Bilgisi', style: TextStyle(color: Color(0xFFFF6B00), fontWeight: FontWeight.bold, fontSize: 18)),
+              backgroundColor: kCardBg,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: kOrange, width: 1)),
+              title: const Text('Kurum / Kuruluş Bilgisi', style: TextStyle(color: kOrange, fontWeight: FontWeight.bold, fontSize: 18)),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -337,12 +340,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   const SizedBox(height: 16),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.white24)),
+                    decoration: BoxDecoration(color: TacticalStyles.kSurfaceLowest, borderRadius: BorderRadius.circular(8), border: Border.all(color: TacticalStyles.kOutlineVariant)),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
                         value: (selectedType.isEmpty || !['Bireysel', 'Spor Kulübü', 'Dernek'].contains(selectedType)) ? 'Bireysel' : selectedType,
                         isExpanded: true,
-                        dropdownColor: Colors.black,
+                        dropdownColor: TacticalStyles.kSurfaceLowest,
                         style: const TextStyle(color: Colors.white, fontSize: 14),
                         items: ['Bireysel', 'Spor Kulübü', 'Dernek'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
                         onChanged: (val) {
@@ -359,8 +362,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       decoration: const InputDecoration(
                         labelText: 'Kurum / Kulüp Adı',
                         labelStyle: TextStyle(color: Colors.white54),
-                        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white24)),
-                        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xFFFF6B00))),
+                        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: TacticalStyles.kOutlineVariant)),
+                        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: kOrange)),
                       ),
                     ),
                   ]
@@ -372,7 +375,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   child: const Text('İPTAL', style: TextStyle(color: Colors.white54)),
                 ),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF6B00)),
+                  style: ElevatedButton.styleFrom(backgroundColor: kOrange),
                   onPressed: () async {
                     if (selectedType != 'Bireysel' && nameCtrl.text.trim().isEmpty) return;
                     final user = FirebaseAuth.instance.currentUser;
@@ -403,17 +406,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1F1111),
+        backgroundColor: kCardBg,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(0),
           side: const BorderSide(color: Colors.redAccent, width: 2),
         ),
-        title: Text('OTURUMU SONLANDIR', style: GoogleFonts.shareTechMono(color: Colors.redAccent, fontWeight: FontWeight.bold)),
-        content: Text('Mevcut oturumu sonlandırmak istediğinize emin misiniz? Ön bellek temizlenecektir.', style: GoogleFonts.shareTechMono(color: Colors.white70)),
+        title: Text('OTURUMU SONLANDIR', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.redAccent, fontWeight: FontWeight.bold)),
+        content: Text('Mevcut oturumu sonlandırmak istediğinize emin misiniz? Ön bellek temizlenecektir.', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white70)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text('İPTAL', style: GoogleFonts.shareTechMono(color: Colors.white38)),
+            child: Text('İPTAL', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white38)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -421,7 +424,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
             ),
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text('SONLANDIR', style: GoogleFonts.shareTechMono(color: Colors.white, fontWeight: FontWeight.bold)),
+            child: Text('SONLANDIR', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -446,22 +449,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
-          backgroundColor: const Color(0xFF1F0808),
+          backgroundColor: kCardBg,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(0),
             side: const BorderSide(color: Colors.redAccent, width: 2),
           ),
-          title: Text('HESABI SİL', style: GoogleFonts.shareTechMono(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+          title: Text('HESABI SİL', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.redAccent, fontWeight: FontWeight.bold)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'Hesabınız 30 gün içinde tamamen silinecektir. Bu süre zarfında giriş yaparsanız silme işlemi iptal edilir.',
-                style: GoogleFonts.shareTechMono(color: Colors.white70, fontSize: 13),
+                style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white70, fontSize: 13),
               ),
               const SizedBox(height: 20),
-              Text('ONAY İÇİN ŞİFRE GİRİN:', style: GoogleFonts.shareTechMono(color: Colors.white38, fontSize: 11)),
+              Text('ONAY İÇİN ŞİFRE GİRİN:', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white38, fontSize: 11)),
               const SizedBox(height: 8),
               TextField(
                 controller: passwordCtrl,
@@ -469,8 +472,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 style: const TextStyle(color: Colors.white),
                 decoration: const InputDecoration(
                   filled: true,
-                  fillColor: Colors.black,
-                  enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white12)),
+                  fillColor: TacticalStyles.kSurfaceLowest,
+                  enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: TacticalStyles.kOutlineVariant)),
                   focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.redAccent)),
                 ),
               ),
@@ -479,7 +482,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: Text('İPTAL', style: GoogleFonts.shareTechMono(color: Colors.white38)),
+              child: Text('İPTAL', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white38)),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -511,7 +514,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               },
               child: isDeleting 
                 ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                : Text('HESABI SİL', style: GoogleFonts.shareTechMono(color: Colors.white, fontWeight: FontWeight.bold)),
+                : Text('HESABI SİL', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -524,42 +527,39 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return Scaffold(
       backgroundColor: kBackground,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: TacticalStyles.kSurfaceLowest,
         elevation: 0,
+        centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: kOrange, size: 18),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(AppState.tr('ROTA+ KOMUTA'), style: GoogleFonts.shareTechMono(color: kOrange, fontWeight: FontWeight.bold, fontSize: 16)),
+        title: TacticalStyles.appBarPill(AppState.tr('PROFİL YÖNETİMİ'), icon: Icons.manage_accounts_outlined),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator(color: kOrange))
           : SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(AppState.tr('PROFİL YÖNETİMİ'), style: GoogleFonts.outfit(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900, letterSpacing: 1)),
-                  const SizedBox(height: 20),
+                  Text(AppState.tr('PROFİL YÖNETİMİ'), style: TacticalStyles.displayHero(color: Colors.white, size: 26)),
+                  const SizedBox(height: 16),
 
                   // Search Bar
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF101014),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.white10),
-                    ),
+                    decoration: TacticalStyles.recessedDecoration(radius: 14),
                     child: Row(
                       children: [
                         const Icon(Icons.search, color: Colors.white54, size: 20),
                         const SizedBox(width: 12),
                         Expanded(
                           child: TextField(
-                            style: GoogleFonts.shareTechMono(color: Colors.white),
+                            style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white),
                             decoration: InputDecoration(
                               hintText: AppState.tr('PARAMETRE ARA..'),
-                              hintStyle: GoogleFonts.shareTechMono(color: Colors.white24, fontSize: 13),
+                              hintStyle: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white24, fontSize: 13),
                               border: InputBorder.none,
                             ),
                           ),
@@ -570,7 +570,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   const SizedBox(height: 32),
 
                   // 01 / ACCOUNT & PROFILE
-                  _buildSectionHeader(AppState.tr('01 / HESAP VE PROFİL'), 'ID: RP-\$_userId'),
+                  _buildSectionHeader(AppState.tr('01 / HESAP VE PROFİL'), 'ID: RP-$_userId'),
                   const SizedBox(height: 12),
                   Container(
                     decoration: const BoxDecoration(
@@ -692,7 +692,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           children: [
                             const Icon(Icons.stars, color: Colors.white, size: 36),
                             const SizedBox(height: 10),
-                            Text('ROTA+ PREMIUM', style: GoogleFonts.outfit(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 2)),
+                            Text('ROTA+ PREMIUM', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 2)),
                             const SizedBox(height: 8),
                             const Text('Taktik Radar, Gece Modu ve Profesyonel Hayatta Kalma Rehberi için yükseltin.', 
                               textAlign: TextAlign.center,
@@ -718,7 +718,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 24),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF120808),
+                        color: kCardBg,
                         border: Border.all(color: Colors.redAccent.withOpacity(0.3), width: 1),
                       ),
                       child: Column(
@@ -726,9 +726,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         children: [
                           const Icon(Icons.logout, color: Color(0xFFFFB3B3), size: 24),
                           const SizedBox(height: 12),
-                          Text(AppState.tr('O T U R U M U   S O N L A N D I R'), style: GoogleFonts.shareTechMono(color: const Color(0xFFFFB3B3), fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 2)),
+                          Text(AppState.tr('O T U R U M U   S O N L A N D I R'), style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: const Color(0xFFFFB3B3), fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 2)),
                           const SizedBox(height: 8),
-                          Text(AppState.tr('UYARI: OTURUMU KAPATMAK ÖNBELLEĞİ TEMİZLEYECEKTİR'), style: GoogleFonts.shareTechMono(color: Colors.white38, fontSize: 9, letterSpacing: 1)),
+                          Text(AppState.tr('UYARI: OTURUMU KAPATMAK ÖNBELLEĞİ TEMİZLEYECEKTİR'), style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white38, fontSize: 9, letterSpacing: 1)),
                         ],
                       ),
                     ),
@@ -742,7 +742,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 24),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF120808).withOpacity(0.5),
+                        color: kCardBg.withOpacity(0.6),
                         border: Border.all(color: Colors.redAccent.withOpacity(0.2), width: 1),
                       ),
                       child: Column(
@@ -750,7 +750,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         children: [
                           const Icon(Icons.delete_forever_outlined, color: Colors.redAccent, size: 24),
                           const SizedBox(height: 12),
-                          Text(AppState.tr('H E S A B I   T A M A M E N   S İ L'), style: GoogleFonts.shareTechMono(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 2)),
+                          Text(AppState.tr('H E S A B I   T A M A M E N   S İ L'), style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 2)),
                         ],
                       ),
                     ),
@@ -761,9 +761,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   Center(
                     child: Column(
                       children: [
-                        Text('ROTA+ OPERATING SYSTEM', style: GoogleFonts.shareTechMono(color: Colors.white24, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 3)),
+                        Text('ROTA+ OPERATING SYSTEM', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white24, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 3)),
                         const SizedBox(height: 8),
-                        Text('BUILD VERSION 4.0.21-ALPINE', style: GoogleFonts.shareTechMono(color: Colors.white12, fontSize: 10, letterSpacing: 2)),
+                        Text('BUILD VERSION 4.0.21-ALPINE', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white12, fontSize: 10, letterSpacing: 2)),
                       ],
                     ),
                   ),
@@ -834,9 +834,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title, style: GoogleFonts.shareTechMono(color: kOrange, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+        Text(title, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kOrange, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
         if (status.isNotEmpty)
-          Text(status, style: GoogleFonts.shareTechMono(color: statusColor, fontSize: 10, letterSpacing: 1)),
+          Text(status, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: statusColor, fontSize: 10, letterSpacing: 1)),
       ],
     );
   }
@@ -848,9 +848,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Row(
           children: [
-            Icon(icon, color: const Color(0xFFD6A485), size: 22),
+            Icon(icon, color: kOrange, size: 22),
             const SizedBox(width: 16),
-            Expanded(child: Text(title, style: GoogleFonts.outfit(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 0.5))),
+            Expanded(child: Text(title, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 0.5))),
             const Icon(Icons.chevron_right, color: Colors.white24, size: 20),
           ],
         ),
@@ -865,10 +865,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Row(
           children: [
-            Icon(icon, color: const Color(0xFFD6A485), size: 22),
+            Icon(icon, color: kOrange, size: 22),
             const SizedBox(width: 16),
-            Expanded(child: Text(title, style: GoogleFonts.outfit(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 0.5))),
-            Text(trailingText, style: GoogleFonts.shareTechMono(color: trailingColor, fontSize: 11, letterSpacing: 1)),
+            Expanded(child: Text(title, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 0.5))),
+            Text(trailingText, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: trailingColor, fontSize: 11, letterSpacing: 1)),
             const SizedBox(width: 8),
             const Icon(Icons.chevron_right, color: Colors.white24, size: 20),
           ],
@@ -892,7 +892,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: GoogleFonts.outfit(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+                Text(title, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),
                 Text(subtitle, style: const TextStyle(color: Colors.white54, fontSize: 11)),
               ],
@@ -921,7 +921,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: GoogleFonts.outfit(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+                  Text(title, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 4),
                   Text(subtitle, style: const TextStyle(color: Colors.white54, fontSize: 11)),
                 ],

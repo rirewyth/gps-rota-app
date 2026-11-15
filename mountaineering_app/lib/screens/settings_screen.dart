@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:mountaineering_app/storage_helper.dart';
 import '../database_helper.dart';
 import 'login_screen.dart';
@@ -13,6 +13,7 @@ import '../services/cloud_sync_service.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
+import '../services/tactical_styles.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -22,10 +23,10 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  static const Color kOrange = Color(0xFFFF6B00);
-  static const Color kCardBg = Color(0xFF141414);
-  static const Color kBackground = Color(0xFF0A0A0A);
-  static const Color kGreen = Color(0xFF62FF4C);
+  static const Color kOrange = TacticalStyles.kPrimaryContainer;
+  static const Color kCardBg = TacticalStyles.kSurfaceLow;
+  static const Color kBackground = TacticalStyles.kSurface;
+  static const Color kGreen = TacticalStyles.kTertiary;
 
   // Baglanti ayarlari
   bool _uyduBaglantisi = true;
@@ -245,21 +246,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: AppBar(
         backgroundColor: kBackground,
         elevation: 0,
+        centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('ROTA+',
-            style: TextStyle(
-                color: kOrange, fontWeight: FontWeight.w900, letterSpacing: 2)),
-        actions: [
-          TextButton(
-            onPressed: _isLoading ? null : _kaydet,
-            child: const Text('KAYDET',
-                style: TextStyle(
-                    color: kOrange, fontWeight: FontWeight.bold, fontSize: 12)),
+        title: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: TacticalStyles.glassCardDecoration(
+            radius: 999,
+            borderColor: kOrange.withValues(alpha: 0.4),
           ),
-          const SizedBox(width: 8),
+          child: Text(
+            'ROTA+ AYARLAR',
+            style: TacticalStyles.labelCaps(color: kOrange, size: 11, weight: FontWeight.w800),
+          ),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: Center(
+              child: InkWell(
+                borderRadius: BorderRadius.circular(999),
+                onTap: _isLoading ? null : _kaydet,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: TacticalStyles.glassCardDecoration(
+                    radius: 999,
+                    borderColor: TacticalStyles.kTertiary.withValues(alpha: 0.45),
+                  ),
+                  child: Text(
+                    'KAYDET',
+                    style: TacticalStyles.labelMicro(color: TacticalStyles.kTertiary, size: 11),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
       body: _isLoading
@@ -298,8 +321,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('PREMIUM ÜYESİNİZ', style: GoogleFonts.shareTechMono(color: kGreen, fontWeight: FontWeight.bold, fontSize: 14)),
-                              Text('Tüm taktiksel özellikler aktif.', style: GoogleFonts.outfit(color: Colors.white70, fontSize: 11)),
+                              Text('PREMIUM ÜYESİNİZ', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kGreen, fontWeight: FontWeight.bold, fontSize: 14)),
+                              Text('Tüm taktiksel özellikler aktif.', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white70, fontSize: 11)),
                             ],
                           ),
                         ],
@@ -715,9 +738,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         labelText: label,
         labelStyle: const TextStyle(color: Colors.white38),
         filled: true,
-        fillColor: const Color(0xFF0A0A0A),
-        border: const OutlineInputBorder(borderSide: BorderSide(color: Colors.white12)),
-        enabledBorder: const OutlineInputBorder(borderSide: BorderSide(color: Colors.white12)),
+        fillColor: TacticalStyles.kSurfaceLowest,
+        border: const OutlineInputBorder(borderSide: BorderSide(color: TacticalStyles.kOutlineVariant)),
+        enabledBorder: const OutlineInputBorder(borderSide: BorderSide(color: TacticalStyles.kOutlineVariant)),
         focusedBorder: const OutlineInputBorder(borderSide: BorderSide(color: kOrange)),
       ),
     );
@@ -805,11 +828,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
               style: const TextStyle(color: Colors.white),
               decoration: const InputDecoration(
                 filled: true,
-                fillColor: Color(0xFF0A0A0A),
+                fillColor: TacticalStyles.kSurfaceLowest,
                 border:
-                    OutlineInputBorder(borderSide: BorderSide(color: Colors.white12)),
+                    OutlineInputBorder(borderSide: BorderSide(color: TacticalStyles.kOutlineVariant)),
                 enabledBorder:
-                    OutlineInputBorder(borderSide: BorderSide(color: Colors.white12)),
+                    OutlineInputBorder(borderSide: BorderSide(color: TacticalStyles.kOutlineVariant)),
                 focusedBorder:
                     OutlineInputBorder(borderSide: BorderSide(color: kOrange)),
               ),
@@ -896,8 +919,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               width: 60,
               padding: const EdgeInsets.symmetric(vertical: 12),
               decoration: BoxDecoration(
-                color: _kanGrubu == g ? kOrange : const Color(0xFF0A0A0A),
-                border: Border.all(color: _kanGrubu == g ? kOrange : Colors.white12),
+                color: _kanGrubu == g ? kOrange : TacticalStyles.kSurfaceLowest,
+                border: Border.all(color: _kanGrubu == g ? kOrange : TacticalStyles.kOutlineVariant),
                 borderRadius: BorderRadius.circular(4),
               ),
               alignment: Alignment.center,
@@ -935,11 +958,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             hintText: 'Alerjiler, ilaçlar, kronik hastalıklar...',
             hintStyle: TextStyle(color: Colors.white24),
             filled: true,
-            fillColor: Color(0xFF0A0A0A),
+            fillColor: TacticalStyles.kSurfaceLowest,
             border:
-                OutlineInputBorder(borderSide: BorderSide(color: Colors.white12)),
+                OutlineInputBorder(borderSide: BorderSide(color: TacticalStyles.kOutlineVariant)),
             enabledBorder:
-                OutlineInputBorder(borderSide: BorderSide(color: Colors.white12)),
+                OutlineInputBorder(borderSide: BorderSide(color: TacticalStyles.kOutlineVariant)),
             focusedBorder:
                 OutlineInputBorder(borderSide: BorderSide(color: kOrange)),
           ),
@@ -978,9 +1001,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             hintText: 'Ad Soyad',
             hintStyle: TextStyle(color: Colors.white24),
             filled: true,
-            fillColor: Color(0xFF0A0A0A),
+            fillColor: TacticalStyles.kSurfaceLowest,
             border:
-                OutlineInputBorder(borderSide: BorderSide(color: Colors.white12)),
+                OutlineInputBorder(borderSide: BorderSide(color: TacticalStyles.kOutlineVariant)),
             focusedBorder:
                 OutlineInputBorder(borderSide: BorderSide(color: kOrange)),
           ),
@@ -1049,7 +1072,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: const Color(0xFF0A0A0A),
+                  fillColor: TacticalStyles.kSurfaceLowest,
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
                     icon: Icon(localVisible ? Icons.visibility : Icons.visibility_off, color: Colors.white38),
@@ -1092,7 +1115,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           controller: ctrl,
           keyboardType: TextInputType.number,
           style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(filled: true, fillColor: Color(0xFF0A0A0A), border: OutlineInputBorder()),
+          decoration: const InputDecoration(filled: true, fillColor: TacticalStyles.kSurfaceLowest, border: OutlineInputBorder()),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('KAPAT', style: TextStyle(color: Colors.white38))),
@@ -1120,7 +1143,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           controller: ctrl,
           keyboardType: TextInputType.number,
           style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(filled: true, fillColor: Color(0xFF0A0A0A), border: OutlineInputBorder()),
+          decoration: const InputDecoration(filled: true, fillColor: TacticalStyles.kSurfaceLowest, border: OutlineInputBorder()),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('KAPAT', style: TextStyle(color: Colors.white38))),
@@ -1148,7 +1171,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           controller: ctrl,
           keyboardType: TextInputType.number,
           style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(filled: true, fillColor: Color(0xFF0A0A0A), border: OutlineInputBorder()),
+          decoration: const InputDecoration(filled: true, fillColor: TacticalStyles.kSurfaceLowest, border: OutlineInputBorder()),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('KAPAT', style: TextStyle(color: Colors.white38))),
@@ -1181,9 +1204,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             hintText: '+90 555 000 0000',
             hintStyle: TextStyle(color: Colors.white24),
             filled: true,
-            fillColor: Color(0xFF0A0A0A),
+            fillColor: TacticalStyles.kSurfaceLowest,
             border:
-                OutlineInputBorder(borderSide: BorderSide(color: Colors.white12)),
+                OutlineInputBorder(borderSide: BorderSide(color: TacticalStyles.kOutlineVariant)),
             focusedBorder:
                 OutlineInputBorder(borderSide: BorderSide(color: kOrange)),
           ),
@@ -1319,9 +1342,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required ValueChanged<bool> onChanged,
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-      color: kCardBg,
+      decoration: TacticalStyles.glassCardDecoration(radius: 14),
       child: Row(
         children: [
           Icon(icon, color: kGreen.withOpacity(0.8), size: 22),
@@ -1362,8 +1385,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required VoidCallback onTap,
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      color: kCardBg,
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: TacticalStyles.glassCardDecoration(radius: 14),
       child: ListTile(
         leading: Icon(icon, color: kGreen.withOpacity(0.8), size: 22),
         title: Text(title,
@@ -1390,9 +1413,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required ValueChanged<double> onChanged,
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(16),
-      color: kCardBg,
+      decoration: TacticalStyles.glassCardDecoration(radius: 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1431,8 +1454,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     Color? trailingColor,
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      color: kCardBg,
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: TacticalStyles.glassCardDecoration(radius: 14),
       child: ListTile(
         leading: Icon(icon, color: kGreen.withOpacity(0.8), size: 22),
         title: Text(title,
@@ -1457,9 +1480,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required String subtitle,
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-      color: kCardBg,
+      decoration: TacticalStyles.glassCardDecoration(radius: 14),
       child: Row(
         children: [
           Icon(icon, color: kGreen.withOpacity(0.8), size: 22),

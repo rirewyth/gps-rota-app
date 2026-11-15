@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -6,6 +6,7 @@ import 'dart:ui';
 import 'dart:async';
 import 'dart:io' show Platform;
 import '../services/premium_service.dart';
+import '../services/tactical_styles.dart';
 
 class PremiumScreen extends StatefulWidget {
   const PremiumScreen({Key? key}) : super(key: key);
@@ -25,6 +26,60 @@ class _PremiumScreenState extends State<PremiumScreen> {
   late StreamSubscription<bool> _purchaseSub;
 
   final List<Map<String, dynamic>> _features = [
+    {
+      'icon': Icons.wb_twilight_rounded,
+      'title': 'Güneş & Gece Operasyon Radarı',
+      'desc': 'Offline güneş yörüngesi, kalan gün ışığı sayacı, altın saat kamp limiti ve ay aydınlatması.',
+      'color': Colors.orangeAccent,
+    },
+    {
+      'icon': Icons.ac_unit_rounded,
+      'title': 'Hipotermi & Rüzgar Soğuğu Kalkanı',
+      'desc': 'Hedef irtifaya göre Wind Chill, donma süresi (dk), matara donma uyarısı ve katman önerisi.',
+      'color': Colors.cyanAccent,
+    },
+    {
+      'icon': Icons.flashlight_on_rounded,
+      'title': 'Mors Feneri & Sinyal İstasyonu',
+      'desc': 'Özel mesajınızı telefon flaşıyla gerçek Mors koduna çevirip yayınlayın + kırmızı gece feneri.',
+      'color': Colors.redAccent,
+    },
+    {
+      'icon': Icons.backpack_rounded,
+      'title': 'Ekipman & Kalori Planlayıcı PRO',
+      'desc': 'Ekspedisyon süresine ve irtifaya göre otomatik teknik çanta listesi, ağırlık (kg), su ve kalori hesabı.',
+      'color': Colors.amber,
+    },
+    {
+      'icon': Icons.workspace_premium_rounded,
+      'title': 'Zirve Pasaportu & Sertifika PRO',
+      'desc': 'GPS koordinatlı zirve günlüğü, alpinist rütbeleri ve paylaşılabilir dijital Zirve Sertifikası.',
+      'color': Colors.tealAccent,
+    },
+    {
+      'icon': Icons.speed_rounded,
+      'title': 'Barometre & Fırtına Radarı PRO',
+      'desc': '24 saatlik hPa basınç eğrisi, 3 saatlik fırtına risk uyarısı ve yüksek irtifa oksijen yoğunluğu.',
+      'color': Colors.lightBlueAccent,
+    },
+    {
+      'icon': Icons.shield_moon_rounded,
+      'title': 'Otomatik Hareketsizlik SOS',
+      'desc': 'Dead Man\'s Switch: Seçtiğiniz süre hareket algılanmazsa 30 sn onay sonrası otomatik SOS gönderir.',
+      'color': Colors.redAccent,
+    },
+    {
+      'icon': Icons.route_rounded,
+      'title': 'Profesyonel GPX Dışa Aktarma',
+      'desc': 'Rotalarınızı Garmin, Strava ve Suunto uyumlu standart .gpx dosyası olarak dışa aktarın.',
+      'color': Colors.amber,
+    },
+    {
+      'icon': Icons.auto_graph_rounded,
+      'title': 'Akıllı Eğim & Zirve Analizi',
+      'desc': 'Naismith kuralıyla tırmanış süresi, maksimum eğim açısı ve >30° dik eğim/çığ riski analizi.',
+      'color': Colors.cyanAccent,
+    },
     {
       'icon': Icons.verified,
       'title': 'Onaylı Mavi Tik',
@@ -109,13 +164,13 @@ class _PremiumScreenState extends State<PremiumScreen> {
           showDialog(
             context: context,
             builder: (ctx) => AlertDialog(
-              backgroundColor: Colors.white,
-              title: const Text('İşlem Tamamlanamadı'),
-              content: const Text('Satın alma işlemi başarısız oldu veya iptal edildi.'),
+              backgroundColor: TacticalStyles.kSurfaceLow,
+              title: const Text('İşlem Tamamlanamadı', style: TextStyle(color: TacticalStyles.kOnSurface)),
+              content: const Text('Satın alma işlemi başarısız oldu veya iptal edildi.', style: TextStyle(color: TacticalStyles.kOnSurfaceVariant)),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),
-                  child: const Text('Tamam', style: TextStyle(color: Colors.green)),
+                  child: const Text('Tamam', style: TextStyle(color: TacticalStyles.kTertiary)),
                 ),
               ],
             ),
@@ -156,13 +211,13 @@ class _PremiumScreenState extends State<PremiumScreen> {
         showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
-            backgroundColor: Colors.white,
-            title: const Text('Satın Alma Başarısız'),
-            content: Text(e.toString().replaceAll('Exception: ', '')),
+            backgroundColor: TacticalStyles.kSurfaceLow,
+            title: const Text('Satın Alma Başarısız', style: TextStyle(color: TacticalStyles.kOnSurface)),
+            content: Text(e.toString().replaceAll('Exception: ', ''), style: const TextStyle(color: TacticalStyles.kOnSurfaceVariant)),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
-                child: const Text('Tamam', style: TextStyle(color: Colors.green)),
+                child: const Text('Tamam', style: TextStyle(color: TacticalStyles.kTertiary)),
               )
             ]
           )
@@ -175,16 +230,18 @@ class _PremiumScreenState extends State<PremiumScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const Color kGreen = Color(0xFF62FF4C);
-    const Color kDarkBg = Color(0xFF0A0A0A);
+    const Color kGreen = TacticalStyles.kTertiary;
+    const Color kDarkBg = TacticalStyles.kSurface;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: kDarkBg,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: kDarkBg,
         elevation: 0,
+        centerTitle: true,
+        title: TacticalStyles.appBarPill('ROTA+ PRO', color: Colors.amber, icon: Icons.workspace_premium_rounded),
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.black54),
+          icon: const Icon(Icons.close, color: TacticalStyles.kOnSurfaceVariant),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -195,12 +252,10 @@ class _PremiumScreenState extends State<PremiumScreen> {
             Text(
               'ROTA+ Premium\nAbonesi Ol',
               textAlign: TextAlign.center,
-              style: GoogleFonts.outfit(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-                height: 1.1,
-              ),
+              style: TacticalStyles.displayHero(
+                size: 30,
+                color: TacticalStyles.kOnSurface,
+              ).copyWith(height: 1.15),
             ),
             const SizedBox(height: 30),
             
@@ -218,15 +273,16 @@ class _PremiumScreenState extends State<PremiumScreen> {
                         Container(
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            color: _features[i]['color'].withOpacity(0.1),
+                            color: _features[i]['color'].withOpacity(0.15),
                             shape: BoxShape.circle,
+                            border: Border.all(color: _features[i]['color'].withOpacity(0.3)),
                           ),
                           child: Icon(_features[i]['icon'], size: 60, color: _features[i]['color']),
                         ),
                         const SizedBox(height: 20),
                         Text(
                           _features[i]['title'],
-                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+                          style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], fontSize: 20, fontWeight: FontWeight.bold, color: TacticalStyles.kOnSurface),
                         ),
                         const SizedBox(height: 8),
                         Padding(
@@ -234,7 +290,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                           child: Text(
                             _features[i]['desc'],
                             textAlign: TextAlign.center,
-                            style: const TextStyle(fontSize: 14, color: Colors.black54, height: 1.4),
+                            style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], fontSize: 14, color: TacticalStyles.kOnSurfaceVariant, height: 1.4),
                           ),
                         ),
                       ],
@@ -254,7 +310,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                   height: 8,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: _currentPage == index ? kGreen : Colors.grey.shade300,
+                    color: _currentPage == index ? kGreen : TacticalStyles.kOutlineVariant,
                   ),
                 );
               }),
@@ -280,13 +336,13 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       const SizedBox(height: 16),
                       Text(
                         'TEBRİKLER!',
-                        style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+                        style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], fontSize: 20, fontWeight: FontWeight.bold, color: TacticalStyles.kOnSurface),
                       ),
                       const SizedBox(height: 8),
-                      const Text(
+                      Text(
                         'Siz bir ROTA+ Premium üyesisiniz. Tüm ayrıcalıklı özelliklerin keyfini çıkarın.',
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.black54, fontSize: 14),
+                        style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurfaceVariant, fontSize: 14),
                       ),
                     ],
                   ),
@@ -297,7 +353,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: _loading 
-                  ? const CircularProgressIndicator()
+                  ? const CircularProgressIndicator(color: kGreen)
                   : Row(
                     children: [
                       // Yearly Plan
@@ -339,12 +395,12 @@ class _PremiumScreenState extends State<PremiumScreen> {
                   width: double.infinity,
                   height: 60,
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.green.shade600, Colors.green.shade400],
+                    gradient: const LinearGradient(
+                      colors: [TacticalStyles.kTertiaryContainer, TacticalStyles.kTertiary],
                     ),
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: [
-                      BoxShadow(color: Colors.green.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 5)),
+                      BoxShadow(color: TacticalStyles.kTertiary.withOpacity(0.25), blurRadius: 12, offset: const Offset(0, 4)),
                     ],
                   ),
                   child: ElevatedButton(
@@ -366,13 +422,13 @@ class _PremiumScreenState extends State<PremiumScreen> {
                             showDialog(
                               context: context,
                               builder: (ctx) => AlertDialog(
-                                backgroundColor: Colors.white,
-                                title: const Text('Bağlantı Hatası'),
-                                content: Text('$storeName ürünleri yüklenemedi. Lütfen internet bağlantınızı kontrol edin veya $storeName hesabınızla giriş yaptığınızdan emin olun.\n\nHata: ${PremiumService.lastError}'),
+                                backgroundColor: TacticalStyles.kSurfaceLow,
+                                title: const Text('Bağlantı Hatası', style: TextStyle(color: TacticalStyles.kOnSurface)),
+                                content: Text('$storeName ürünleri yüklenemedi. Lütfen internet bağlantınızı kontrol edin veya $storeName hesabınızla giriş yaptığınızdan emin olun.\n\nHata: ${PremiumService.lastError}', style: const TextStyle(color: TacticalStyles.kOnSurfaceVariant)),
                                 actions: [
                                   TextButton(
                                     onPressed: () => Navigator.pop(ctx),
-                                    child: const Text('Tamam', style: TextStyle(color: Colors.green)),
+                                    child: const Text('Tamam', style: TextStyle(color: TacticalStyles.kTertiary)),
                                   ),
                                 ],
                               ),
@@ -409,7 +465,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       : Text(
                           '14 günlüğüne ÜCRETSİZ olarak deneyin',
                           textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                          style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], fontSize: 16, fontWeight: FontWeight.bold, color: TacticalStyles.kOnTertiary),
                         ),
                   ),
                 ),
@@ -423,7 +479,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
               child: Text(
                 'Dilediğiniz zaman iptal edebilirsiniz, yenilenen faturalandırma. Endişelenmeyin, aboneliğinizin kontrolü tamamen sizdedir. Ödeme, satın alma onayının ya da deneme döneminin (varsa) sonunda ${Platform.isAndroid ? "Google Play" : "App Store"} hesabınızdan tahsil edilir. Rota+ Premium aboneliğiniz, iptal edilmediği sürece otomatik olarak yenilenir. Aboneliğinizi yenilenme tarihinden en az 24 saat öncesine kadar iptal etmeye karar vermediğiniz sürece, mevcut dönemin bitiminden önceki 24 saat içinde hesabınızdan yenilenme ücreti alınır. Aboneliğinizi ${Platform.isAndroid ? "Google Play" : "App Store"} hesap ayarları üzerinden yönetebilirsiniz.',
                 textAlign: TextAlign.start,
-                style: TextStyle(color: Colors.grey.shade500, fontSize: 10.5, height: 1.4),
+                style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurfaceVariant, fontSize: 10.5, height: 1.4),
               ),
             ),
             
@@ -448,23 +504,23 @@ class _PremiumScreenState extends State<PremiumScreen> {
                   });
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Premium hesabınız başarıyla doğrulandı!', style: TextStyle(color: Colors.green))),
+                      const SnackBar(content: Text('Premium hesabınız başarıyla doğrulandı!', style: TextStyle(color: TacticalStyles.kTertiary))),
                     );
                   }
                 } else {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Aktif bir premium abonelik bulunamadı.', style: TextStyle(color: Colors.red))),
+                      const SnackBar(content: Text('Aktif bir premium abonelik bulunamadı.', style: TextStyle(color: TacticalStyles.kError))),
                     );
                   }
                 }
               },
-              child: const Text('Satın Alımları Geri Yükle', style: TextStyle(color: Colors.black45, fontSize: 12)),
+              child: Text('Satın Alımları Geri Yükle', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurfaceVariant, fontSize: 12)),
             ),
             const SizedBox(height: 10),
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('ŞİMDİ DEĞİL', style: TextStyle(color: Colors.black38, fontWeight: FontWeight.bold)),
+              child: Text('ŞİMDİ DEĞİL', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurfaceVariant, fontWeight: FontWeight.bold)),
             ),
             const SizedBox(height: 30),
           ],
@@ -485,10 +541,10 @@ class _PremiumScreenState extends State<PremiumScreen> {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isHighlighted ? const Color(0xFF62FF4C) : Colors.grey.shade200, width: 2),
-          boxShadow: isHighlighted ? [BoxShadow(color: Colors.green.withOpacity(0.1), blurRadius: 10)] : [],
+          color: TacticalStyles.kSurfaceLow,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: isHighlighted ? TacticalStyles.kTertiary : TacticalStyles.kOutlineVariant, width: 2),
+          boxShadow: isHighlighted ? [BoxShadow(color: TacticalStyles.kTertiary.withOpacity(0.15), blurRadius: 12)] : [],
         ),
         child: Column(
           children: [
@@ -497,24 +553,24 @@ class _PremiumScreenState extends State<PremiumScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 decoration: const BoxDecoration(
-                  color: Color(0xFF43A047),
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(9), topRight: Radius.circular(9)),
+                  color: TacticalStyles.kTertiaryContainer,
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(11), topRight: Radius.circular(11)),
                 ),
                 child: Text(
                   savings,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
                 ),
               ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
               child: Column(
                 children: [
-                  Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black54)),
+                  Text(title, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], fontSize: 18, fontWeight: FontWeight.bold, color: TacticalStyles.kOnSurfaceVariant)),
                   const SizedBox(height: 10),
-                  Text(price, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.black87)),
+                  Text(price, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], fontSize: 24, fontWeight: FontWeight.w800, color: TacticalStyles.kOnSurface)),
                   const SizedBox(height: 4),
-                  Text(monthlyPrice, style: const TextStyle(fontSize: 12, color: Colors.black38)),
+                  Text(monthlyPrice, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], fontSize: 12, color: TacticalStyles.kOnSurfaceVariant)),
                 ],
               ),
             ),

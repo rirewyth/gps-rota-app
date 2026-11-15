@@ -1,8 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:lottie/lottie.dart';
 import '../services/premium_service.dart';
+import '../services/tactical_styles.dart';
 
 class SurvivalGuideScreen extends StatefulWidget {
   const SurvivalGuideScreen({Key? key}) : super(key: key);
@@ -12,15 +14,17 @@ class SurvivalGuideScreen extends StatefulWidget {
 }
 
 class _SurvivalGuideScreenState extends State<SurvivalGuideScreen> {
-  static const Color kOrange = Color(0xFFFF6B00);
-  static const Color kBackground = Color(0xFF0A0A0A);
-  static const Color kCardBg = Color(0xFF141414);
-  static const Color kRed = Color(0xFFFF3B30);
-  static const Color kBlue = Color(0xFF4FC3F7);
+  static const Color kOrange = TacticalStyles.kPrimaryContainer;
+  static const Color kBackground = TacticalStyles.kSurface;
+  static const Color kCardBg = TacticalStyles.kSurfaceLow;
+  static const Color kRed = TacticalStyles.kError;
+  static const Color kBlue = TacticalStyles.kSecondaryContainer;
   static const Color kAmber = Colors.amber;
   static const Color kPurple = Color(0xFFBB86FC);
 
   final PageController _pageController = PageController();
+  final FlutterTts _tts = FlutterTts();
+  String? _speakingKey;
   int _currentPage = 0;
   bool _isPremium = false;
 
@@ -28,6 +32,11 @@ class _SurvivalGuideScreenState extends State<SurvivalGuideScreen> {
   void initState() {
     super.initState();
     _checkPremium();
+    _tts.setLanguage('tr-TR');
+    _tts.setSpeechRate(0.48);
+    _tts.setCompletionHandler(() {
+      if (mounted) setState(() => _speakingKey = null);
+    });
   }
 
   Future<void> _checkPremium() async {
@@ -37,8 +46,20 @@ class _SurvivalGuideScreenState extends State<SurvivalGuideScreen> {
 
   @override
   void dispose() {
+    _tts.stop();
     _pageController.dispose();
     super.dispose();
+  }
+
+  Future<void> _toggleSectionSpeak(String key, String text) async {
+    if (_speakingKey == key) {
+      await _tts.stop();
+      if (mounted) setState(() => _speakingKey = null);
+    } else {
+      await _tts.stop();
+      if (mounted) setState(() => _speakingKey = key);
+      await _tts.speak(text);
+    }
   }
 
   @override
@@ -46,23 +67,23 @@ class _SurvivalGuideScreenState extends State<SurvivalGuideScreen> {
     return Scaffold(
       backgroundColor: kBackground,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: TacticalStyles.kSurfaceLowest,
         elevation: 0,
         centerTitle: true,
         title: Column(
           children: [
             Text(
-              'TACTICAL SURVIVAL MANUAL',
-              style: GoogleFonts.shareTechMono(color: Colors.white24, fontSize: 10, letterSpacing: 2),
+              'DOĞADA HAYATTA KALMA REHBERİ',
+              style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurfaceVariant, fontSize: 10, letterSpacing: 1.2, fontWeight: FontWeight.w600),
             ),
             Text(
               'BÖLÜM ${_currentPage + 1} / 9',
-              style: GoogleFonts.shareTechMono(color: kOrange, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1),
+              style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kOrange, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 0.5),
             ),
           ],
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white70, size: 18),
+          icon: const Icon(Icons.arrow_back_ios, color: TacticalStyles.kOnSurfaceVariant, size: 18),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
@@ -70,13 +91,13 @@ class _SurvivalGuideScreenState extends State<SurvivalGuideScreen> {
             margin: const EdgeInsets.only(right: 16, top: 12, bottom: 12),
             padding: const EdgeInsets.symmetric(horizontal: 8),
             decoration: BoxDecoration(
-              border: Border.all(color: _currentPage >= 3 ? kOrange : Colors.white10),
-              borderRadius: BorderRadius.circular(4),
+              border: Border.all(color: _currentPage >= 3 ? kOrange : TacticalStyles.kOutlineVariant),
+              borderRadius: BorderRadius.circular(6),
             ),
             child: Center(
               child: Text(
                 _currentPage >= 3 ? 'PREMIUM' : 'FREE',
-                style: GoogleFonts.shareTechMono(color: _currentPage >= 3 ? kOrange : Colors.white38, fontSize: 10, fontWeight: FontWeight.bold),
+                style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: _currentPage >= 3 ? kOrange : TacticalStyles.kOnSurfaceVariant, fontSize: 10, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -88,7 +109,7 @@ class _SurvivalGuideScreenState extends State<SurvivalGuideScreen> {
           Container(
             height: 2,
             width: double.infinity,
-            color: Colors.white10,
+            color: TacticalStyles.kOutlineVariant,
             child: Stack(
               children: [
                 AnimatedContainer(
@@ -158,7 +179,7 @@ class _SurvivalGuideScreenState extends State<SurvivalGuideScreen> {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: Container(
-                        decoration: BoxDecoration(border: Border.all(color: Colors.white10), color: Colors.black),
+                        decoration: BoxDecoration(border: Border.all(color: TacticalStyles.kOutlineVariant), color: TacticalStyles.kSurfaceLowest),
                         child: Column(
                           children: [
                             GestureDetector(
@@ -168,13 +189,13 @@ class _SurvivalGuideScreenState extends State<SurvivalGuideScreen> {
                             Container(
                               padding: const EdgeInsets.all(8),
                               width: double.infinity,
-                              color: Colors.white10,
+                              color: TacticalStyles.kSurfaceLow,
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Icon(Icons.zoom_in, color: Colors.white38, size: 14),
+                                  const Icon(Icons.zoom_in, color: TacticalStyles.kOnSurfaceVariant, size: 14),
                                   const SizedBox(width: 8),
-                                  Text('Şemayı büyütmek için dokunun', style: GoogleFonts.shareTechMono(color: Colors.white38, fontSize: 10)),
+                                  Text('Şemayı büyütmek için dokunun', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurfaceVariant, fontSize: 10)),
                                 ],
                               ),
                             ),
@@ -243,15 +264,15 @@ class _SurvivalGuideScreenState extends State<SurvivalGuideScreen> {
           // Navigation Footer
           Container(
             padding: const EdgeInsets.all(20),
-            color: Colors.black,
+            color: TacticalStyles.kSurfaceLowest,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 if (_currentPage > 0)
                   TextButton.icon(
                     onPressed: () => _pageController.previousPage(duration: const Duration(milliseconds: 500), curve: Curves.ease),
-                    icon: const Icon(Icons.arrow_back, color: Colors.white54, size: 16),
-                    label: Text('ÖNCEKİ', style: GoogleFonts.shareTechMono(color: Colors.white54)),
+                    icon: const Icon(Icons.arrow_back, color: TacticalStyles.kOnSurfaceVariant, size: 16),
+                    label: Text('ÖNCEKİ', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurfaceVariant, fontWeight: FontWeight.w600)),
                   )
                 else
                   const SizedBox(),
@@ -259,16 +280,16 @@ class _SurvivalGuideScreenState extends State<SurvivalGuideScreen> {
                 if (_currentPage < 8)
                   ElevatedButton.icon(
                     onPressed: () => _pageController.nextPage(duration: const Duration(milliseconds: 500), curve: Curves.ease),
-                    style: ElevatedButton.styleFrom(backgroundColor: _currentPage >= 2 ? kPurple : kOrange, padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12)),
-                    icon: const Icon(Icons.arrow_forward, color: Colors.black, size: 16),
-                    label: Text('SONRAKİ BÖLÜM', style: GoogleFonts.shareTechMono(color: Colors.black, fontWeight: FontWeight.bold)),
+                    style: ElevatedButton.styleFrom(backgroundColor: _currentPage >= 2 ? kPurple : kOrange, padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                    icon: const Icon(Icons.arrow_forward, color: Colors.white, size: 16),
+                    label: Text('SONRAKİ BÖLÜM', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontWeight: FontWeight.bold)),
                   )
                 else
                   ElevatedButton.icon(
                     onPressed: () => Navigator.pop(context),
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.white10, padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12)),
-                    icon: const Icon(Icons.check, color: Colors.white, size: 16),
-                    label: Text('TAMAMLA', style: GoogleFonts.shareTechMono(color: Colors.white)),
+                    style: ElevatedButton.styleFrom(backgroundColor: TacticalStyles.kSurfaceHigh, padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                    icon: const Icon(Icons.check, color: TacticalStyles.kOnSurface, size: 16),
+                    label: Text('TAMAMLA', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurface, fontWeight: FontWeight.bold)),
                   ),
               ],
             ),
@@ -306,19 +327,19 @@ class _SurvivalGuideScreenState extends State<SurvivalGuideScreen> {
           Text(
             title,
             textAlign: TextAlign.center,
-            style: GoogleFonts.outfit(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+            style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurface, fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
           Text(
             'Bu bölüm ileri düzey teknik bilgiler içerir ve sadece Premium üyelerimize özeldir.',
             textAlign: TextAlign.center,
-            style: GoogleFonts.outfit(color: Colors.white54, fontSize: 16),
+            style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurfaceVariant, fontSize: 16),
           ),
           const SizedBox(height: 32),
           ElevatedButton(
             onPressed: () => PremiumService.showPremiumRequired(context, title),
             style: ElevatedButton.styleFrom(backgroundColor: kPurple, padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-            child: Text('PREMIUM\'A YÜKSELT', style: GoogleFonts.shareTechMono(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16)),
+            child: Text('PREMIUM\'A YÜKSELT', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
           ),
         ],
       ),
@@ -330,11 +351,11 @@ class _SurvivalGuideScreenState extends State<SurvivalGuideScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => Scaffold(
-          backgroundColor: Colors.black,
+          backgroundColor: TacticalStyles.kSurfaceLowest,
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
-            iconTheme: const IconThemeData(color: Colors.white),
+            iconTheme: const IconThemeData(color: TacticalStyles.kOnSurface),
           ),
           extendBodyBehindAppBar: true,
           body: Center(
@@ -364,7 +385,7 @@ class _SurvivalGuideScreenState extends State<SurvivalGuideScreen> {
       imageWidget = ClipRRect(
         borderRadius: BorderRadius.circular(12),
         child: Container(
-          decoration: BoxDecoration(border: Border.all(color: Colors.white10), color: Colors.black),
+          decoration: BoxDecoration(border: Border.all(color: TacticalStyles.kOutlineVariant), color: TacticalStyles.kSurfaceLowest),
           child: Column(
             children: [
               if (isLottie)
@@ -377,13 +398,13 @@ class _SurvivalGuideScreenState extends State<SurvivalGuideScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 width: double.infinity,
-                color: Colors.white10,
+                color: TacticalStyles.kSurfaceLow,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.zoom_in, color: Colors.white38, size: 14),
+                    const Icon(Icons.zoom_in, color: TacticalStyles.kOnSurfaceVariant, size: 14),
                     const SizedBox(width: 8),
-                    Text(isLottie ? 'PROFESYONEL SİSTEM' : 'Şemayı büyütmek için dokunun', style: GoogleFonts.shareTechMono(color: Colors.white38, fontSize: 10)),
+                    Text(isLottie ? 'PROFESYONEL SİSTEM' : 'Şemayı büyütmek için dokunun', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurfaceVariant, fontSize: 10)),
                   ],
                 ),
               ),
@@ -399,16 +420,16 @@ class _SurvivalGuideScreenState extends State<SurvivalGuideScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(2)),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(color: color.withOpacity(0.18), borderRadius: BorderRadius.circular(6), border: Border.all(color: color.withOpacity(0.4))),
             child: Text(
-              'OFFICIAL PROTOCOL',
-              style: GoogleFonts.shareTechMono(color: Colors.black, fontSize: 10, fontWeight: FontWeight.bold),
+              'RESMİ PROTOKOL',
+              style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: color, fontSize: 10, fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(height: 12),
-          Text(title, style: GoogleFonts.outfit(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w900)),
-          Text(subtitle, style: GoogleFonts.shareTechMono(color: color, fontSize: 14, letterSpacing: 1)),
+          Text(title, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurface, fontSize: 26, fontWeight: FontWeight.w800)),
+          Text(subtitle, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: color, fontSize: 13, fontWeight: FontWeight.w600, letterSpacing: 0.4)),
           const SizedBox(height: 24),
           
           if (imageWidget != null && !imageAtEnd) ...[
@@ -431,8 +452,8 @@ class _SurvivalGuideScreenState extends State<SurvivalGuideScreen> {
                 angle: -0.2,
                 child: Container(
                   padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(border: Border.all(color: Colors.white, width: 4)),
-                  child: Text('ROTA+ TACTICAL SYSTEM', style: GoogleFonts.shareTechMono(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+                  decoration: BoxDecoration(border: Border.all(color: TacticalStyles.kOnSurface, width: 4)),
+                  child: Text('ROTA+ OUTDOOR REHBERİ', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurface, fontSize: 22, fontWeight: FontWeight.bold)),
                 ),
               ),
             ),
@@ -446,7 +467,7 @@ class _SurvivalGuideScreenState extends State<SurvivalGuideScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.black,
+        color: TacticalStyles.kSurfaceLowest,
         border: Border.all(color: color.withOpacity(0.2)),
         borderRadius: BorderRadius.circular(12),
       ),
@@ -468,7 +489,7 @@ class _SurvivalGuideScreenState extends State<SurvivalGuideScreen> {
             ],
           ),
           const SizedBox(height: 24),
-          const Divider(color: Colors.white10),
+          const Divider(color: TacticalStyles.kOutlineVariant),
           const SizedBox(height: 16),
           _buildRescueDetailRow('İstasyon: Çift emniyetli ana ankraj.', color),
           _buildRescueDetailRow('Z-Sistemi: 3:1 mekanik avantaj düzeni.', color),
@@ -488,7 +509,7 @@ class _SurvivalGuideScreenState extends State<SurvivalGuideScreen> {
                 Expanded(
                   child: Text(
                     'Şemalar teknik kütüphaneden (PRO) alınmıştır. Tüm ekipman sertifikalı olmalıdır.',
-                    style: GoogleFonts.outfit(color: color.withOpacity(0.7), fontSize: 10),
+                    style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: color.withOpacity(0.8), fontSize: 10),
                   ),
                 ),
               ],
@@ -514,7 +535,7 @@ class _SurvivalGuideScreenState extends State<SurvivalGuideScreen> {
         const SizedBox(height: 8),
         Text(
           label,
-          style: GoogleFonts.shareTechMono(color: color, fontSize: 10, fontWeight: FontWeight.bold),
+          style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: color, fontSize: 10, fontWeight: FontWeight.bold),
         ),
       ],
     );
@@ -530,7 +551,7 @@ class _SurvivalGuideScreenState extends State<SurvivalGuideScreen> {
           Expanded(
             child: Text(
               text,
-              style: GoogleFonts.outfit(color: Colors.white70, fontSize: 12),
+              style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurfaceVariant, fontSize: 12),
             ),
           ),
         ],
@@ -539,6 +560,8 @@ class _SurvivalGuideScreenState extends State<SurvivalGuideScreen> {
   }
 
   Widget _buildManualSection(String title, String content, IconData icon) {
+    final accentColor = _currentPage >= 3 ? kPurple : kOrange;
+    final isSpeaking = _speakingKey == title;
     return FadeInUp(
       duration: const Duration(milliseconds: 600),
       child: Padding(
@@ -548,25 +571,52 @@ class _SurvivalGuideScreenState extends State<SurvivalGuideScreen> {
           children: [
             Row(
               children: [
-                Icon(icon, color: _currentPage >= 3 ? kPurple : kOrange, size: 20),
-                const SizedBox(width: 12),
-                Text(
-                  title,
-                  style: GoogleFonts.outfit(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                Icon(icon, color: accentColor, size: 20),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TacticalStyles.headline(color: TacticalStyles.kOnSurface, size: 15),
+                  ),
+                ),
+                InkWell(
+                  borderRadius: BorderRadius.circular(999),
+                  onTap: () => _toggleSectionSpeak(title, '$title. $content'),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: TacticalStyles.glassCardDecoration(
+                      radius: 999,
+                      borderColor: (isSpeaking ? TacticalStyles.kError : accentColor).withValues(alpha: 0.45),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          isSpeaking ? Icons.stop_rounded : Icons.volume_up_rounded,
+                          size: 14,
+                          color: isSpeaking ? TacticalStyles.kError : accentColor,
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          isSpeaking ? 'DURDUR' : 'SESLİ OKU',
+                          style: TacticalStyles.labelMicro(
+                            color: isSpeaking ? TacticalStyles.kError : accentColor,
+                            size: 10,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.03),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.white10),
-              ),
+              decoration: TacticalStyles.glassCardDecoration(radius: 16),
               child: Text(
                 content,
-                style: GoogleFonts.outfit(color: Colors.white70, fontSize: 14, height: 1.6),
+                style: TacticalStyles.body(color: TacticalStyles.kOnSurfaceVariant, size: 14).copyWith(height: 1.6),
               ),
             ),
           ],

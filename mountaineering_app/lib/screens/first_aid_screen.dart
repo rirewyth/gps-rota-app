@@ -1,6 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:animate_do/animate_do.dart';
+import '../services/tactical_styles.dart';
 
 class FirstAidScreen extends StatefulWidget {
   const FirstAidScreen({Key? key}) : super(key: key);
@@ -22,7 +24,7 @@ class StepData {
     this.instruction,
     required this.options,
     this.icon = Icons.help_outline,
-    this.color = const Color(0xFFFF6B00),
+    this.color = TacticalStyles.kPrimaryContainer,
     this.imagePath,
   });
 }
@@ -44,10 +46,10 @@ class OptionData {
 }
 
 class _FirstAidScreenState extends State<FirstAidScreen> {
-  static const Color kOrange = Color(0xFFFF6B00);
-  static const Color kCardBg = Color(0xFF141414);
-  static const Color kBackground = Color(0xFF0A0A0A);
-  static const Color kGreen = Color(0xFF62FF4C);
+  static const Color kOrange = TacticalStyles.kPrimaryContainer;
+  static const Color kCardBg = TacticalStyles.kSurfaceLow;
+  static const Color kBackground = TacticalStyles.kSurface;
+  static const Color kGreen = TacticalStyles.kTertiary;
 
   String _currentStepKey = 'start';
   final List<String> _history = [];
@@ -167,7 +169,38 @@ class _FirstAidScreenState extends State<FirstAidScreen> {
     ),
   };
 
+  final FlutterTts _tts = FlutterTts();
+  bool _isSpeaking = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _tts.setLanguage('tr-TR');
+    _tts.setSpeechRate(0.48);
+    _tts.setCompletionHandler(() {
+      if (mounted) setState(() => _isSpeaking = false);
+    });
+  }
+
+  @override
+  void dispose() {
+    _tts.stop();
+    super.dispose();
+  }
+
+  Future<void> _toggleSpeak(String text) async {
+    if (_isSpeaking) {
+      await _tts.stop();
+      if (mounted) setState(() => _isSpeaking = false);
+    } else {
+      if (mounted) setState(() => _isSpeaking = true);
+      await _tts.speak(text);
+    }
+  }
+
   void _onOptionSelected(OptionData option) {
+    _tts.stop();
+    if (mounted) setState(() => _isSpeaking = false);
     if (option.isFinal) {
       _showResult(option.finalAdvice!, imagePath: option.finalAdviceImage);
     } else {
@@ -179,6 +212,8 @@ class _FirstAidScreenState extends State<FirstAidScreen> {
   }
 
   void _goBack() {
+    _tts.stop();
+    if (mounted) setState(() => _isSpeaking = false);
     if (_history.isNotEmpty) {
       setState(() {
         _currentStepKey = _history.removeLast();
@@ -203,7 +238,7 @@ class _FirstAidScreenState extends State<FirstAidScreen> {
             const SizedBox(height: 16),
             Text(
               'UYGULAMA PROTOKOLÜ',
-              style: GoogleFonts.shareTechMono(color: kGreen, fontWeight: FontWeight.bold, fontSize: 16),
+              style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kGreen, fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 20),
             if (imagePath != null) ...[
@@ -216,13 +251,28 @@ class _FirstAidScreenState extends State<FirstAidScreen> {
             Text(
               advice,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.white, fontSize: 15, height: 1.6),
+              style: TacticalStyles.body(color: TacticalStyles.kOnSurface, size: 15).copyWith(height: 1.6),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 16),
+            OutlinedButton.icon(
+              onPressed: () => _toggleSpeak('Uygulama protokolü. $advice'),
+              icon: Icon(_isSpeaking ? Icons.stop_rounded : Icons.volume_up_rounded, color: kOrange, size: 18),
+              label: Text(
+                _isSpeaking ? 'DURDUR' : 'SESLİ OKU',
+                style: TacticalStyles.labelCaps(color: kOrange, size: 11, weight: FontWeight.w800),
+              ),
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: kOrange.withValues(alpha: 0.5)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+              ),
+            ),
+            const SizedBox(height: 20),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: kOrange,
                 minimumSize: const Size(double.infinity, 50),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               onPressed: () {
                 Navigator.pop(ctx);
@@ -231,7 +281,7 @@ class _FirstAidScreenState extends State<FirstAidScreen> {
                   _history.clear();
                 });
               },
-              child: const Text('TAMAM', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+              child: const Text('TAMAM', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -248,11 +298,37 @@ class _FirstAidScreenState extends State<FirstAidScreen> {
       appBar: AppBar(
         backgroundColor: kBackground,
         elevation: 0,
-        title: Text('TEMEL İLKYARDIM PROTOKOLLERİ', style: GoogleFonts.shareTechMono(fontWeight: FontWeight.bold, fontSize: 15, letterSpacing: 1.0)),
+        centerTitle: true,
+        title: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: TacticalStyles.glassCardDecoration(
+            radius: 999,
+            borderColor: kOrange.withValues(alpha: 0.4),
+          ),
+          child: Text(
+            'ROTA+ İLKYARDIM',
+            style: TacticalStyles.labelCaps(color: kOrange, size: 11, weight: FontWeight.w800),
+          ),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: kOrange),
           onPressed: _goBack,
         ),
+        actions: [
+          IconButton(
+            tooltip: _isSpeaking ? 'Durdur' : 'Sesli Oku',
+            icon: Icon(
+              _isSpeaking ? Icons.stop_circle_outlined : Icons.volume_up_rounded,
+              color: _isSpeaking ? TacticalStyles.kError : kOrange,
+            ),
+            onPressed: () {
+              final text = step.instruction != null
+                  ? '${step.question}. ${step.instruction}'
+                  : step.question;
+              _toggleSpeak(text);
+            },
+          ),
+        ],
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -280,12 +356,12 @@ class _FirstAidScreenState extends State<FirstAidScreen> {
                     Text(
                       step.question,
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.outfit(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900),
+                      style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurface, fontSize: 24, fontWeight: FontWeight.w800),
                     ),
                     if (step.imagePath != null) ...[
                       const SizedBox(height: 20),
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(12),
                         child: Image.asset(step.imagePath!, fit: BoxFit.contain, height: 200),
                       ),
                     ],
@@ -294,7 +370,7 @@ class _FirstAidScreenState extends State<FirstAidScreen> {
                       Text(
                         step.instruction!,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.white38, fontSize: 13),
+                        style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurfaceVariant, fontSize: 13),
                       ),
                     ],
                   ],
@@ -310,18 +386,14 @@ class _FirstAidScreenState extends State<FirstAidScreen> {
                     child: Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
-                      decoration: BoxDecoration(
-                        color: kCardBg,
-                        border: Border.all(color: Colors.white12),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                      decoration: TacticalStyles.glassCardDecoration(radius: 16),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
                             child: Text(
                               opt.label,
-                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                              style: TacticalStyles.headline(color: TacticalStyles.kOnSurface, size: 15),
                             ),
                           ),
                           const Icon(Icons.arrow_forward_ios, color: kOrange, size: 16),

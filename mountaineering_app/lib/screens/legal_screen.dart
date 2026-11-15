@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../services/tactical_styles.dart';
 
 enum LegalType { terms, privacy }
 
@@ -7,8 +8,8 @@ class LegalScreen extends StatelessWidget {
   final LegalType type;
   const LegalScreen({Key? key, required this.type}) : super(key: key);
 
-  static const Color kOrange = Color(0xFFFF6B00);
-  static const Color kBackground = Color(0xFF0A0A0A);
+  static const Color kOrange = TacticalStyles.kPrimaryContainer;
+  static const Color kBackground = TacticalStyles.kSurface;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +25,7 @@ class LegalScreen extends StatelessWidget {
           icon: const Icon(Icons.close, color: kOrange, size: 24),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(title, style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+        title: Text(title, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurface, fontWeight: FontWeight.bold, fontSize: 18)),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -33,13 +34,13 @@ class LegalScreen extends StatelessWidget {
           children: [
             Text(
               'Son Güncelleme: 28 Nisan 2026',
-              style: GoogleFonts.shareTechMono(color: kOrange, fontSize: 12),
+              style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kOrange, fontSize: 12, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 24),
             Text(
               content,
-              style: GoogleFonts.outfit(
-                color: Colors.white.withOpacity(0.7),
+              style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                color: TacticalStyles.kOnSurfaceVariant,
                 fontSize: 14,
                 height: 1.6,
               ),

@@ -1,5 +1,6 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'notification_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -19,6 +20,7 @@ import 'notification_screen.dart';
 import 'package:file_picker/file_picker.dart';
 import 'admin_panel_screen.dart';
 import '../services/ad_service.dart';
+import '../services/tactical_styles.dart';
 import '../widgets/create_post_sheet.dart';
 
 const List<String> _kAdminEmails = ['sercanoral65@gmail.com', 'admin@rota.plus', 'keser.bora@yandex.com', 'demo@gmail.com'];
@@ -32,10 +34,10 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProviderStateMixin {
-  static const Color kOrange = Color(0xFFFF6B00);
-  static const Color kCardBg = Color(0xFF141414);
-  static const Color kBackground = Color(0xFF0A0A0A);
-  static const Color kGreen = Color(0xFF62FF4C);
+  static const Color kOrange = TacticalStyles.kPrimaryContainer;
+  static const Color kCardBg = TacticalStyles.kSurfaceLow;
+  static const Color kBackground = TacticalStyles.kSurface;
+  static const Color kGreen = TacticalStyles.kTertiary;
 
   String _userName = '';
   String _usernameField = '';
@@ -172,7 +174,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             children: [
               const Icon(Icons.edit, color: kOrange, size: 20),
               const SizedBox(width: 8),
-              Text('Profili Düzenle', style: GoogleFonts.outfit(color: kOrange, fontWeight: FontWeight.bold)),
+              Text('Profili Düzenle', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kOrange, fontWeight: FontWeight.bold)),
             ],
           ),
           content: SingleChildScrollView(
@@ -188,7 +190,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                       children: [
                         const Icon(Icons.error_outline, color: Colors.red, size: 16),
                         const SizedBox(width: 8),
-                        Expanded(child: Text(errorMessage!, style: GoogleFonts.outfit(color: Colors.red, fontSize: 12))),
+                        Expanded(child: Text(errorMessage!, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.red, fontSize: 12))),
                       ],
                     ),
                   ),
@@ -203,9 +205,9 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
-                    color: Colors.black,
+                    color: TacticalStyles.kSurfaceLowest,
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.white12),
+                    border: Border.all(color: TacticalStyles.kOutlineVariant),
                   ),
                   child: Row(
                     children: [
@@ -291,7 +293,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
         labelStyle: const TextStyle(color: Colors.white38, fontSize: 13),
         prefixIcon: Icon(icon, color: Colors.white38, size: 18),
         filled: true,
-        fillColor: Colors.black,
+        fillColor: TacticalStyles.kSurfaceLowest,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
         focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: kOrange)),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -385,7 +387,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
   Widget build(BuildContext context) {
     if (_isNotFound) {
       return Scaffold(
-        backgroundColor: const Color(0xFF0A0A0A),
+        backgroundColor: kBackground,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -401,13 +403,13 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               const Icon(Icons.person_off, color: Colors.white24, size: 80),
               const SizedBox(height: 24),
               Text('HESAP BULUNAMADI', 
-                style: GoogleFonts.outfit(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
               const SizedBox(height: 8),
               const Text('Bu kullanıcı artık mevcut değil.', 
                 style: TextStyle(color: Colors.white38, fontSize: 14)),
               const SizedBox(height: 40),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF6B00)),
+                style: ElevatedButton.styleFrom(backgroundColor: kOrange),
                 onPressed: () => Navigator.pop(context),
                 child: const Text('GERİ DÖN', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
               ),
@@ -425,28 +427,96 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     }
 
     return Scaffold(
-      backgroundColor: kBackground,
+      backgroundColor: TacticalStyles.kSurface,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        centerTitle: true,
+        backgroundColor: TacticalStyles.kSurfaceLowest,
+        centerTitle: false,
+        titleSpacing: widget.targetUserId != null ? 0 : 16,
         leading: widget.targetUserId != null 
-          ? IconButton(icon: const Icon(Icons.arrow_back, color: Colors.white), onPressed: () => Navigator.pop(context))
+          ? IconButton(icon: const Icon(Icons.arrow_back_rounded, color: Colors.white), onPressed: () => Navigator.pop(context))
           : null,
-        title: RichText(
-          text: TextSpan(
-            children: [
-              const TextSpan(
-                text: 'ROTA+ ',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 20, letterSpacing: 1),
+        title: Row(
+          children: [
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: TacticalStyles.kPrimaryContainer.withOpacity(0.16),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: TacticalStyles.kPrimaryContainer.withOpacity(0.35),
+                ),
               ),
-              TextSpan(
-                text: _isOwnProfile ? 'PROFİLİM' : 'PROFİL',
-                style: const TextStyle(color: kOrange, fontWeight: FontWeight.w900, fontSize: 20, fontStyle: FontStyle.italic, letterSpacing: 2),
+              child: const Icon(
+                Icons.badge_outlined,
+                color: TacticalStyles.kPrimary,
+                size: 18,
               ),
-            ],
-          ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        'ROTA+',
+                        style: TacticalStyles.headline(
+                          color: TacticalStyles.kOnSurface,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 18,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: TacticalStyles.kPrimary.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            _isOwnProfile ? 'OPERATÖR' : 'PROFİL',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TacticalStyles.labelMicro(
+                              color: TacticalStyles.kPrimary,
+                              fontSize: 8.5,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.8,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    'Saha Sicili & Telemetri',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TacticalStyles.labelCaps(
+                      color: TacticalStyles.kOnSurfaceVariant,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
         elevation: 0,
+        scrolledUnderElevation: 0,
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(1),
+          child: SizedBox(
+            height: 1,
+            child: ColoredBox(color: TacticalStyles.kOutlineVariant),
+          ),
+        ),
         actions: [
           if (widget.targetUserId == null) ...[
             if (_kAdminEmails.contains(FirebaseAuth.instance.currentUser?.email))
@@ -467,7 +537,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                 return Stack(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.notifications_outlined, color: Colors.white),
+                      icon: const Icon(Icons.notifications_outlined, color: TacticalStyles.kOnSurfaceVariant),
                       onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationScreen())),
                     ),
                     if (unread > 0)
@@ -489,7 +559,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               },
             ),
             IconButton(
-              icon: const Icon(Icons.add_box_outlined, color: Colors.white),
+              icon: const Icon(Icons.add_box_outlined, color: TacticalStyles.kOnSurfaceVariant),
               onPressed: () {
                 showModalBottomSheet(
                   context: context,
@@ -500,7 +570,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               },
             ),
             IconButton(
-              icon: const Icon(Icons.menu, color: Colors.white),
+              icon: const Icon(Icons.tune_rounded, color: TacticalStyles.kOnSurfaceVariant),
               onPressed: () async {
                 await Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen()));
                 _loadProfile();
@@ -520,17 +590,30 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                 delegate: _SliverAppBarDelegate(
                   TabBar(
                     controller: _tabController,
-                    indicatorColor: kOrange,
-                    labelColor: kOrange,
-                    unselectedLabelColor: Colors.white38,
+                    dividerColor: Colors.transparent,
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    indicator: BoxDecoration(
+                      color: TacticalStyles.kPrimaryContainer,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    labelColor: TacticalStyles.kSurfaceLowest,
+                    unselectedLabelColor: TacticalStyles.kOnSurfaceVariant,
                     isScrollable: false,
-                    labelPadding: const EdgeInsets.symmetric(horizontal: 0),
+                    labelPadding: EdgeInsets.zero,
+                    labelStyle: TacticalStyles.labelMicro(
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w700,
+                    ),
+                    unselectedLabelStyle: TacticalStyles.labelMicro(
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w500,
+                    ),
                     tabs: [
-                      Tab(icon: const Icon(Icons.image_outlined, size: 18), text: AppState.tr('FOTO')),
-                      Tab(icon: const Icon(Icons.text_snippet_outlined, size: 18), text: AppState.tr('Yazı')),
-                      Tab(icon: const Icon(Icons.route, size: 18), text: AppState.tr('Rota')),
-                      Tab(icon: const Icon(Icons.favorite_border, size: 18), text: AppState.tr('Beğeni')),
-                      Tab(icon: const Icon(Icons.bar_chart, size: 18), text: AppState.tr('İstat')),
+                      Tab(height: 36, text: AppState.tr('FOTO').toUpperCase()),
+                      Tab(height: 36, text: AppState.tr('Yazı').toUpperCase()),
+                      Tab(height: 36, text: AppState.tr('Rota').toUpperCase()),
+                      Tab(height: 36, text: AppState.tr('Beğeni').toUpperCase()),
+                      Tab(height: 36, text: AppState.tr('İstat').toUpperCase()),
                     ],
                   ),
                 ),
@@ -662,18 +745,18 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               margin: const EdgeInsets.only(top: 8),
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFF1A1A24),
-                borderRadius: BorderRadius.circular(2),
-                border: const Border(left: BorderSide(color: Colors.cyanAccent, width: 3)),
+                color: TacticalStyles.kSurfaceHigh,
+                borderRadius: BorderRadius.circular(4),
+                border: const Border(left: BorderSide(color: TacticalStyles.kSecondary, width: 3)),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(_affiliationType == 'Dernek' ? Icons.shield_outlined : Icons.flag_outlined, color: Colors.cyanAccent, size: 12),
+                  Icon(_affiliationType == 'Dernek' ? Icons.shield_outlined : Icons.flag_outlined, color: TacticalStyles.kSecondary, size: 12),
                   const SizedBox(width: 6),
                   Flexible(
                     child: Text('$_affiliationType: ${_affiliationName.toUpperCase()}', 
-                      style: GoogleFonts.shareTechMono(color: Colors.cyanAccent, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+                      style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
                       maxLines: 2, overflow: TextOverflow.ellipsis),
                   ),
                 ],
@@ -1103,12 +1186,12 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                           : Image.network(imageUrl, fit: BoxFit.cover)
                     else if (postType == 'route')
                       Container(
-                        color: const Color(0xFF62FF4C).withOpacity(0.08),
-                        child: const Center(child: Icon(Icons.route, color: Color(0xFF62FF4C), size: 32)),
+                        color: kGreen.withOpacity(0.08),
+                        child: const Center(child: Icon(Icons.route, color: kGreen, size: 32)),
                       )
                     else
                       Container(
-                        color: const Color(0xFF1A1A1A),
+                        color: TacticalStyles.kSurfaceHigh,
                         child: Center(
                           child: Padding(
                             padding: const EdgeInsets.all(6),
@@ -1646,9 +1729,9 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                       ? Image.memory(base64Decode(img.substring(7)), fit: BoxFit.cover)
                       : Image.network(img, fit: BoxFit.cover)
                 else if (postType == 'route')
-                  Container(color: const Color(0xFF62FF4C).withOpacity(0.08), child: const Center(child: Icon(Icons.route, color: Color(0xFF62FF4C), size: 32)))
+                  Container(color: kGreen.withOpacity(0.08), child: const Center(child: Icon(Icons.route, color: kGreen, size: 32)))
                 else
-                  Container(color: const Color(0xFF1A1A1A), child: Center(child: Padding(padding: const EdgeInsets.all(6),
+                  Container(color: TacticalStyles.kSurfaceHigh, child: Center(child: Padding(padding: const EdgeInsets.all(6),
                     child: Text(desc, style: const TextStyle(color: Colors.white60, fontSize: 11), maxLines: 4, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center)))),
                 Positioned(bottom: 4, left: 6, child: Row(children: [
                   const Icon(Icons.favorite, color: Colors.redAccent, size: 12),
@@ -1998,7 +2081,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                                         bool confirm = await showDialog(
                                           context: context,
                                           builder: (c) => AlertDialog(
-                                            backgroundColor: const Color(0xFF141414),
+                                            backgroundColor: kCardBg,
                                             title: const Text('Yorumu Sil', style: TextStyle(color: Colors.white)),
                                             content: const Text('Bu yorumu silmek istediğinize emin misiniz?', style: TextStyle(color: Colors.white70)),
                                             actions: [
@@ -2029,15 +2112,15 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                     decoration: const BoxDecoration(
-                      color: Colors.black,
-                      border: Border(top: BorderSide(color: Colors.white10)),
+                      color: TacticalStyles.kSurfaceLowest,
+                      border: Border(top: BorderSide(color: TacticalStyles.kOutlineVariant)),
                     ),
                     child: Row(
                       children: [
                         Expanded(
                           child: Container(
                             decoration: BoxDecoration(
-                              color: const Color(0xFF1E1E1E),
+                              color: TacticalStyles.kSurfaceHigh,
                               borderRadius: BorderRadius.circular(24),
                             ),
                             child: TextField(
@@ -2093,7 +2176,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF141414),
+        backgroundColor: kCardBg,
         title: const Text('Gönderiyi Düzenle', style: TextStyle(color: Colors.white)),
         content: TextField(
           controller: controller,
@@ -2102,7 +2185,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             hintText: 'Açıklama...',
             hintStyle: const TextStyle(color: Colors.white38),
             filled: true,
-            fillColor: Colors.black,
+            fillColor: TacticalStyles.kSurfaceLowest,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
           ),
           maxLines: 3,
@@ -2144,12 +2227,16 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
         }
 
         double totalDist = 0;
+        double totalElev = 0;
+        double maxAlt = 0;
         bool isPremium = false;
         String email = '';
 
         if (snapshot.hasData && snapshot.data!.exists) {
           final data = snapshot.data!.data() as Map<String, dynamic>;
           totalDist = (data['total_distance'] ?? 0).toDouble();
+          totalElev = (data['total_elevation_gain'] ?? data['total_elevation'] ?? 0).toDouble();
+          maxAlt = (data['max_altitude'] ?? 0).toDouble();
           isPremium = data['is_premium'] ?? false;
           email = data['email'] ?? '';
         }
@@ -2157,84 +2244,116 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
         final double distanceKm = totalDist / 1000;
 
         return SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('KİŞİSEL VİTRİN VE BAŞARILAR',
-                  style: TextStyle(color: kOrange, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
-              const SizedBox(height: 16),
-
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(color: kCardBg, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.white12)),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text('Toplam Yürünen Mesafe', style: TextStyle(color: Colors.white70, fontSize: 14)),
-                    Text('${distanceKm.toStringAsFixed(1)} KM',
-                        style: const TextStyle(color: kOrange, fontSize: 18, fontWeight: FontWeight.bold)),
-                  ],
-                ),
+              Row(
+                children: [
+                  Text(
+                    'OPERATÖR TELEMETRİ & BAŞARIMLAR',
+                    style: TacticalStyles.labelCaps(
+                      color: TacticalStyles.kPrimary,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 24),
-
-              const Text('ROZETLER', style: TextStyle(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
 
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    _buildBadgeCard(
-                      imagePath: 'assets/badges/badge_bronze_10km_1776324001012.png',
-                      title: 'Bronz Ayak',
-                      desc: '10 KM barajı',
-                      earned: distanceKm >= 10,
+              // 3'lü Telemetri Özet Kartları
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: TacticalStyles.glassCardDecoration(radius: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('TOPLAM MESAFE', style: TacticalStyles.labelMicro(color: TacticalStyles.kOnSurfaceVariant, fontSize: 9.5)),
+                          const SizedBox(height: 6),
+                          Text('${distanceKm.toStringAsFixed(1)} km', style: TacticalStyles.headline(color: kOrange, fontSize: 18, fontWeight: FontWeight.w800)),
+                        ],
+                      ),
                     ),
-                    const SizedBox(width: 12),
-                    _buildBadgeCard(
-                      imagePath: 'assets/badges/badge_silver_50km_1776324073001.png',
-                      title: 'Gümüş Rota',
-                      desc: '50 KM barajı',
-                      earned: distanceKm >= 50,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: TacticalStyles.glassCardDecoration(radius: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('TIRMANIŞ', style: TacticalStyles.labelMicro(color: TacticalStyles.kOnSurfaceVariant, fontSize: 9.5)),
+                          const SizedBox(height: 6),
+                          Text('+${totalElev.toInt()} m', style: TacticalStyles.headline(color: TacticalStyles.kSecondary, fontSize: 18, fontWeight: FontWeight.w800)),
+                        ],
+                      ),
                     ),
-                    const SizedBox(width: 12),
-                    _buildBadgeCard(
-                      imagePath: 'assets/badges/badge_gold_100km_1776324088846.png',
-                      title: 'Altın Keşif',
-                      desc: '100 KM barajı',
-                      earned: distanceKm >= 100,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: TacticalStyles.glassCardDecoration(radius: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('ZİRVE REKOR', style: TacticalStyles.labelMicro(color: TacticalStyles.kOnSurfaceVariant, fontSize: 9.5)),
+                          const SizedBox(height: 6),
+                          Text('${maxAlt.toInt()} m', style: TacticalStyles.headline(color: TacticalStyles.kTertiary, fontSize: 18, fontWeight: FontWeight.w800)),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 22),
+
+              // ── TIRMANIŞ & AKTİVİTE GEÇMİŞİ GRAFİĞİ ──────────────────────────
+              _buildElevationActivityChartCard(),
+              const SizedBox(height: 22),
+
+              // ── GÜNCELLENMİŞ ÖDÜL & ROZET SİSTEMİ ────────────────────────────
+              ..._buildUpdatedRewardsSection(
+                distanceKm: distanceKm,
+                totalElev: totalElev,
+                maxAlt: maxAlt,
               ),
 
               const SizedBox(height: 24),
-              const Text('ÖZEL STATÜLER', style: TextStyle(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.bold)),
+              Text('ÖZEL STATÜLER', style: TacticalStyles.labelCaps(color: TacticalStyles.kOnSurfaceVariant, fontSize: 10.5, fontWeight: FontWeight.w700, letterSpacing: 1.0)),
               const SizedBox(height: 12),
 
               if (isPremium)
                 Container(
                   margin: const EdgeInsets.only(bottom: 8),
-                  decoration: BoxDecoration(color: kCardBg, borderRadius: BorderRadius.circular(12)),
+                  decoration: TacticalStyles.glassCardDecoration(
+                    radius: 14,
+                    borderColor: Colors.amber.withValues(alpha: 0.4),
+                  ),
                   child: const ListTile(
                     leading: Icon(Icons.stars, color: Colors.amber, size: 32),
                     title: Text('Premium Üye', style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
                     subtitle: Text('Tüm özelliklere sınırsız erişim', style: TextStyle(color: Colors.white54, fontSize: 12)),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
                   ),
                 ),
 
               if (_kAdminEmails.contains(email))
                 Container(
                   margin: const EdgeInsets.only(top: 8),
-                  decoration: BoxDecoration(color: kCardBg, borderRadius: BorderRadius.circular(12)),
+                  decoration: TacticalStyles.glassCardDecoration(
+                    radius: 14,
+                    borderColor: Colors.blueAccent.withValues(alpha: 0.4),
+                  ),
                   child: const ListTile(
                     leading: Icon(Icons.verified, color: Colors.blueAccent, size: 32),
                     title: Text('Acil Durum Lideri', style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold)),
                     subtitle: Text('Onaylı sistem yöneticisi/lideri', style: TextStyle(color: Colors.white54, fontSize: 12)),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
                   ),
                 ),
 
@@ -2256,27 +2375,361 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     );
   }
 
-  Widget _buildBadgeCard({required String imagePath, required String title, required String desc, required bool earned}) {
+  Widget _buildElevationActivityChartCard() {
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: DatabaseHelper.instance.tumRotalarGetir(),
+      builder: (context, snapshot) {
+        final routes = (snapshot.data ?? []).take(8).toList().reversed.toList();
+        final spots = <FlSpot>[];
+        double totalKm = 0;
+        double totalGain = 0;
+        for (int i = 0; i < routes.length; i++) {
+          final elev = (routes[i]['elevation_gain'] as num?)?.toDouble() ?? 0.0;
+          final dist = ((routes[i]['distance'] as num?)?.toDouble() ?? 0.0) / 1000.0;
+          totalKm += dist;
+          totalGain += elev;
+          spots.add(FlSpot(i.toDouble(), elev > 0 ? elev : (dist * 40)));
+        }
+        if (spots.isEmpty) {
+          spots.addAll(const [FlSpot(0, 0), FlSpot(1, 0), FlSpot(2, 0)]);
+        }
+
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: TacticalStyles.glassCardDecoration(radius: 18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'TIRMANIŞ & AKTİVİTE PROFİLİ',
+                    style: TacticalStyles.labelCaps(
+                      color: TacticalStyles.kSecondary,
+                      fontSize: 10.5,
+                      weight: FontWeight.w800,
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: TacticalStyles.glassCardDecoration(
+                      radius: 999,
+                      borderColor: TacticalStyles.kTertiary.withValues(alpha: 0.4),
+                    ),
+                    child: Text(
+                      '${routes.length} PARKUR',
+                      style: TacticalStyles.labelMicro(color: TacticalStyles.kTertiary, size: 9.5),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Text(
+                    '${totalKm.toStringAsFixed(1)} km',
+                    style: TacticalStyles.telemetry(color: kOrange, size: 15),
+                  ),
+                  const SizedBox(width: 14),
+                  Text(
+                    '+${totalGain.toInt()} m tırmanış',
+                    style: TacticalStyles.telemetry(color: TacticalStyles.kTertiary, size: 13),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              SizedBox(
+                height: 130,
+                child: LineChart(
+                  LineChartData(
+                    gridData: FlGridData(
+                      show: true,
+                      drawVerticalLine: false,
+                      getDrawingHorizontalLine: (_) => FlLine(
+                        color: Colors.white.withValues(alpha: 0.06),
+                        strokeWidth: 1,
+                      ),
+                    ),
+                    titlesData: const FlTitlesData(show: false),
+                    borderData: FlBorderData(show: false),
+                    lineBarsData: [
+                      LineChartBarData(
+                        spots: spots,
+                        isCurved: true,
+                        color: kOrange,
+                        barWidth: 3,
+                        dotData: FlDotData(
+                          show: true,
+                          getDotPainter: (spot, _, __, ___) => FlDotCirclePainter(
+                            radius: 3.5,
+                            color: TacticalStyles.kTertiary,
+                            strokeWidth: 1.5,
+                            strokeColor: Colors.black,
+                          ),
+                        ),
+                        belowBarData: BarAreaData(
+                          show: true,
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              kOrange.withValues(alpha: 0.32),
+                              kOrange.withValues(alpha: 0.02),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              if (routes.isEmpty) ...[
+                const SizedBox(height: 8),
+                Text(
+                  'İlk yürüyüşünüzü kaydettiğinizde irtifa ve mesafe eğrisi burada canlı çizilir.',
+                  style: TacticalStyles.body(color: TacticalStyles.kOnSurfaceVariant, size: 11),
+                ),
+              ],
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  List<Widget> _buildUpdatedRewardsSection({
+    required double distanceKm,
+    required double totalElev,
+    required double maxAlt,
+  }) {
+    final rewards = [
+      {
+        'image': 'assets/badges/badge_bronze_10km_1776324001012.png',
+        'title': 'Bronz Ayak',
+        'desc': '10 KM barajı',
+        'progress': (distanceKm / 10.0).clamp(0.0, 1.0),
+        'status': '${distanceKm.toStringAsFixed(1)}/10 km',
+        'earned': distanceKm >= 10,
+      },
+      {
+        'image': 'assets/badges/badge_silver_50km_1776324073001.png',
+        'title': 'Gümüş Rota',
+        'desc': '50 KM barajı',
+        'progress': (distanceKm / 50.0).clamp(0.0, 1.0),
+        'status': '${distanceKm.toStringAsFixed(1)}/50 km',
+        'earned': distanceKm >= 50,
+      },
+      {
+        'image': 'assets/badges/badge_gold_100km_1776324088846.png',
+        'title': 'Altın Keşif',
+        'desc': '100 KM barajı',
+        'progress': (distanceKm / 100.0).clamp(0.0, 1.0),
+        'status': '${distanceKm.toStringAsFixed(1)}/100 km',
+        'earned': distanceKm >= 100,
+      },
+      {
+        'icon': Icons.military_tech_rounded,
+        'color': Colors.amberAccent,
+        'title': 'Efsane Dağcı',
+        'desc': '250 KM barajı',
+        'progress': (distanceKm / 250.0).clamp(0.0, 1.0),
+        'status': '${distanceKm.toStringAsFixed(0)}/250 km',
+        'earned': distanceKm >= 250,
+      },
+      {
+        'icon': Icons.terrain_rounded,
+        'color': TacticalStyles.kSecondary,
+        'title': 'Yüksek İrtifa',
+        'desc': '2000m+ Zirve',
+        'progress': (maxAlt / 2000.0).clamp(0.0, 1.0),
+        'status': '${maxAlt.toInt()}/2000 m',
+        'earned': maxAlt >= 2000,
+      },
+      {
+        'icon': Icons.landscape_rounded,
+        'color': kOrange,
+        'title': 'Zirve Fatihi',
+        'desc': '3500m+ Zirve',
+        'progress': (maxAlt / 3500.0).clamp(0.0, 1.0),
+        'status': '${maxAlt.toInt()}/3500 m',
+        'earned': maxAlt >= 3500,
+      },
+      {
+        'icon': Icons.trending_up_rounded,
+        'color': TacticalStyles.kTertiary,
+        'title': 'Dikey Tırmanıcı',
+        'desc': '5000m+ Kazanç',
+        'progress': (totalElev / 5000.0).clamp(0.0, 1.0),
+        'status': '${totalElev.toInt()}/5000 m',
+        'earned': totalElev >= 5000,
+      },
+      {
+        'icon': Icons.workspace_premium_rounded,
+        'color': Colors.cyanAccent,
+        'title': 'Kutup Yıldızı',
+        'desc': '10000m+ Kazanç',
+        'progress': (totalElev / 10000.0).clamp(0.0, 1.0),
+        'status': '${totalElev.toInt()}/10000 m',
+        'earned': totalElev >= 10000,
+      },
+    ];
+
+    final earnedCount = rewards.where((r) => r['earned'] == true).length;
+
+    return [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'OPERATÖR ROZETLERİ & ÖDÜLLER',
+            style: TacticalStyles.labelCaps(
+              color: TacticalStyles.kOnSurfaceVariant,
+              fontSize: 10.5,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.0,
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+            decoration: TacticalStyles.glassCardDecoration(
+              radius: 999,
+              borderColor: kOrange.withValues(alpha: 0.45),
+            ),
+            child: Text(
+              '$earnedCount / ${rewards.length} AÇILDI',
+              style: TacticalStyles.labelMicro(color: kOrange, size: 9.5),
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: 12),
+      SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: rewards.map((r) {
+            final earned = r['earned'] == true;
+            final progress = (r['progress'] as double?) ?? 0.0;
+            final status = r['status'] as String;
+            final Widget card = r.containsKey('image')
+                ? _buildBadgeCard(
+                    imagePath: r['image'] as String,
+                    title: r['title'] as String,
+                    desc: r['desc'] as String,
+                    earned: earned,
+                    progress: progress,
+                    statusLabel: status,
+                  )
+                : _buildIconBadgeCard(
+                    icon: r['icon'] as IconData,
+                    color: r['color'] as Color,
+                    title: r['title'] as String,
+                    desc: r['desc'] as String,
+                    earned: earned,
+                    progress: progress,
+                    statusLabel: status,
+                  );
+            return Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: card,
+            );
+          }).toList(),
+        ),
+      ),
+    ];
+  }
+
+  Widget _buildBadgeCard({
+    required String imagePath,
+    required String title,
+    required String desc,
+    required bool earned,
+    double progress = 0.0,
+    String? statusLabel,
+  }) {
     return Container(
-      width: 110,
+      width: 126,
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: kCardBg,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: earned ? kOrange.withOpacity(0.5) : Colors.white12, width: 1.5),
-        boxShadow: earned ? [BoxShadow(color: kOrange.withOpacity(0.1), blurRadius: 12)] : null,
+      decoration: TacticalStyles.glassCardDecoration(
+        radius: 16,
+        borderColor: earned ? kOrange.withOpacity(0.55) : TacticalStyles.kOutlineVariant,
       ),
       child: Column(
         children: [
           Opacity(
-            opacity: earned ? 1.0 : 0.2,
-            child: Image.asset(imagePath, width: 64, height: 64, fit: BoxFit.contain,
-                errorBuilder: (c, e, s) => const Icon(Icons.shield, color: Colors.amber, size: 60)),
+            opacity: earned ? 1.0 : 0.3,
+            child: Image.asset(imagePath, width: 56, height: 56, fit: BoxFit.contain,
+                errorBuilder: (c, e, s) => const Icon(Icons.shield, color: Colors.amber, size: 52)),
           ),
-          const SizedBox(height: 12),
-          Text(title, style: TextStyle(color: earned ? kOrange : Colors.white54, fontSize: 11, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-          const SizedBox(height: 4),
-          Text(desc, style: const TextStyle(color: Colors.white38, fontSize: 9), textAlign: TextAlign.center),
+          const SizedBox(height: 8),
+          Text(title, style: TacticalStyles.headline(color: earned ? kOrange : TacticalStyles.kOnSurfaceVariant, fontSize: 11.5, fontWeight: FontWeight.w700), textAlign: TextAlign.center),
+          const SizedBox(height: 3),
+          Text(desc, style: TacticalStyles.body(color: TacticalStyles.kOutline, fontSize: 9.5), textAlign: TextAlign.center),
+          const SizedBox(height: 8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 4,
+              backgroundColor: Colors.white10,
+              valueColor: AlwaysStoppedAnimation<Color>(earned ? TacticalStyles.kTertiary : kOrange),
+            ),
+          ),
+          if (statusLabel != null) ...[
+            const SizedBox(height: 4),
+            Text(statusLabel, style: TacticalStyles.labelMicro(color: TacticalStyles.kOnSurfaceVariant, size: 8.5)),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildIconBadgeCard({
+    required IconData icon,
+    required Color color,
+    required String title,
+    required String desc,
+    required bool earned,
+    double progress = 0.0,
+    String? statusLabel,
+  }) {
+    return Container(
+      width: 126,
+      padding: const EdgeInsets.all(12),
+      decoration: TacticalStyles.glassCardDecoration(
+        radius: 16,
+        borderColor: earned ? color.withOpacity(0.55) : TacticalStyles.kOutlineVariant,
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: earned ? color.withOpacity(0.16) : TacticalStyles.kSurfaceHigh.withOpacity(0.5),
+              border: Border.all(color: earned ? color.withOpacity(0.5) : TacticalStyles.kOutlineVariant),
+            ),
+            child: Icon(icon, color: earned ? color : TacticalStyles.kOutline, size: 26),
+          ),
+          const SizedBox(height: 8),
+          Text(title, style: TacticalStyles.headline(color: earned ? color : TacticalStyles.kOnSurfaceVariant, fontSize: 11.5, fontWeight: FontWeight.w700), textAlign: TextAlign.center),
+          const SizedBox(height: 3),
+          Text(desc, style: TacticalStyles.body(color: TacticalStyles.kOutline, fontSize: 9.5), textAlign: TextAlign.center),
+          const SizedBox(height: 8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 4,
+              backgroundColor: Colors.white10,
+              valueColor: AlwaysStoppedAnimation<Color>(earned ? TacticalStyles.kTertiary : color),
+            ),
+          ),
+          if (statusLabel != null) ...[
+            const SizedBox(height: 4),
+            Text(statusLabel, style: TacticalStyles.labelMicro(color: TacticalStyles.kOnSurfaceVariant, size: 8.5)),
+          ],
         ],
       ),
     );
@@ -2386,7 +2839,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('SERTİFİKALI REHBER', style: GoogleFonts.shareTechMono(color: kOrange, fontWeight: FontWeight.bold)),
+                      Text('SERTİFİKALI REHBER', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kOrange, fontWeight: FontWeight.bold)),
                       const Text('TDF Onaylı Uzman Dağ Mihmandarı', style: TextStyle(color: Colors.white70, fontSize: 11)),
                     ],
                   ),
@@ -2399,7 +2852,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
         return Container(
           width: double.infinity,
           padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: kCardBg, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.white10)),
+          decoration: BoxDecoration(color: kCardBg, borderRadius: BorderRadius.circular(12), border: Border.all(color: TacticalStyles.kOutlineVariant)),
           child: Row(
             children: [
               const Icon(Icons.hiking, color: Colors.white38),
@@ -2436,13 +2889,25 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   final TabBar _tabBar;
 
   @override
-  double get minExtent => _tabBar.preferredSize.height;
+  double get minExtent => 54;
   @override
-  double get maxExtent => _tabBar.preferredSize.height;
+  double get maxExtent => 54;
 
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(color: Colors.black, child: _tabBar);
+    return Container(
+      color: TacticalStyles.kSurface,
+      padding: const EdgeInsets.fromLTRB(12, 6, 12, 6),
+      child: Container(
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: TacticalStyles.kSurfaceLow,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: TacticalStyles.kGlassBorder),
+        ),
+        child: _tabBar,
+      ),
+    );
   }
 
   @override

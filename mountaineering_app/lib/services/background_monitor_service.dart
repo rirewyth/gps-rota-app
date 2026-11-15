@@ -65,28 +65,36 @@ class BackgroundMonitorService {
     );
     await _notifications.initialize(initSettings);
 
-    // Android bildirim kanalları
+    // Android bildirim kanalları ve Android 13+ izin talebi
     if (Platform.isAndroid) {
-      await _notifications
+      final androidPlugin = _notifications
           .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>()
-          ?.createNotificationChannel(
-            const AndroidNotificationChannel(
-              'background_notifications',
-              'Rota+ Bildirimleri',
-              importance: Importance.max,
-            ),
-          );
-      await _notifications
-          .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>()
-          ?.createNotificationChannel(
-            const AndroidNotificationChannel(
-              'critical_earthquake_channel',
-              'KRİTİK DEPREM UYARISI',
-              importance: Importance.max,
-            ),
-          );
+              AndroidFlutterLocalNotificationsPlugin>();
+      await androidPlugin?.requestNotificationsPermission();
+      await androidPlugin?.createNotificationChannel(
+        const AndroidNotificationChannel(
+          'rota_plus_fcm_channel',
+          'Rota+ Mesajlar ve Uyarılar',
+          description: 'Uygulama kapalıyken gelen ekip, takip ve sistem bildirimleri',
+          importance: Importance.max,
+          playSound: true,
+          enableVibration: true,
+        ),
+      );
+      await androidPlugin?.createNotificationChannel(
+        const AndroidNotificationChannel(
+          'background_notifications',
+          'Rota+ Bildirimleri',
+          importance: Importance.max,
+        ),
+      );
+      await androidPlugin?.createNotificationChannel(
+        const AndroidNotificationChannel(
+          'critical_earthquake_channel',
+          'KRİTİK DEPREM UYARISI',
+          importance: Importance.max,
+        ),
+      );
     }
   }
 
@@ -99,7 +107,7 @@ class BackgroundMonitorService {
       _taskTag,
       frequency: const Duration(minutes: 15),
       constraints: Constraints(networkType: NetworkType.connected),
-      existingWorkPolicy: ExistingPeriodicWorkPolicy.keep,
+      existingWorkPolicy: ExistingPeriodicWorkPolicy.update,
     );
     debugPrint('BackgroundMonitorService: Android Workmanager başlatıldı.');
   }

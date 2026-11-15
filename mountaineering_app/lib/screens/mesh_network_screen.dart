@@ -1,4 +1,4 @@
-import 'dart:typed_data';
+﻿import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nearby_connections/nearby_connections.dart';
@@ -12,6 +12,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:vibration/vibration.dart';
 import '../storage_helper.dart';
+import '../services/tactical_styles.dart';
 
 class MeshNetworkScreen extends StatefulWidget {
   const MeshNetworkScreen({Key? key}) : super(key: key);
@@ -21,10 +22,10 @@ class MeshNetworkScreen extends StatefulWidget {
 }
 
 class _MeshNetworkScreenState extends State<MeshNetworkScreen> {
-  static const Color kOrange = Color(0xFFFF6B00);
-  static const Color kCardBg = Color(0xFF141414);
-  static const Color kBackground = Color(0xFF0A0A0A);
-  static const Color kGreen = Color(0xFF62FF4C);
+  static const Color kOrange = TacticalStyles.kPrimaryContainer;
+  static const Color kCardBg = TacticalStyles.kSurfaceLow;
+  static const Color kBackground = TacticalStyles.kSurface;
+  static const Color kGreen = TacticalStyles.kTertiary;
 
   static const String _serviceId = 'rotameshp2p';
 
@@ -331,12 +332,13 @@ class _MeshNetworkScreenState extends State<MeshNetworkScreen> {
     return Scaffold(
       backgroundColor: kBackground,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: TacticalStyles.kSurfaceLowest,
         elevation: 0,
-        title: Text('TAKTİK MESH AĞI (PRO)', style: GoogleFonts.shareTechMono(color: kOrange, fontWeight: FontWeight.bold, fontSize: 16)),
+        centerTitle: true,
+        title: TacticalStyles.appBarPill('DOĞA MESH AĞI', icon: Icons.hub_outlined),
         actions: [
           IconButton(
-            icon: Icon(_isAutoConnectEnabled ? Icons.auto_fix_high : Icons.auto_fix_off, color: _isAutoConnectEnabled ? kGreen : Colors.white24),
+            icon: Icon(_isAutoConnectEnabled ? Icons.auto_fix_high : Icons.auto_fix_off, color: _isAutoConnectEnabled ? kGreen : TacticalStyles.kOnSurfaceVariant),
             onPressed: () => setState(() => _isAutoConnectEnabled = !_isAutoConnectEnabled),
             tooltip: 'Otomatik Bağlanma',
           ),
@@ -347,16 +349,12 @@ class _MeshNetworkScreenState extends State<MeshNetworkScreen> {
           // Transport Status Header
           _buildTransportHeader(),
           
-          // Mesh Grid Animation View (Placeholder for tactical feel)
+          // Mesh Grid Animation View
           Container(
             height: 120,
             width: double.infinity,
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.black,
-              border: Border.all(color: kOrange.withOpacity(0.3)),
-              borderRadius: BorderRadius.circular(12),
-            ),
+            decoration: TacticalStyles.glassCardDecoration(radius: 16),
             child: Stack(
               children: [
                 Center(child: Icon(Icons.hub, color: kOrange.withOpacity(0.1), size: 80)),
@@ -365,8 +363,8 @@ class _MeshNetworkScreenState extends State<MeshNetworkScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('${_connectedEndpoints.length}', style: GoogleFonts.shareTechMono(color: kGreen, fontSize: 32, fontWeight: FontWeight.bold)),
-                      Text('AKTİF DÜĞÜM', style: GoogleFonts.shareTechMono(color: kGreen.withOpacity(0.7), fontSize: 10)),
+                      Text('${_connectedEndpoints.length}', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kGreen, fontSize: 32, fontWeight: FontWeight.bold)),
+                      Text('AKTİF DÜĞÜM', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kGreen.withOpacity(0.8), fontSize: 10, fontWeight: FontWeight.w600)),
                     ],
                   ),
                 ),
@@ -380,9 +378,9 @@ class _MeshNetworkScreenState extends State<MeshNetworkScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: Row(
                 children: [
-                  const Icon(Icons.radar, color: Colors.blueAccent, size: 14),
+                  const Icon(Icons.radar, color: TacticalStyles.kSecondaryContainer, size: 14),
                   const SizedBox(width: 8),
-                  Text('KEŞFEDİLEN DÜĞÜMLER', style: GoogleFonts.shareTechMono(color: Colors.blueAccent, fontSize: 10)),
+                  Text('KEŞFEDİLEN DÜĞÜMLER', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kSecondaryContainer, fontSize: 10, fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
@@ -395,11 +393,11 @@ class _MeshNetworkScreenState extends State<MeshNetworkScreen> {
                   margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   decoration: BoxDecoration(
-                    color: _connectedEndpoints.contains(e.key) ? kGreen.withOpacity(0.1) : kCardBg,
-                    border: Border.all(color: _connectedEndpoints.contains(e.key) ? kGreen : Colors.white10),
+                    color: _connectedEndpoints.contains(e.key) ? kGreen.withOpacity(0.12) : kCardBg,
+                    border: Border.all(color: _connectedEndpoints.contains(e.key) ? kGreen : TacticalStyles.kOutlineVariant),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Center(child: Text(e.value, style: GoogleFonts.shareTechMono(color: Colors.white, fontSize: 11))),
+                  child: Center(child: Text(e.value, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurface, fontSize: 11, fontWeight: FontWeight.w600))),
                 )).toList(),
               ),
             ),
@@ -410,7 +408,7 @@ class _MeshNetworkScreenState extends State<MeshNetworkScreen> {
             child: Container(
               margin: const EdgeInsets.all(16),
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: kCardBg, borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(color: kCardBg, borderRadius: BorderRadius.circular(16), border: Border.all(color: TacticalStyles.kOutlineVariant)),
               child: ListView.builder(
                 reverse: true,
                 itemCount: _messages.length,
@@ -435,7 +433,7 @@ class _MeshNetworkScreenState extends State<MeshNetworkScreen> {
           const SizedBox(width: 8),
           _transportBadge('Bluetooth 5.0', _isAdvertising || _isDiscovering),
           const Spacer(),
-          Text(_status, style: GoogleFonts.shareTechMono(color: Colors.white38, fontSize: 10)),
+          Text(_status, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurfaceVariant, fontSize: 10, fontWeight: FontWeight.w500)),
         ],
       ),
     );
@@ -443,18 +441,18 @@ class _MeshNetworkScreenState extends State<MeshNetworkScreen> {
 
   Widget _transportBadge(String label, bool active) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: active ? kGreen.withOpacity(0.1) : Colors.white.withOpacity(0.05),
-        border: Border.all(color: active ? kGreen : Colors.white10),
-        borderRadius: BorderRadius.circular(4),
+        color: active ? kGreen.withOpacity(0.1) : TacticalStyles.kSurfaceLow,
+        border: Border.all(color: active ? kGreen : TacticalStyles.kOutlineVariant),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(width: 6, height: 6, decoration: BoxDecoration(shape: BoxShape.circle, color: active ? kGreen : Colors.white24)),
+          Container(width: 6, height: 6, decoration: BoxDecoration(shape: BoxShape.circle, color: active ? kGreen : TacticalStyles.kOnSurfaceVariant)),
           const SizedBox(width: 6),
-          Text(label, style: GoogleFonts.shareTechMono(color: active ? kGreen : Colors.white24, fontSize: 9)),
+          Text(label, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: active ? kGreen : TacticalStyles.kOnSurfaceVariant, fontSize: 10, fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -473,27 +471,27 @@ class _MeshNetworkScreenState extends State<MeshNetworkScreen> {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (!m.isMe) Text(m.sender, style: GoogleFonts.shareTechMono(color: m.isSystem ? Colors.white38 : kOrange, fontSize: 10, fontWeight: FontWeight.bold)),
+              if (!m.isMe) Text(m.sender, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: m.isSystem ? TacticalStyles.kOnSurfaceVariant : kOrange, fontSize: 10, fontWeight: FontWeight.bold)),
               const SizedBox(width: 8),
-              Text('${m.time.hour}:${m.time.minute}', style: const TextStyle(color: Colors.white24, fontSize: 8)),
+              Text('${m.time.hour}:${m.time.minute}', style: const TextStyle(color: TacticalStyles.kOnSurfaceVariant, fontSize: 8)),
               if (m.isMe) const SizedBox(width: 8),
-              if (m.isMe) Text('SİZ', style: GoogleFonts.shareTechMono(color: kGreen, fontSize: 10, fontWeight: FontWeight.bold)),
+              if (m.isMe) Text('SİZ', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kGreen, fontSize: 10, fontWeight: FontWeight.bold)),
             ],
           ),
           const SizedBox(height: 4),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: m.isSystem ? Colors.transparent : m.isMe ? kGreen.withOpacity(0.1) : Colors.white.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: m.isSystem ? Colors.white10 : m.isMe ? kGreen.withOpacity(0.3) : Colors.white10),
+              color: m.isSystem ? Colors.transparent : m.isMe ? kGreen.withOpacity(0.1) : TacticalStyles.kSurfaceHigh,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: m.isSystem ? TacticalStyles.kOutlineVariant : m.isMe ? kGreen.withOpacity(0.3) : TacticalStyles.kOutlineVariant),
             ),
-            child: Text(m.isVoice ? '▶ SESLİ MESAJI DİNLE' : m.text, style: TextStyle(color: m.isSystem ? Colors.white38 : (m.isVoice ? kOrange : Colors.white), fontSize: 13, fontWeight: m.isVoice ? FontWeight.bold : FontWeight.normal)),
+            child: Text(m.isVoice ? '▶ SESLİ MESAJI DİNLE' : m.text, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: m.isSystem ? TacticalStyles.kOnSurfaceVariant : (m.isVoice ? kOrange : TacticalStyles.kOnSurface), fontSize: 13, fontWeight: m.isVoice ? FontWeight.bold : FontWeight.normal)),
           ),
           if (m.isVoice)
              const Padding(
                padding: EdgeInsets.only(top: 4, left: 4),
-               child: Text('Dokunarak tekrar dinle', style: TextStyle(color: Colors.white24, fontSize: 8)),
+               child: Text('Dokunarak tekrar dinle', style: TextStyle(color: TacticalStyles.kOnSurfaceVariant, fontSize: 8)),
              ),
         ],
       ),
@@ -504,19 +502,20 @@ class _MeshNetworkScreenState extends State<MeshNetworkScreen> {
     final TextEditingController ctrl = TextEditingController();
     return Container(
       padding: const EdgeInsets.all(16),
-      color: Colors.black,
+      color: TacticalStyles.kSurfaceLowest,
       child: Row(
         children: [
           Expanded(
             child: TextField(
               controller: ctrl,
-              style: const TextStyle(color: Colors.white),
+              style: const TextStyle(color: TacticalStyles.kOnSurface),
               decoration: InputDecoration(
                 hintText: 'Mesaj gönder...',
-                hintStyle: const TextStyle(color: Colors.white24),
+                hintStyle: const TextStyle(color: TacticalStyles.kOnSurfaceVariant),
                 filled: true,
                 fillColor: kCardBg,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: TacticalStyles.kOutlineVariant)),
+                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: TacticalStyles.kOutlineVariant)),
               ),
             ),
           ),
@@ -539,9 +538,9 @@ class _MeshNetworkScreenState extends State<MeshNetworkScreen> {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: _isRecording ? Colors.redAccent : kCardBg,
+                color: _isRecording ? TacticalStyles.kErrorContainer : kCardBg,
                 shape: BoxShape.circle,
-                border: Border.all(color: _isRecording ? Colors.red : Colors.white10),
+                border: Border.all(color: _isRecording ? TacticalStyles.kError : TacticalStyles.kOutlineVariant),
               ),
               child: Icon(Icons.mic, color: _isRecording ? Colors.white : kOrange, size: 24),
             ),

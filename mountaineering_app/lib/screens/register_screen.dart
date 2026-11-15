@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import '../database_helper.dart';
 import '../storage_helper.dart';
@@ -9,10 +9,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:animate_do/animate_do.dart';
 import 'legal_screen.dart';
 import 'onboarding_screen.dart';
+import '../services/tactical_styles.dart';
 
-const Color kOrange = Color(0xFFFF6B00);
-const Color kBackground = Color(0xFF0A0A0A);
-const Color kGreen = Color(0xFF62FF4C);
+const Color kOrange = TacticalStyles.kPrimaryContainer;
+const Color kBackground = TacticalStyles.kSurface;
+const Color kCardBg = TacticalStyles.kSurfaceLow;
+const Color kGreen = TacticalStyles.kTertiary;
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -156,7 +158,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     children: [
                       const Icon(Icons.arrow_back_ios_new, color: Colors.white38, size: 16),
                       const SizedBox(width: 8),
-                      Text('GERİ DÖN', style: GoogleFonts.shareTechMono(color: Colors.white38, fontSize: 12)),
+                      Text('GERİ DÖN', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white38, fontSize: 12)),
                     ],
                   ),
                 ),
@@ -177,8 +179,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('YENİ KAYIT', style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 24, letterSpacing: 2)),
-                        Text('FIELD OPS ENROLLMENT', style: GoogleFonts.shareTechMono(color: kOrange, fontSize: 11, letterSpacing: 2)),
+                        Text('YENİ KAYIT', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontWeight: FontWeight.w900, fontSize: 24, letterSpacing: 2)),
+                        Text('FIELD OPS ENROLLMENT', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kOrange, fontSize: 11, letterSpacing: 2, fontWeight: FontWeight.w600)),
                       ],
                     ),
                   ],
@@ -251,20 +253,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 16),
                 
                 // Affiliation Selector
-                Text('KURUM / KURULUŞ BAĞLANTISI', style: GoogleFonts.shareTechMono(color: kOrange, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                Text('KURUM / KURULUŞ BAĞLANTISI', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kOrange, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
                 const SizedBox(height: 6),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF141414),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.white10),
+                    color: kCardBg,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: TacticalStyles.kOutlineVariant),
                   ),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
                       value: _affiliationType,
                       isExpanded: true,
-                      dropdownColor: const Color(0xFF141414),
+                      dropdownColor: kCardBg,
                       icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white24),
                       style: const TextStyle(color: Colors.white, fontSize: 14),
                       items: ['Bireysel', 'Spor Kulübü', 'Dernek'].map((String value) {
@@ -302,9 +304,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                      color: const Color(0xFF141414),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: _agreed ? kOrange.withOpacity(0.3) : Colors.white10)),
+                      color: kCardBg,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: _agreed ? kOrange.withOpacity(0.3) : TacticalStyles.kOutlineVariant)),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -366,7 +368,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     child: Container(
                       width: double.infinity, height: 56,
                       decoration: BoxDecoration(gradient: LinearGradient(colors: _isLoading ? [Colors.grey.shade900, Colors.grey.shade800] : [const Color(0xFFFF9D42), kOrange]), borderRadius: BorderRadius.circular(8)),
-                      child: _isLoading ? const Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2))) : Center(child: Text('KAYDI TAMAMLA', style: GoogleFonts.outfit(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18, letterSpacing: 1))),
+                      child: _isLoading ? const Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2))) : Center(child: Text('KAYDI TAMAMLA', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18, letterSpacing: 1))),
                     ),
                   ),
                 ),
@@ -386,10 +388,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: GoogleFonts.shareTechMono(color: kOrange, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+        Text(label, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kOrange, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
         const SizedBox(height: 6),
         Container(
-          decoration: BoxDecoration(color: const Color(0xFF141414), borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.white10)),
+          decoration: BoxDecoration(color: kCardBg, borderRadius: BorderRadius.circular(10), border: Border.all(color: TacticalStyles.kOutlineVariant)),
           child: TextField(
             controller: controller,
             obscureText: isPass ? obscure : false,

@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:math' as math;
+import '../services/tactical_styles.dart';
 
 class AppIntroScreen extends StatefulWidget {
   const AppIntroScreen({Key? key}) : super(key: key);
@@ -24,9 +25,9 @@ class _AppIntroScreenState extends State<AppIntroScreen>
   static const _slides = [
     _IntroSlide(
       icon: Icons.crisis_alert,
-      accentColor: Color(0xFFFF2244),
-      bgColorA: Color(0xFF1A0008),
-      bgColorB: Color(0xFF0A0A0A),
+      accentColor: TacticalStyles.kError,
+      bgColorA: TacticalStyles.kSurfaceHigh,
+      bgColorB: TacticalStyles.kSurface,
       tag: 'ACİL DURUM',
       title: 'SOS — Tek Dokunuş,\nHayat Kurtarır',
       desc:
@@ -35,9 +36,9 @@ class _AppIntroScreenState extends State<AppIntroScreen>
     ),
     _IntroSlide(
       icon: Icons.radar,
-      accentColor: Color(0xFF00AAFF),
-      bgColorA: Color(0xFF00111A),
-      bgColorB: Color(0xFF0A0A0A),
+      accentColor: TacticalStyles.kSecondaryContainer,
+      bgColorA: TacticalStyles.kSurfaceHigh,
+      bgColorB: TacticalStyles.kSurface,
       tag: 'EKİP RADARI',
       title: 'Ekibinin Konumunu\nAnlık Gör',
       desc:
@@ -46,9 +47,9 @@ class _AppIntroScreenState extends State<AppIntroScreen>
     ),
     _IntroSlide(
       icon: Icons.groups,
-      accentColor: Color(0xFF62FF4C),
-      bgColorA: Color(0xFF001A00),
-      bgColorB: Color(0xFF0A0A0A),
+      accentColor: TacticalStyles.kTertiary,
+      bgColorA: TacticalStyles.kSurfaceHigh,
+      bgColorB: TacticalStyles.kSurface,
       tag: 'EKİP YÖNETİMİ',
       title: 'Ekip Kur,\nKoordine Ol',
       desc:
@@ -58,8 +59,8 @@ class _AppIntroScreenState extends State<AppIntroScreen>
     _IntroSlide(
       icon: Icons.dynamic_feed,
       accentColor: Color(0xFFFFD700),
-      bgColorA: Color(0xFF1A1400),
-      bgColorB: Color(0xFF0A0A0A),
+      bgColorA: TacticalStyles.kSurfaceHigh,
+      bgColorB: TacticalStyles.kSurface,
       tag: 'SOSYAL AKIŞ',
       title: 'Dağcıların\nSosyal Dünyası',
       desc:
@@ -68,9 +69,9 @@ class _AppIntroScreenState extends State<AppIntroScreen>
     ),
     _IntroSlide(
       icon: Icons.map,
-      accentColor: Color(0xFFFF6B00),
-      bgColorA: Color(0xFF1A0800),
-      bgColorB: Color(0xFF0A0A0A),
+      accentColor: TacticalStyles.kPrimaryContainer,
+      bgColorA: TacticalStyles.kSurfaceHigh,
+      bgColorB: TacticalStyles.kSurface,
       tag: 'ROTA PLANLAMA',
       title: 'Profesyonel\nRota Planla',
       desc:
@@ -80,8 +81,8 @@ class _AppIntroScreenState extends State<AppIntroScreen>
     _IntroSlide(
       icon: Icons.share_location,
       accentColor: Color(0xFFAA44FF),
-      bgColorA: Color(0xFF0D0018),
-      bgColorB: Color(0xFF0A0A0A),
+      bgColorA: TacticalStyles.kSurfaceHigh,
+      bgColorB: TacticalStyles.kSurface,
       tag: 'ROTA PAYLAŞMA',
       title: 'Rotanı Paylaş,\nBirlikte Keşfet',
       desc:
@@ -158,7 +159,7 @@ class _AppIntroScreenState extends State<AppIntroScreen>
                     // Page count
                     Text(
                       '${_currentPage + 1}/${_slides.length}',
-                      style: GoogleFonts.shareTechMono(
+                      style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
                         color: Colors.white24,
                         fontSize: 12,
                         letterSpacing: 2,
@@ -170,12 +171,12 @@ class _AppIntroScreenState extends State<AppIntroScreen>
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white12),
+                          border: Border.all(color: TacticalStyles.kOutlineVariant),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
                           'ATLA',
-                          style: GoogleFonts.shareTechMono(
+                          style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
                             color: Colors.white38,
                             fontSize: 12,
                             letterSpacing: 2,
@@ -280,7 +281,7 @@ class _AppIntroScreenState extends State<AppIntroScreen>
                               _currentPage == _slides.length - 1
                                   ? 'HEMEN BAŞLA'
                                   : 'DEVAM ET',
-                              style: GoogleFonts.outfit(
+                              style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
                                 color: Colors.white,
                                 fontSize: 17,
                                 fontWeight: FontWeight.bold,
@@ -405,7 +406,7 @@ class _AppIntroScreenState extends State<AppIntroScreen>
               ),
               child: Text(
                 slide.tag,
-                style: GoogleFonts.shareTechMono(
+                style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
                   color: slide.accentColor,
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
@@ -430,7 +431,7 @@ class _AppIntroScreenState extends State<AppIntroScreen>
               child: Text(
                 slide.title,
                 textAlign: TextAlign.center,
-                style: GoogleFonts.outfit(
+                style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
                   color: Colors.white,
                   fontSize: 30,
                   fontWeight: FontWeight.w900,

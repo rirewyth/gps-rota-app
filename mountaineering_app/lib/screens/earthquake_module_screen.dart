@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -30,9 +30,9 @@ class EarthquakeModuleScreen extends StatefulWidget {
 }
 
 class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with TickerProviderStateMixin {
-  // Ultra power saving: Black background, high contrast red/orange text
-  static const Color kBg = Colors.black;
-  static const Color kOrange = Color(0xFFFF6B00);
+  static const Color kBg = TacticalStyles.kSurface;
+  static const Color kOrange = TacticalStyles.kPrimaryContainer;
+  static const Color kCardBg = TacticalStyles.kSurfaceLow;
 
   bool _isAcousticSosActive = false;
   bool _isVisualSosActive = false;
@@ -192,9 +192,9 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
           });
 
           return AlertDialog(
-            backgroundColor: const Color(0xFF141414),
-            title: const Text('BİLİNÇ KONTROLÜ', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
-            content: const Text('Uyanık mısınız? İyi olduğunuzu doğrulamak için ekrana dokunun.', style: TextStyle(color: Colors.white70)),
+            backgroundColor: kCardBg,
+            title: const Text('BİLİNÇ KONTROLÜ', style: TextStyle(color: TacticalStyles.kError, fontWeight: FontWeight.bold)),
+            content: const Text('Uyanık mısınız? İyi olduğunuzu doğrulamak için ekrana dokunun.', style: TextStyle(color: TacticalStyles.kOnSurfaceVariant)),
             actions: [
               ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: kOrange),
@@ -203,7 +203,7 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
                   _isPromptingConsciousness = false;
                   Navigator.pop(ctx);
                 },
-                child: const Text('İYİYİM, UYANIĞIM', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                child: const Text('İYİYİM, UYANIĞIM', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ),
             ],
           );
@@ -360,8 +360,8 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
   void _showMedicalIdDialog() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF141414),
-      builder: (ctx) => Container(padding: const EdgeInsets.all(24), child: const Text("Tıbbi Kimlik Ayarları", style: TextStyle(color: Colors.white))),
+      backgroundColor: kCardBg,
+      builder: (ctx) => Container(padding: const EdgeInsets.all(24), child: const Text("Tıbbi Kimlik Ayarları", style: TextStyle(color: TacticalStyles.kOnSurface))),
     );
   }
 
@@ -382,9 +382,9 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
     
     if (mounted) {
       if (result['basarili'] == true) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mesaj başarıyla acil durum kişinize gönderildi! ✓', style: TextStyle(color: Colors.white)), backgroundColor: Colors.green));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mesaj başarıyla acil durum kişinize gönderildi! ✓', style: TextStyle(color: Colors.white)), backgroundColor: TacticalStyles.kTertiaryContainer));
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mesaj gönderilemedi. İzinleri ve şebekeyi kontrol edin.', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mesaj gönderilemedi. İzinleri ve şebekeyi kontrol edin.', style: TextStyle(color: Colors.white)), backgroundColor: TacticalStyles.kErrorContainer));
       }
     }
   }
@@ -401,13 +401,13 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
       final confirm = await showDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
-          backgroundColor: Colors.black,
-          title: const Text('ENKAZ MODU', style: TextStyle(color: Colors.redAccent)),
-          content: const Text('Ekran parlaklığı sıfıra indirilecek ve arka plandaki enerji tüketen servisler durdurulacak. Telefonunuzun şarjı günlerce dayanacak. Onaylıyor musunuz?', style: TextStyle(color: Colors.white70)),
+          backgroundColor: kCardBg,
+          title: const Text('ENKAZ MODU', style: TextStyle(color: TacticalStyles.kError)),
+          content: const Text('Ekran parlaklığı sıfıra indirilecek ve arka plandaki enerji tüketen servisler durdurulacak. Telefonunuzun şarjı günlerce dayanacak. Onaylıyor musunuz?', style: TextStyle(color: TacticalStyles.kOnSurfaceVariant)),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('İPTAL', style: TextStyle(color: Colors.white54))),
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('İPTAL', style: TextStyle(color: TacticalStyles.kOnSurfaceVariant))),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+              style: ElevatedButton.styleFrom(backgroundColor: TacticalStyles.kErrorContainer),
               onPressed: () => Navigator.pop(ctx, true),
               child: const Text('AKTİF ET', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             ),
@@ -432,11 +432,11 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-          backgroundColor: Colors.black,
-          title: const Text('iOS Kısıtlaması', style: TextStyle(color: Colors.orangeAccent)),
-          content: const Text('Apple işletim sistemi kısıtlamaları nedeniyle Bluetooth Mesh yayın özelliği iPhone cihazlarda tam olarak desteklenmemektedir.', style: TextStyle(color: Colors.white70)),
+          backgroundColor: kCardBg,
+          title: const Text('iOS Kısıtlaması', style: TextStyle(color: kOrange)),
+          content: const Text('Apple işletim sistemi kısıtlamaları nedeniyle Bluetooth Mesh yayın özelliği iPhone cihazlarda tam olarak desteklenmemektedir.', style: TextStyle(color: TacticalStyles.kOnSurfaceVariant)),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('ANLADIM', style: TextStyle(color: Colors.orangeAccent))),
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('ANLADIM', style: TextStyle(color: kOrange))),
           ],
         )
       );
@@ -472,7 +472,7 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
   void _showGoBagChecklist() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF141414),
+      backgroundColor: kCardBg,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (ctx) => StatefulBuilder(
@@ -483,16 +483,16 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text('AFET ÇANTASI (GO-BAG)', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                Text('AFET ÇANTASI (GO-BAG)', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurface, fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 10),
-                const Text('Deprem çantanıza eklediğiniz hayati malzemeleri işaretleyin.', style: TextStyle(color: Colors.white54, fontSize: 13)),
+                Text('Deprem çantanıza eklediğiniz hayati malzemeleri işaretleyin.', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurfaceVariant, fontSize: 13)),
                 const SizedBox(height: 20),
                 ..._goBagItems.keys.map((key) {
                   return CheckboxListTile(
-                    title: Text(key, style: TextStyle(color: _goBagItems[key]! ? Colors.green : Colors.white)),
+                    title: Text(key, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: _goBagItems[key]! ? TacticalStyles.kTertiary : TacticalStyles.kOnSurface)),
                     value: _goBagItems[key],
-                    activeColor: Colors.green,
-                    checkColor: Colors.black,
+                    activeColor: TacticalStyles.kTertiary,
+                    checkColor: TacticalStyles.kSurfaceLowest,
                     onChanged: (val) async {
                       if (val != null) {
                         setStateSheet(() => _goBagItems[key] = val);
@@ -515,7 +515,7 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
   void _showAssemblyAreas() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF141414),
+      backgroundColor: kCardBg,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (ctx) => Padding(
@@ -523,29 +523,29 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.shield, color: Colors.greenAccent, size: 48),
+            const Icon(Icons.shield, color: TacticalStyles.kTertiary, size: 48),
             const SizedBox(height: 16),
-            const Text('ACİL TOPLANMA ALANI', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            Text('ACİL TOPLANMA ALANI', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurface, fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
-            const Text('Çevrimdışı Pusula Navigasyonu: Size en yakın toplanma alanına yönlendirme sağlar.', textAlign: TextAlign.center, style: TextStyle(color: Colors.white54, fontSize: 13)),
+            Text('Çevrimdışı Pusula Navigasyonu: Size en yakın toplanma alanına yönlendirme sağlar.', textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurfaceVariant, fontSize: 13)),
             const SizedBox(height: 24),
             StreamBuilder<CompassEvent>(
               stream: FlutterCompass.events,
               builder: (context, snapshot) {
-                if (snapshot.hasError || !snapshot.hasData) return const Center(child: CircularProgressIndicator(color: Colors.greenAccent));
+                if (snapshot.hasError || !snapshot.hasData) return const Center(child: CircularProgressIndicator(color: TacticalStyles.kTertiary));
                 double? direction = snapshot.data!.heading;
-                if (direction == null) return const Text('Pusula sensörü bulunamadı', style: TextStyle(color: Colors.red));
+                if (direction == null) return const Text('Pusula sensörü bulunamadı', style: TextStyle(color: TacticalStyles.kError));
                 
                 return Column(
                   children: [
                     Transform.rotate(
                       angle: (direction * (math.pi / 180) * -1) + (45 * (math.pi / 180)),
-                      child: const Icon(Icons.navigation, color: Colors.greenAccent, size: 80),
+                      child: const Icon(Icons.navigation, color: TacticalStyles.kTertiary, size: 80),
                     ),
                     const SizedBox(height: 16),
-                    Text('Hedef: Merkez Toplanma Alanı (~450m)', style: GoogleFonts.shareTechMono(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                    Text('Hedef: Merkez Toplanma Alanı (~450m)', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurface, fontSize: 16, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
-                    const Text('Yeşil ok yönünde ilerleyin.', style: TextStyle(color: Colors.greenAccent)),
+                    const Text('Yeşil ok yönünde ilerleyin.', style: TextStyle(color: TacticalStyles.kTertiary)),
                   ],
                 );
               },
@@ -561,7 +561,7 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
   Widget build(BuildContext context) {
     if (_isDebrisModeActive) {
       return Scaffold(
-        backgroundColor: Colors.black,
+        backgroundColor: TacticalStyles.kSurfaceLowest,
         body: SafeArea(
           child: Center(
             child: GestureDetector(
@@ -569,10 +569,10 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 60),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.white10),
+                  border: Border.all(color: TacticalStyles.kOutlineVariant),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Text('ENKAZ MODUNDAN ÇIK', style: TextStyle(color: Colors.white38, fontSize: 18, fontWeight: FontWeight.bold)),
+                child: Text('ENKAZ MODUNDAN ÇIK', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurfaceVariant, fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ),
           ),
@@ -585,9 +585,37 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
         Scaffold(
           backgroundColor: kBg,
           appBar: AppBar(
-            backgroundColor: Colors.black,
-            iconTheme: const IconThemeData(color: Colors.white54),
-            title: Text('AFET BİLGİ MODU', style: GoogleFonts.shareTechMono(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+            backgroundColor: TacticalStyles.kSurfaceLowest,
+            iconTheme: const IconThemeData(color: TacticalStyles.kOnSurfaceVariant),
+            title: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: TacticalStyles.glassCardDecoration(
+                radius: 999,
+                borderColor: TacticalStyles.kError.withValues(alpha: 0.4),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 6,
+                    height: 6,
+                    decoration: const BoxDecoration(
+                      color: TacticalStyles.kError,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'ROTA+ DEPREM & ENKAZ',
+                    style: TacticalStyles.labelCaps(
+                      color: TacticalStyles.kError,
+                      size: 11,
+                      weight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+              ),
+            ),
             centerTitle: true,
           ),
           body: SafeArea(
@@ -604,17 +632,17 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 18),
                       decoration: BoxDecoration(
-                        color: Colors.green.shade700,
+                        color: TacticalStyles.kTertiaryContainer,
                         borderRadius: BorderRadius.circular(16),
-                        boxShadow: [BoxShadow(color: Colors.green.withOpacity(0.3), blurRadius: 10, spreadRadius: 2)],
+                        boxShadow: [BoxShadow(color: TacticalStyles.kTertiary.withOpacity(0.25), blurRadius: 12, spreadRadius: 1)],
                       ),
                       child: Column(
                         children: [
                           const Icon(Icons.check_circle_outline, color: Colors.white, size: 36),
                           const SizedBox(height: 8),
-                          Text('GÜVENDEYİM', style: GoogleFonts.shareTechMono(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 2)),
+                          Text('GÜVENDEYİM', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
                           const SizedBox(height: 4),
-                          const Text('Acil durum kişilerine konumunu SMS atar', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                          Text('Acil durum kişilerine konumunu SMS atar', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white.withOpacity(0.85), fontSize: 12)),
                         ],
                       ),
                     ),
@@ -624,13 +652,17 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
                   // Hayatta Kalma Sayacı
                   Container(
                     padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(border: Border.all(color: Colors.redAccent.withOpacity(0.5)), borderRadius: BorderRadius.circular(12), color: const Color(0xFF0F0000)),
+                    decoration: TacticalStyles.glassCardDecoration(
+                      radius: 16,
+                      borderColor: TacticalStyles.kError.withValues(alpha: 0.4),
+                    ),
                     child: Column(
                       children: [
-                        const Icon(Icons.timer, color: Colors.redAccent, size: 28),
+                        const Icon(Icons.timer, color: TacticalStyles.kError, size: 28),
                         const SizedBox(height: 8),
-                        Text('HAYATTA KALMA SAYACI', style: GoogleFonts.shareTechMono(color: Colors.white54, fontSize: 12)),
-                        Text(_formatDuration(_timeUnderDebris), style: GoogleFonts.shareTechMono(color: Colors.white, fontSize: 36, fontWeight: FontWeight.bold)),
+                        Text('HAYATTA KALMA SAYACI', style: TacticalStyles.labelCaps(color: TacticalStyles.kOnSurfaceVariant, size: 11)),
+                        const SizedBox(height: 4),
+                        Text(_formatDuration(_timeUnderDebris), style: TacticalStyles.displayHero(color: TacticalStyles.kOnSurface, size: 36)),
                       ],
                     ),
                   ),
@@ -691,28 +723,28 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
   Widget _buildWarningOverlay() {
     return Positioned.fill(
       child: Container(
-        color: Colors.red.withOpacity(0.9),
+        color: TacticalStyles.kErrorContainer.withOpacity(0.95),
         child: SafeArea(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Icon(Icons.warning_amber_rounded, color: Colors.white, size: 80),
               const SizedBox(height: 24),
-              Text('YIKICI SARSINTI BEKLENİYOR!', style: GoogleFonts.shareTechMono(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+              Text('YIKICI SARSINTI BEKLENİYOR!', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
-              Text(_incomingLocation, style: const TextStyle(color: Colors.white70, fontSize: 18)),
+              Text(_incomingLocation, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white70, fontSize: 18)),
               const SizedBox(height: 40),
               Container(
                 width: 150,
                 height: 150,
                 decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 4)),
-                child: Center(child: Text('${_secondsLeft.toInt()}s', style: GoogleFonts.shareTechMono(color: Colors.white, fontSize: 60, fontWeight: FontWeight.bold))),
+                child: Center(child: Text('${_secondsLeft.toInt()}s', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontSize: 60, fontWeight: FontWeight.bold))),
               ),
               const SizedBox(height: 40),
-              const Text('ÇÖK - KAPAN - TUTUN', style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
+              Text('ÇÖK - KAPAN - TUTUN', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
               const SizedBox(height: 20),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.red, padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16)),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: TacticalStyles.kErrorContainer, padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16)),
                 onPressed: () => setState(() => _isShakingIncoming = false),
                 child: const Text('ALARM DURDUR', style: TextStyle(fontWeight: FontWeight.bold)),
               ),
@@ -729,12 +761,12 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-        decoration: BoxDecoration(color: isActive ? Colors.redAccent.withOpacity(0.2) : const Color(0xFF141414), border: Border.all(color: isActive ? Colors.redAccent : Colors.white10, width: 2), borderRadius: BorderRadius.circular(16)),
+        decoration: BoxDecoration(color: isActive ? TacticalStyles.kError.withOpacity(0.18) : kCardBg, border: Border.all(color: isActive ? TacticalStyles.kError : TacticalStyles.kOutlineVariant, width: isActive ? 2 : 1), borderRadius: BorderRadius.circular(16)),
         child: Row(
           children: [
-            Icon(icon, color: isActive ? Colors.redAccent : kOrange, size: 32),
+            Icon(icon, color: isActive ? TacticalStyles.kError : kOrange, size: 32),
             const SizedBox(width: 20),
-            Expanded(child: Text(title, style: GoogleFonts.shareTechMono(color: isActive ? Colors.redAccent : Colors.white, fontSize: 16, fontWeight: FontWeight.bold))),
+            Expanded(child: Text(title, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: isActive ? TacticalStyles.kError : TacticalStyles.kOnSurface, fontSize: 15, fontWeight: FontWeight.bold))),
           ],
         ),
       ),
@@ -747,15 +779,15 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-        decoration: BoxDecoration(color: isActive ? Colors.blueAccent.withOpacity(0.2) : const Color(0xFF141414), border: Border.all(color: isActive ? Colors.blueAccent : Colors.white10, width: 1), borderRadius: BorderRadius.circular(12)),
+        decoration: BoxDecoration(color: isActive ? TacticalStyles.kSecondaryContainer.withOpacity(0.18) : kCardBg, border: Border.all(color: isActive ? TacticalStyles.kSecondaryContainer : TacticalStyles.kOutlineVariant, width: 1), borderRadius: BorderRadius.circular(14)),
         child: Column(
           children: [
-            Icon(icon, color: isActive ? Colors.blueAccent : Colors.white70, size: 28),
+            Icon(icon, color: isActive ? TacticalStyles.kSecondaryContainer : TacticalStyles.kOnSurfaceVariant, size: 28),
             const SizedBox(height: 12),
-            Text(title, textAlign: TextAlign.center, style: GoogleFonts.shareTechMono(color: isActive ? Colors.blueAccent : Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+            Text(title, textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: isActive ? TacticalStyles.kSecondaryContainer : TacticalStyles.kOnSurface, fontSize: 12, fontWeight: FontWeight.bold)),
             if (subtitle.isNotEmpty) ...[
               const SizedBox(height: 4),
-              Text(subtitle, textAlign: TextAlign.center, style: TextStyle(color: isActive ? Colors.blueAccent.withOpacity(0.7) : Colors.redAccent.withOpacity(0.8), fontSize: 10, fontWeight: FontWeight.bold)),
+              Text(subtitle, textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: isActive ? TacticalStyles.kSecondary : TacticalStyles.kOnSurfaceVariant, fontSize: 10, fontWeight: FontWeight.w600)),
             ]
           ],
         ),

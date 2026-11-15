@@ -78,17 +78,16 @@ class EarthquakeService {
     );
   }
 
-  Future<List<EarthquakeModel>> getRecentEarthquakes() async {
+  Future<List<EarthquakeModel>> getRecentEarthquakes({double minMag = 4.0}) async {
     try {
       final response = await http.get(Uri.parse(_apiUrl));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['status'] == true) {
           final List list = data['result'];
-          // ROTA+ EMNİYETTEYİM: Yalnızca 4.0 ve üstü depremler baz alınır
           return list
               .map((e) => EarthquakeModel.fromJson(e))
-              .where((q) => q.mag >= 4.0)
+              .where((q) => q.mag >= minMag)
               .toList();
         }
       }

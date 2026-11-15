@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -7,6 +7,8 @@ import 'package:vibration/vibration.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../services/tactical_styles.dart';
 
 class CriticalAlertScreen extends StatefulWidget {
   final double magnitude;
@@ -88,7 +90,7 @@ class _CriticalAlertScreenState extends State<CriticalAlertScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A0000), // Very dark red
+      backgroundColor: TacticalStyles.kSurface,
       body: Stack(
         children: [
           // Background Glow
@@ -97,7 +99,7 @@ class _CriticalAlertScreenState extends State<CriticalAlertScreen> {
               decoration: BoxDecoration(
                 gradient: RadialGradient(
                   colors: [
-                    Colors.red.withOpacity(0.3),
+                    TacticalStyles.kErrorContainer.withOpacity(0.25),
                     Colors.transparent,
                   ],
                   radius: 0.8,
@@ -118,16 +120,16 @@ class _CriticalAlertScreenState extends State<CriticalAlertScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                         decoration: BoxDecoration(
-                          color: Colors.red.shade900,
+                          color: TacticalStyles.kErrorContainer,
                           borderRadius: BorderRadius.circular(30),
-                          border: Border.all(color: Colors.redAccent, width: 2),
+                          border: Border.all(color: TacticalStyles.kError, width: 2),
                         ),
-                        child: const Text(
+                        child: Text(
                           'KRİTİK DEPREM UYARISI',
-                          style: TextStyle(
+                          style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            letterSpacing: 2,
+                            letterSpacing: 1.5,
                           ),
                         ),
                       ),
@@ -135,10 +137,10 @@ class _CriticalAlertScreenState extends State<CriticalAlertScreen> {
                       Text(
                         widget.location.toUpperCase(),
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.white70,
+                        style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                          color: TacticalStyles.kOnSurfaceVariant,
                           fontSize: 16,
-                          fontWeight: FontWeight.w300,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
@@ -154,13 +156,14 @@ class _CriticalAlertScreenState extends State<CriticalAlertScreen> {
                     width: 220,
                     height: 220,
                     decoration: BoxDecoration(
+                      color: TacticalStyles.kSurfaceLow,
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.redAccent, width: 4),
+                      border: Border.all(color: TacticalStyles.kError, width: 4),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.red.withOpacity(0.5),
-                          blurRadius: 30,
-                          spreadRadius: 10,
+                          color: TacticalStyles.kErrorContainer.withOpacity(0.35),
+                          blurRadius: 24,
+                          spreadRadius: 6,
                         ),
                       ],
                     ),
@@ -169,19 +172,19 @@ class _CriticalAlertScreenState extends State<CriticalAlertScreen> {
                       children: [
                         Text(
                           'M ${widget.magnitude.toStringAsFixed(1)}',
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                            color: TacticalStyles.kOnSurface,
                             fontSize: 48,
-                            fontWeight: FontWeight.w900,
+                            fontWeight: FontWeight.w800,
                           ),
                         ),
-                        const Divider(color: Colors.white24, indent: 50, endIndent: 50),
+                        const Divider(color: TacticalStyles.kOutlineVariant, indent: 50, endIndent: 50),
                         Text(
                           _remainingSeconds > 0 
                             ? '${_remainingSeconds.toInt()} sn' 
                             : 'DALGA ULAŞTI',
-                          style: TextStyle(
-                            color: _remainingSeconds > 0 ? Colors.orangeAccent : Colors.redAccent,
+                          style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                            color: _remainingSeconds > 0 ? TacticalStyles.kPrimaryContainer : TacticalStyles.kError,
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),
@@ -199,7 +202,7 @@ class _CriticalAlertScreenState extends State<CriticalAlertScreen> {
                   margin: const EdgeInsets.symmetric(horizontal: 20),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white10, width: 1),
+                    border: Border.all(color: TacticalStyles.kOutlineVariant, width: 1),
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: FlutterMap(
@@ -222,7 +225,7 @@ class _CriticalAlertScreenState extends State<CriticalAlertScreen> {
                               infinite: true,
                               child: const Icon(
                                 Icons.stars,
-                                color: Colors.red,
+                                color: TacticalStyles.kErrorContainer,
                                 size: 40,
                               ),
                             ),
@@ -235,8 +238,8 @@ class _CriticalAlertScreenState extends State<CriticalAlertScreen> {
                             point: LatLng(widget.lat, widget.lng),
                             radius: 50000, // 50km visual hint
                             useRadiusInMeter: true,
-                            color: Colors.red.withOpacity(0.2),
-                            borderColor: Colors.red,
+                            color: TacticalStyles.kErrorContainer.withOpacity(0.2),
+                            borderColor: TacticalStyles.kErrorContainer,
                             borderStrokeWidth: 2,
                           ),
                         ],
@@ -256,9 +259,9 @@ class _CriticalAlertScreenState extends State<CriticalAlertScreen> {
                         FadeInUp(
                           child: Column(
                             children: [
-                              const Text(
+                              Text(
                                 'DURUMUNUZ NEDİR?',
-                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+                                style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurface, fontWeight: FontWeight.bold, fontSize: 18),
                               ),
                               const SizedBox(height: 16),
                               Row(
@@ -269,9 +272,10 @@ class _CriticalAlertScreenState extends State<CriticalAlertScreen> {
                                       icon: const Icon(Icons.check_circle),
                                       label: const Text('GÜVENDEYİM'),
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.green,
+                                        backgroundColor: TacticalStyles.kTertiaryContainer,
                                         foregroundColor: Colors.white,
                                         padding: const EdgeInsets.symmetric(vertical: 16),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                       ),
                                     ),
                                   ),
@@ -282,9 +286,10 @@ class _CriticalAlertScreenState extends State<CriticalAlertScreen> {
                                       icon: const Icon(Icons.warning),
                                       label: const Text('YARDIM LAZIM'),
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.orange,
+                                        backgroundColor: TacticalStyles.kPrimaryContainer,
                                         foregroundColor: Colors.white,
                                         padding: const EdgeInsets.symmetric(vertical: 16),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                       ),
                                     ),
                                   ),
@@ -300,8 +305,8 @@ class _CriticalAlertScreenState extends State<CriticalAlertScreen> {
                             child: OutlinedButton(
                               onPressed: () => Navigator.pop(context),
                               style: OutlinedButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                side: const BorderSide(color: Colors.white24),
+                                foregroundColor: TacticalStyles.kOnSurface,
+                                side: const BorderSide(color: TacticalStyles.kOutlineVariant),
                                 padding: const EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                               ),
@@ -314,7 +319,7 @@ class _CriticalAlertScreenState extends State<CriticalAlertScreen> {
                               child: ElevatedButton(
                                 onPressed: _stopAlarm,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.redAccent,
+                                  backgroundColor: TacticalStyles.kErrorContainer,
                                   foregroundColor: Colors.white,
                                   padding: const EdgeInsets.symmetric(vertical: 16),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

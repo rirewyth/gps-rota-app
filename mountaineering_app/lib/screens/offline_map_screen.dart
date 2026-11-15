@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart' as fm;
 import 'package:latlong2/latlong.dart' as ll;
@@ -6,9 +6,10 @@ import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mbx;
 import '../services/offline_map_manager.dart';
 import '../services/premium_service.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../services/tactical_styles.dart';
 
-const Color kOrange = Color(0xFFFF6B00);
-const Color kHeaderBg = Colors.black;
+const Color kOrange = TacticalStyles.kPrimaryContainer;
+const Color kHeaderBg = TacticalStyles.kSurfaceLowest;
 
 class OfflineMapScreen extends StatefulWidget {
   const OfflineMapScreen({Key? key}) : super(key: key);
@@ -92,11 +93,13 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
+      backgroundColor: TacticalStyles.kSurface,
       appBar: AppBar(
-        title: Text('Çevrimdışı Harita Yönetimi', style: GoogleFonts.outfit(color: kOrange, fontSize: 18, fontWeight: FontWeight.bold)),
-        backgroundColor: kHeaderBg,
-        iconTheme: const IconThemeData(color: Colors.white),
+        centerTitle: true,
+        title: TacticalStyles.appBarPill('ÇEVRİMDIŞI HARİTA', icon: Icons.map_outlined),
+        backgroundColor: TacticalStyles.kSurfaceLowest,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: TacticalStyles.kOnSurface),
       ),
       body: Stack(
         children: [
@@ -140,16 +143,16 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
           if (_isDownloading)
             Positioned.fill(
               child: Container(
-                color: Colors.black87,
+                color: TacticalStyles.kSurfaceLowest.withOpacity(0.88),
                 child: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      CircularProgressIndicator(value: _progress, color: kOrange, backgroundColor: Colors.white24),
+                      CircularProgressIndicator(value: _progress, color: kOrange, backgroundColor: TacticalStyles.kOutlineVariant),
                       const SizedBox(height: 20),
-                      Text("Harita İndiriliyor...", style: GoogleFonts.outfit(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                      Text("Harita İndiriliyor...", style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurface, fontSize: 20, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 8),
-                      Text(_statusTxt, style: const TextStyle(color: Colors.white70)),
+                      Text(_statusTxt, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurfaceVariant)),
                     ],
                   ),
                 ),
@@ -162,16 +165,16 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: kOrange,
-                  foregroundColor: Colors.black,
+                  foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  elevation: 8,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  elevation: 6,
                 ),
                 onPressed: _startDownload,
                 icon: const Icon(Icons.file_download, size: 24),
-                label: const Text(
+                label: Text(
                   'BAKIŞ AÇISINDAKİ ALANI İNDİR',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, letterSpacing: 1),
+                  style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], fontWeight: FontWeight.bold, fontSize: 14, letterSpacing: 0.5),
                 ),
               ),
             ),
@@ -182,13 +185,13 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.black87,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.white24),
+                  color: TacticalStyles.kSurfaceLow.withOpacity(0.95),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: TacticalStyles.kOutlineVariant),
                 ),
                 child: Text(
                   "Turuncu çerçevenin içindeki bölge seçilecektir. Aşırı yakınlaştırma çok fazla yer kaplayabilir.",
-                  style: GoogleFonts.shareTechMono(color: Colors.amber, fontSize: 11),
+                  style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kPrimary, fontSize: 11, fontWeight: FontWeight.w500),
                   textAlign: TextAlign.center,
                 ),
               ),

@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart' as fm;
@@ -16,13 +16,13 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'notification_screen.dart';
 import 'package:battery_plus/battery_plus.dart';
 import 'package:just_audio/just_audio.dart';
-
 import 'package:vibration/vibration.dart';
+import '../services/tactical_styles.dart';
 
-const Color kOrange = Color(0xFFFF6B00);
-const Color kBackground = Color(0xFF0A0A0A);
-const Color kCardBg = Color(0xFF141414);
-const Color kGreen = Color(0xFF62FF4C);
+const Color kOrange = TacticalStyles.kPrimaryContainer;
+const Color kBackground = TacticalStyles.kSurface;
+const Color kCardBg = TacticalStyles.kSurfaceLow;
+const Color kGreen = TacticalStyles.kTertiary;
 
 class LiveTrackingScreen extends StatefulWidget {
   final bool autoStart;
@@ -70,12 +70,235 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
   double _lastWarningAltitude = 0;
   bool _criticalWarningGiven = false;
 
+  // Sesli Kilometre & İrtifa Koçu (Audio Pace Coach)
+  bool _audioCoachEnabled = true;
+  int _lastAnnouncedKm = 0;
+  int _lastAnnouncedElevStep = 0;
+
+  void _checkAudioPaceCoach(double altitude) {
+    if (!_audioCoachEnabled) return;
+    final currentKm = (_totalDistance / 1000).floor();
+    if (currentKm >= 1 && currentKm > _lastAnnouncedKm) {
+      _lastAnnouncedKm = currentKm;
+      _speak(
+        '$currentKm kilometre tamamlandı. Mevcut rakım ${altitude.toInt()} metre. Toplam tırmanış ${_elevationGain.toInt()} metre.',
+      );
+      return;
+    }
+    final currentElevStep = (_elevationGain / 250).floor();
+    if (currentElevStep >= 1 && currentElevStep > _lastAnnouncedElevStep) {
+      _lastAnnouncedElevStep = currentElevStep;
+      _speak(
+        '${currentElevStep * 250} metre tırmanış kazanımı aşıldı. Mevcut rakım ${altitude.toInt()} metre.',
+      );
+    }
+  }
+
   // New features
   bool _isPaused = false;
   DateTime? _lastSyncTime;
   DateTime? _lastAnnotationUpdate; // Mapbox annotation throttle (iOS bellek tasarrufu)
   bool _isLocationLocked = true; // Konum kilidi
   static const int _maxRoutePoints = 300; // Bellek sınırı (iOS için kritik)
+
+  // Premium: Otomatik Hareketsizlik SOS (Dead Man's Switch)
+  bool _deadMansSwitchEnabled = false;
+  int _inactivityLimitMinutes = 15;
+  DateTime _lastMovementAt = DateTime.now();
+  ll.LatLng? _lastMovementAnchor;
+  Timer? _inactivityCheckTimer;
+  bool _inactivityAlertShowing = false;
+
+  void _recordMovementForDeadMansSwitch(Position pos) {
+    if (!_deadMansSwitchEnabled) return;
+    final current = ll.LatLng(pos.latitude, pos.longitude);
+    if (_lastMovementAnchor == null) {
+      _lastMovementAnchor = current;
+      _lastMovementAt = DateTime.now();
+      return;
+    }
+    final movedMeters = const ll.Distance().as(
+      ll.LengthUnit.Meter,
+      _lastMovementAnchor!,
+      current,
+    );
+    if (movedMeters >= 15.0) {
+      _lastMovementAnchor = current;
+      _lastMovementAt = DateTime.now();
+    }
+  }
+
+  void _toggleDeadMansSwitch() {
+    if (!_isPremiumUser) {
+      PremiumService.showPremiumRequired(
+        context,
+        'Otomatik Hareketsizlik SOS (Dead Man\'s Switch)',
+      );
+      return;
+    }
+
+    if (_deadMansSwitchEnabled) {
+      _inactivityCheckTimer?.cancel();
+      _inactivityCheckTimer = null;
+      setState(() => _deadMansSwitchEnabled = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Hareketsizlik Koruması (Auto-SOS) kapatıldı.')),
+      );
+      return;
+    }
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: kCardBg,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Row(
+                children: [
+                  Icon(Icons.shield_moon_rounded, color: Colors.amber, size: 22),
+                  SizedBox(width: 8),
+                  Text(
+                    'HAREKETSİZLİK KORUMASI (PRO)',
+                    style: TextStyle(
+                      color: TacticalStyles.kTextPrimary,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Belirlenen süre boyunca 15 metreden fazla hareket algılanmazsa 30 saniyelik onay penceresi açılır; yanıt verilmezse otomatik SOS tetiklenir.',
+                style: TextStyle(color: TacticalStyles.kTextSecondary, fontSize: 12),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [10, 15, 30].map((mins) {
+                  return Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: TacticalStyles.kPrimaryContainer,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(ctx);
+                          _activateDeadMansSwitch(mins);
+                        },
+                        child: Text('$mins dk', style: const TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _activateDeadMansSwitch(int minutes) {
+    _inactivityCheckTimer?.cancel();
+    setState(() {
+      _inactivityLimitMinutes = minutes;
+      _deadMansSwitchEnabled = true;
+      _lastMovementAt = DateTime.now();
+      if (_currentPosition != null) {
+        _lastMovementAnchor = ll.LatLng(_currentPosition!.latitude, _currentPosition!.longitude);
+      }
+    });
+    _inactivityCheckTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (!mounted || !_deadMansSwitchEnabled || !_isTracking || _isPaused || _inactivityAlertShowing) {
+        return;
+      }
+      final idleMinutes = DateTime.now().difference(_lastMovementAt).inMinutes;
+      if (idleMinutes >= _inactivityLimitMinutes) {
+        _showDeadMansSwitchCountdown();
+      }
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Hareketsizlik Koruması aktif ($minutes dk).'),
+        backgroundColor: TacticalStyles.kTertiary,
+      ),
+    );
+  }
+
+  void _showDeadMansSwitchCountdown() {
+    _inactivityAlertShowing = true;
+    int secondsLeft = 30;
+    Timer? countdownTimer;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) {
+          countdownTimer ??= Timer.periodic(const Duration(seconds: 1), (t) {
+            if (!mounted) {
+              t.cancel();
+              return;
+            }
+            if (secondsLeft <= 1) {
+              t.cancel();
+              Navigator.of(ctx).pop();
+              _inactivityAlertShowing = false;
+              if (!_isSOS) {
+                _toggleSOS();
+              }
+            } else {
+              setDialogState(() => secondsLeft--);
+            }
+          });
+          return AlertDialog(
+            backgroundColor: TacticalStyles.kSurfaceLow,
+            title: const Row(
+              children: [
+                Icon(Icons.warning_amber_rounded, color: Colors.redAccent),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Hareketsizlik Tespit Edildi',
+                    style: TextStyle(color: TacticalStyles.kOnSurface, fontSize: 16),
+                  ),
+                ),
+              ],
+            ),
+            content: Text(
+              '$_inactivityLimitMinutes dakikadır hareket algılanmadı.\n$secondsLeft saniye içinde onay verilmezse otomatik SOS başlatılacak.',
+              style: const TextStyle(color: TacticalStyles.kOnSurfaceVariant, fontSize: 13),
+            ),
+            actions: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: TacticalStyles.kTertiary),
+                onPressed: () {
+                  countdownTimer?.cancel();
+                  _lastMovementAt = DateTime.now();
+                  _inactivityAlertShowing = false;
+                  Navigator.of(ctx).pop();
+                },
+                child: const Text('İYİYİM, DEVAM ET', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          );
+        },
+      ),
+    ).then((_) {
+      countdownTimer?.cancel();
+      _inactivityAlertShowing = false;
+    });
+  }
 
   void _checkAltitudeWarnings(double altitude) {
     if (!_isPremiumUser) return; // AMS Uyarıları sadece Premium üyeler içindir
@@ -333,9 +556,11 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
         }
       }
 
-      // İrtifa uyarısı
+      // İrtifa uyarısı ve Sesli Kilometre / İrtifa Koçu
       if (_isTracking && !_isPaused) {
         _checkAltitudeWarnings(pos.altitude);
+        _checkAudioPaceCoach(pos.altitude);
+        _recordMovementForDeadMansSwitch(pos);
         CloudSyncService.syncLocation(
             pos.latitude, pos.longitude, pos.altitude, DateTime.now().toIso8601String());
       }
@@ -764,6 +989,7 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
     DatabaseHelper.rotaUpdateNotifier.removeListener(_onRotaGuncellendi);
     _positionStream?.cancel();
     _timer?.cancel();
+    _inactivityCheckTimer?.cancel();
     _mapController?.dispose();
     _sirenPlayer.dispose();
     super.dispose();
@@ -777,24 +1003,162 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
     String adimTxt = _steps.toString();
 
     return Scaffold(
-      backgroundColor: kBackground,
+      backgroundColor: TacticalStyles.kSurface,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        centerTitle: true,
-        title: RichText(
-          text: const TextSpan(
-            children: [
-              TextSpan(
-                text: 'ACİL DURUM ',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: 1),
-              ),
-              TextSpan(
-                text: 'CANLI TAKİP',
-                style: TextStyle(color: kOrange, fontWeight: FontWeight.w900, fontSize: 18, fontStyle: FontStyle.italic, letterSpacing: 2),
-              ),
-            ],
+        backgroundColor: TacticalStyles.kSurfaceLowest,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: false,
+        titleSpacing: 12,
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(1),
+          child: SizedBox(
+            height: 1,
+            child: ColoredBox(color: TacticalStyles.kOutlineVariant),
           ),
         ),
+        title: Row(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: TacticalStyles.kPrimaryContainer.withOpacity(0.16),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: TacticalStyles.kPrimaryContainer.withOpacity(0.35),
+                ),
+              ),
+              child: const Icon(
+                Icons.gps_fixed_rounded,
+                color: TacticalStyles.kPrimary,
+                size: 17,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        'ROTA+',
+                        style: TacticalStyles.headline(
+                          color: TacticalStyles.kOnSurface,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: TacticalStyles.kPrimary.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            'TELEMETRİ',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TacticalStyles.labelMicro(
+                              color: TacticalStyles.kPrimary,
+                              fontSize: 8.5,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    'Gerçek Zamanlı Saha & GPS Takibi',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TacticalStyles.labelCaps(
+                      color: TacticalStyles.kOnSurfaceVariant,
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(999),
+              onTap: () {
+                setState(() => _audioCoachEnabled = !_audioCoachEnabled);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      _audioCoachEnabled
+                          ? 'Sesli Kilometre & İrtifa Koçu Açıldı (Her 1 km / 250 m)'
+                          : 'Sesli Kilometre & İrtifa Koçu Kapatıldı',
+                    ),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: TacticalStyles.capsuleDecoration(
+                  backgroundColor: TacticalStyles.kSurfaceHigh.withOpacity(0.85),
+                  borderColor: _audioCoachEnabled
+                      ? TacticalStyles.kPrimary.withOpacity(0.5)
+                      : TacticalStyles.kGlassBorder,
+                ),
+                child: Icon(
+                  _audioCoachEnabled ? Icons.record_voice_over : Icons.voice_over_off,
+                  size: 16,
+                  color: _audioCoachEnabled ? TacticalStyles.kPrimary : TacticalStyles.kOnSurfaceVariant,
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 14),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: TacticalStyles.capsuleDecoration(
+                backgroundColor: TacticalStyles.kSurfaceHigh.withOpacity(0.85),
+                borderColor: _isTracking
+                    ? TacticalStyles.kTertiary.withOpacity(0.45)
+                    : TacticalStyles.kGlassBorder,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  PulsingStatusIndicator(
+                    color: _isTracking
+                        ? TacticalStyles.kTertiary
+                        : TacticalStyles.kPrimaryContainer,
+                    size: 7,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    _isTracking ? 'KAYIT AKTİF' : 'HAZIR',
+                    style: TacticalStyles.labelMicro(
+                      color: _isTracking
+                          ? TacticalStyles.kTertiary
+                          : TacticalStyles.kOnSurface,
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
       // Removed floatingActionButton to consolidate all map controls in the Stack below
       body: Column(
@@ -838,7 +1202,7 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
                         fm.PolylineLayer<Object>(polylines: [
                           fm.Polyline<Object>(
                             points: _aktifRotaNoktalar,
-                            color: Colors.cyanAccent.withOpacity(0.8),
+                            color: TacticalStyles.kSecondaryContainer.withOpacity(0.85),
                             strokeWidth: 6.0,
                             pattern: fm.StrokePattern.dashed(segments: [15, 15]),
                           ),
@@ -848,7 +1212,7 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
                         fm.PolylineLayer<Object>(polylines: [
                           fm.Polyline<Object>(
                             points: _routePoints,
-                            color: kOrange,
+                            color: TacticalStyles.kPrimaryContainer,
                             strokeWidth: 5.0,
                           ),
                         ]),
@@ -857,12 +1221,19 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
                         fm.MarkerLayer(markers: [
                           fm.Marker(
                             point: ll.LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
-                            width: 16, height: 16,
+                            width: 18,
+                            height: 18,
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Colors.blueAccent,
+                                color: TacticalStyles.kSecondaryContainer,
                                 shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 2),
+                                border: Border.all(color: Colors.white, width: 2.5),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: TacticalStyles.kSecondaryContainer.withOpacity(0.6),
+                                    blurRadius: 10,
+                                  ),
+                                ],
                               ),
                             ),
                           ),
@@ -871,19 +1242,66 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
                   ),
                 // Gradient Gölge 
                 Positioned(
-                  bottom: 0, left: 0, right: 0,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
                   height: 60,
                   child: Container(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
-                        colors: [kBackground, Colors.transparent],
+                        colors: [TacticalStyles.kSurface, Colors.transparent],
                       ),
                     ),
                   ),
                 ),
                 
+                // --- SOL ÜST: HAREKETSİZLİK KORUMASI (PRO DEAD MAN'S SWITCH) ---
+                Positioned(
+                  top: 16,
+                  left: 16,
+                  child: GestureDetector(
+                    onTap: _toggleDeadMansSwitch,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                      decoration: BoxDecoration(
+                        color: _deadMansSwitchEnabled
+                            ? TacticalStyles.kTertiary.withOpacity(0.18)
+                            : TacticalStyles.kSurfaceLowest.withOpacity(0.82),
+                        borderRadius: BorderRadius.circular(999),
+                        border: Border.all(
+                          color: _deadMansSwitchEnabled
+                              ? TacticalStyles.kTertiary
+                              : Colors.amber.withOpacity(0.45),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            _deadMansSwitchEnabled ? Icons.shield_rounded : Icons.shield_moon_outlined,
+                            color: _deadMansSwitchEnabled ? TacticalStyles.kTertiary : Colors.amber,
+                            size: 14,
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            _deadMansSwitchEnabled
+                                ? 'AUTO-SOS $_inactivityLimitMinutes DK'
+                                : 'AUTO-SOS PRO',
+                            style: TextStyle(
+                              color: _deadMansSwitchEnabled ? TacticalStyles.kTertiary : Colors.amber,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
                 // --- SAĞ TARAF KONTROL PANELİ (DÜZENLİ SÜTUN) ---
                 Positioned(
                   top: 20,
@@ -894,9 +1312,17 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
                       // SOS BUTONU
                       FloatingActionButton(
                         heroTag: "sos_btn",
-                        backgroundColor: _isSOS ? Colors.white : Colors.redAccent.shade700,
+                        backgroundColor: _isSOS
+                            ? Colors.white
+                            : TacticalStyles.kPrimaryContainer,
                         onPressed: _toggleSOS,
-                        child: Icon(Icons.share_location, color: _isSOS ? Colors.redAccent.shade700 : Colors.white, size: 32),
+                        child: Icon(
+                          Icons.share_location_rounded,
+                          color: _isSOS
+                              ? TacticalStyles.kErrorContainer
+                              : Colors.white,
+                          size: 30,
+                        ),
                       ),
                       const SizedBox(height: 12),
                       
@@ -904,10 +1330,14 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
                       FloatingActionButton(
                         heroTag: 'locationLockBtn',
                         mini: true,
-                        backgroundColor: _isLocationLocked ? kOrange : kCardBg,
+                        backgroundColor: _isLocationLocked
+                            ? TacticalStyles.kPrimaryContainer
+                            : TacticalStyles.kSurfaceLow.withOpacity(0.95),
                         child: Icon(
                           _isLocationLocked ? Icons.my_location : Icons.location_searching, 
-                          color: _isLocationLocked ? Colors.black : Colors.white, 
+                          color: _isLocationLocked
+                              ? Colors.white
+                              : TacticalStyles.kTextPrimary, 
                           size: 20
                         ),
                         onPressed: () {
@@ -932,9 +1362,9 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
                       if (_aktifRotaNoktalar.isNotEmpty) ...[
                         FloatingActionButton(
                           heroTag: "fly_btn",
-                          backgroundColor: kOrange,
+                          backgroundColor: TacticalStyles.kPrimaryContainer,
                           onPressed: _startFlyThrough,
-                          child: const Icon(Icons.auto_awesome_motion, color: Colors.black, size: 28),
+                          child: const Icon(Icons.auto_awesome_motion, color: Colors.white, size: 26),
                         ),
                         const SizedBox(height: 12),
                       ],
@@ -943,8 +1373,14 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
                       FloatingActionButton(
                         heroTag: 'soundToggleBtn',
                         mini: true,
-                        backgroundColor: _isVoiceNavEnabled ? kCardBg : Colors.redAccent.withOpacity(0.8),
-                        child: Icon(_isVoiceNavEnabled ? Icons.volume_up : Icons.volume_off, color: Colors.white, size: 20),
+                        backgroundColor: _isVoiceNavEnabled
+                            ? TacticalStyles.kSurfaceLow.withOpacity(0.95)
+                            : TacticalStyles.kErrorContainer,
+                        child: Icon(
+                          _isVoiceNavEnabled ? Icons.volume_up_rounded : Icons.volume_off_rounded,
+                          color: _isVoiceNavEnabled ? TacticalStyles.kTextPrimary : Colors.white,
+                          size: 20,
+                        ),
                         onPressed: () {
                           setState(() {
                             _isVoiceNavEnabled = !_isVoiceNavEnabled;
@@ -958,8 +1394,8 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
                       FloatingActionButton(
                         heroTag: 'layerBtn1',
                         mini: true,
-                        backgroundColor: kCardBg,
-                        child: const Icon(Icons.layers, color: Colors.white, size: 20),
+                        backgroundColor: TacticalStyles.kSurfaceLow.withOpacity(0.95),
+                        child: const Icon(Icons.layers_rounded, color: TacticalStyles.kTextPrimary, size: 20),
                         onPressed: _showMapLayerSelector,
                       ),
                     ],
@@ -975,91 +1411,142 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
-                          color: kCardBg,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.white12),
+                          color: TacticalStyles.kSurfaceLow.withOpacity(0.95),
+                          borderRadius: BorderRadius.circular(999),
+                          border: Border.all(color: TacticalStyles.kOutlineVariant),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.close, color: Colors.redAccent, size: 14),
-                            SizedBox(width: 4),
-                            Text('Rotayı Kaldır', style: TextStyle(color: Colors.white54, fontSize: 11)),
+                            const Icon(Icons.close_rounded, color: TacticalStyles.kError, size: 14),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Rotayı Kaldır',
+                              style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                                color: TacticalStyles.kTextPrimary,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     ),
                   ),
-                // Ses Kapatma Butonu artık yukarıdaki sütunda
-                // (Eski konumu temizlendi)
               ],
             ),
           ),
           
-          // ALT YARI: DASHBOARD
+          // ALT YARI: DASHBOARD (TACTICAL LIQUID GLASS TELEMETRY SHEET)
           Expanded(
             flex: 5,
             child: Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
               decoration: const BoxDecoration(
-                color: kBackground,
+                color: TacticalStyles.kSurface,
+                border: Border(
+                  top: BorderSide(color: TacticalStyles.kGlassBorder),
+                ),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Ana Süre
+                  // Top Specular Highlight Strip
+                  Container(
+                    height: 1.2,
+                    width: 140,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.transparent,
+                          TacticalStyles.kPrimary.withOpacity(0.45),
+                          Colors.transparent,
+                        ],
+                      ),
+                    ),
+                  ),
+                  // Ana Süre Monoliti
                   Column(
                     children: [
-                      Text('GEÇEN SÜRE', style: TextStyle(color: Colors.white38, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 2)),
-                      const SizedBox(height: 4),
+                      Text(
+                        'OPERASYON SÜRESİ',
+                        style: TacticalStyles.labelCaps(
+                          color: TacticalStyles.kOutline,
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.1,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
                       Text(
                         _timeStr,
-                        style: GoogleFonts.outfit(color: Colors.white, fontSize: 64, fontWeight: FontWeight.w900, height: 1.0),
+                        style: TacticalStyles.displayHero(
+                          fontSize: 48,
+                          color: TacticalStyles.kOnSurface,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ],
                   ),
                   
                   // Metrikler
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildStatBox(Icons.straighten, kmTxt, 'KM'),
-                      Container(width: 1, height: 40, color: Colors.white10),
-                      _buildStatBox(Icons.trending_up, rakimTxt, 'İRTİFA (M)'),
-                      Container(width: 1, height: 40, color: Colors.white10),
-                      _buildStatBox(Icons.directions_walk, adimTxt, 'ADIM'),
-                    ],
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                    decoration: TacticalStyles.glassCardDecoration(radius: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildStatBox(Icons.straighten_rounded, kmTxt, 'MESAFE (KM)'),
+                        Container(width: 1, height: 36, color: TacticalStyles.kGlassBorder),
+                        _buildStatBox(Icons.terrain_rounded, rakimTxt, 'İRTİFA (M)'),
+                        Container(width: 1, height: 36, color: TacticalStyles.kGlassBorder),
+                        _buildStatBox(Icons.directions_walk_rounded, adimTxt, 'ADIM'),
+                      ],
+                    ),
                   ),
                   
                   // Butonlar
                   if (!_isTracking)
-                    GestureDetector(
+                    TacticalPressable(
                       onTap: _startTracking,
                       child: Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 18),
+                        padding: const EdgeInsets.symmetric(vertical: 15),
                         decoration: BoxDecoration(
-                          color: kGreen,
+                          gradient: LinearGradient(
+                            colors: [
+                              TacticalStyles.kPrimaryContainer,
+                              TacticalStyles.kPrimaryContainer.withOpacity(0.85),
+                            ],
+                          ),
                           borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: TacticalStyles.kPrimary.withOpacity(0.45),
+                          ),
                           boxShadow: [
                             BoxShadow(
-                              color: kGreen.withOpacity(0.3),
-                              blurRadius: 15,
-                              offset: const Offset(0, 5),
+                              color: TacticalStyles.kPrimaryContainer.withOpacity(0.32),
+                              blurRadius: 16,
+                              offset: const Offset(0, 4),
                             ),
                           ],
                         ),
-                        child: Center(
-                          child: Text(
-                            'BAŞLA',
-                            style: GoogleFonts.outfit(
-                              color: Colors.black,
-                              fontSize: 22,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 2,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 22),
+                            const SizedBox(width: 8),
+                            Text(
+                              'BAŞLAT',
+                              style: TacticalStyles.headline(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.6,
+                              ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
                     )
@@ -1069,56 +1556,65 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
                         // Mola / Devam Butonu
                         Expanded(
                           flex: 2,
-                          child: GestureDetector(
+                          child: TacticalPressable(
                             onTap: _togglePause,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(vertical: 18),
+                              padding: const EdgeInsets.symmetric(vertical: 15),
                               decoration: BoxDecoration(
-                                color: _isPaused ? kOrange : Colors.white12,
+                                color: _isPaused
+                                    ? TacticalStyles.kPrimaryContainer
+                                    : TacticalStyles.kSurfaceHigh,
                                 borderRadius: BorderRadius.circular(16),
-                                border: Border.all(color: _isPaused ? kOrange : Colors.white24),
+                                border: Border.all(
+                                  color: _isPaused
+                                      ? TacticalStyles.kPrimary
+                                      : TacticalStyles.kGlassBorder,
+                                ),
                               ),
                               child: Center(
                                 child: Text(
                                   _isPaused ? 'DEVAM ET' : 'MOLA VER',
-                                  style: GoogleFonts.outfit(
-                                    color: _isPaused ? Colors.black : Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: 1,
+                                  style: TacticalStyles.headline(
+                                    color: Colors.white,
+                                    fontSize: 14.5,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.4,
                                   ),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 10),
                         // Bitir Butonu
                         Expanded(
                           flex: 3,
-                          child: GestureDetector(
+                          child: TacticalPressable(
                             onTap: _stopTracking,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(vertical: 18),
+                              padding: const EdgeInsets.symmetric(vertical: 15),
                               decoration: BoxDecoration(
-                                color: Colors.redAccent.shade700,
+                                color: TacticalStyles.kErrorContainer,
                                 borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: TacticalStyles.kError.withOpacity(0.45),
+                                ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.redAccent.withOpacity(0.3),
-                                    blurRadius: 15,
-                                    offset: const Offset(0, 5),
+                                    color: TacticalStyles.kErrorContainer.withOpacity(0.35),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 4),
                                   ),
                                 ],
                               ),
                               child: Center(
                                 child: Text(
                                   'TAKİBİ BİTİR',
-                                  style: GoogleFonts.outfit(
+                                  style: TacticalStyles.headline(
                                     color: Colors.white,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: 1,
+                                    fontSize: 15.5,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.5,
                                   ),
                                 ),
                               ),
@@ -1139,11 +1635,20 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
   Widget _buildStatBox(IconData icon, String value, String unit) {
     return Column(
       children: [
-        Icon(icon, color: kOrange, size: 24),
-        const SizedBox(height: 8),
-        Text(value, style: GoogleFonts.outfit(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold, height: 1.0)),
-        const SizedBox(height: 4),
-        Text(unit, style: const TextStyle(color: Colors.white54, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
+        Icon(icon, color: TacticalStyles.kPrimaryContainer, size: 20),
+        const SizedBox(height: 6),
+        Text(
+          value,
+          style: TacticalStyles.heroMetric(size: 24),
+        ),
+        const SizedBox(height: 3),
+        Text(
+          unit,
+          style: TacticalStyles.monoLabel(
+            color: TacticalStyles.kTextSecondary,
+            size: 9.5,
+          ),
+        ),
       ],
     );
   }
@@ -1160,9 +1665,9 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Harita Katmanı Seçimi', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+              Text('Harita Katmanı Seçimi', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kTextPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
-              const Text('Premium üyeler Mapbox 3D ve uydu katmanlarına erişebilir.', style: TextStyle(color: Colors.white38, fontSize: 11)),
+              Text('Premium üyeler Mapbox 3D ve uydu katmanlarına erişebilir.', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kTextSecondary, fontSize: 12)),
               const SizedBox(height: 16),
               _buildLayerOption('Topografik (Ücretsiz)', 'free', Icons.map, false),
               const SizedBox(height: 8),
@@ -1171,7 +1676,7 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
               _buildLayerOption('Uydu Görünümü (Premium)', mbx.MapboxStyles.SATELLITE_STREETS, Icons.satellite_alt, true),
               const SizedBox(height: 8),
               _buildLayerOption('Gece Modu (Taktiksel)', mbx.MapboxStyles.DARK, Icons.nightlight_round, true),
-              const Divider(color: Colors.white10),
+              const Divider(color: TacticalStyles.kOutlineVariant),
               _buildHighDetailToggle(),
             ],
           ),
@@ -1183,13 +1688,13 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
   Widget _buildLayerOption(String name, String url, IconData icon, bool requiresPremium) {
     bool isSelected = _selectedMapLayer == name;
     return ListTile(
-      tileColor: isSelected ? kOrange.withOpacity(0.1) : Colors.black26,
+      tileColor: isSelected ? kOrange.withOpacity(0.12) : TacticalStyles.kSurfaceLowest,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: isSelected ? kOrange : Colors.white10),
+        side: BorderSide(color: isSelected ? kOrange : TacticalStyles.kOutlineVariant),
       ),
-      leading: Icon(icon, color: isSelected ? kOrange : Colors.white54),
-      title: Text(name, style: TextStyle(color: isSelected ? kOrange : Colors.white, fontWeight: FontWeight.bold)),
+      leading: Icon(icon, color: isSelected ? kOrange : TacticalStyles.kTextSecondary),
+      title: Text(name, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: isSelected ? kOrange : TacticalStyles.kTextPrimary, fontWeight: FontWeight.w600)),
       trailing: requiresPremium
           ? const Icon(Icons.stars, color: Colors.amber, size: 20)
           : null,
@@ -1261,10 +1766,10 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
 
   Widget _buildHighDetailToggle() {
     return ListTile(
-      tileColor: _isHighDetailTerrain ? kOrange.withOpacity(0.1) : Colors.black26,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      leading: Icon(Icons.terrain, color: _isHighDetailTerrain ? kOrange : Colors.white54),
-      title: const Text('YÜKSEK DETAYLI 3D ARAZİ', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+      tileColor: _isHighDetailTerrain ? kOrange.withOpacity(0.12) : TacticalStyles.kSurfaceLowest,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: TacticalStyles.kOutlineVariant)),
+      leading: Icon(Icons.terrain, color: _isHighDetailTerrain ? kOrange : TacticalStyles.kTextSecondary),
+      title: Text('YÜKSEK DETAYLI 3D ARAZİ', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kTextPrimary, fontSize: 13, fontWeight: FontWeight.w600)),
       trailing: Switch(
         value: _isHighDetailTerrain,
         onChanged: (val) async {

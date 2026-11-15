@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'profile_screen.dart';
+import '../services/tactical_styles.dart';
 
-const Color kOrange = Color(0xFFFF6B00);
-const Color kBackground = Color(0xFF0A0A0A);
-const Color kCardBg = Color(0xFF141414);
+const Color kOrange = TacticalStyles.kPrimaryContainer;
+const Color kBackground = TacticalStyles.kSurface;
+const Color kCardBg = TacticalStyles.kSurfaceLow;
 
 class FollowersScreen extends StatelessWidget {
   final String userId;
@@ -19,9 +20,12 @@ class FollowersScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: kBackground,
       appBar: AppBar(
-        title: Text(type == 'followers' ? 'Takipçiler' : 'Takip Edilenler', 
-          style: GoogleFonts.outfit(color: kOrange, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.black,
+        centerTitle: true,
+        title: TacticalStyles.appBarPill(
+          type == 'followers' ? 'TAKİPÇİLER' : 'TAKİP EDİLENLER',
+          icon: Icons.people_outline_rounded,
+        ),
+        backgroundColor: TacticalStyles.kSurfaceLowest,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),

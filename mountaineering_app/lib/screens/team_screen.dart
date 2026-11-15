@@ -1,5 +1,6 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'dart:convert';
+import 'dart:ui';
 import 'package:image_picker/image_picker.dart';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -21,15 +22,16 @@ import 'dart:io';
 import '../services/premium_service.dart';
 import '../services/routing_service.dart';
 import '../services/cloud_sync_service.dart';
+import '../services/tactical_styles.dart';
 import 'profile_screen.dart';
 import '../database_helper.dart';
 import 'mesh_network_screen.dart';
 import '../utils/location_permission_helper.dart';
 
-const Color kTOrange = Color(0xFFFF6B00);
-const Color kTBg = Color(0xFF0A0A0A);
-const Color kTCard = Color(0xFF141414);
-const Color kTGreen = Color(0xFF62FF4C);
+const Color kTOrange = TacticalStyles.kPrimaryContainer;
+const Color kTBg = TacticalStyles.kSurface;
+const Color kTCard = TacticalStyles.kSurfaceLow;
+const Color kTGreen = TacticalStyles.kTertiary;
 
 class TeamScreen extends StatefulWidget {
   const TeamScreen({Key? key}) : super(key: key);
@@ -51,6 +53,7 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
   
   final MapController _mapController = MapController();
   bool _isFirstLocationFetch = true;
+  LatLng? _myLatLng;
   
   StreamSubscription<Position>? _syncStream;
   DateTime? _lastSyncTime;
@@ -106,6 +109,31 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
     if (!serviceEnabled) return;
     LocationPermission permission = await LocationPermissionHelper.checkAndRequestLocationPermission(context);
     if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) return;
+
+    try {
+      final last = await Geolocator.getLastKnownPosition();
+      if (last != null && mounted) {
+        final loc = LatLng(last.latitude, last.longitude);
+        setState(() => _myLatLng = loc);
+        if (_isFirstLocationFetch) {
+          _isFirstLocationFetch = false;
+          try {
+            _mapController.move(loc, 14.5);
+          } catch (_) {}
+        }
+      }
+      final current = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
+      if (mounted) {
+        final loc = LatLng(current.latitude, current.longitude);
+        setState(() => _myLatLng = loc);
+        if (_isFirstLocationFetch) {
+          _isFirstLocationFetch = false;
+          try {
+            _mapController.move(loc, 14.5);
+          } catch (_) {}
+        }
+      }
+    } catch (_) {}
 
     _syncStream = Geolocator.getPositionStream(
       locationSettings: Platform.isIOS
@@ -240,7 +268,7 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                 hintText: 'Ekip adı (Örn: İDADİK Dağcılık)',
                 hintStyle: const TextStyle(color: Colors.white38),
                 filled: true,
-                fillColor: Colors.black,
+                fillColor: TacticalStyles.kSurfaceLowest,
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
                 focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: kTOrange)),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -249,19 +277,19 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
             const SizedBox(height: 12),
             TextField(
               controller: codeCtrl,
-              style: GoogleFonts.shareTechMono(color: kTOrange, fontWeight: FontWeight.bold),
+              style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kTOrange, fontWeight: FontWeight.w700),
               decoration: InputDecoration(
                 hintText: 'Özel Kod (İsteğe Bağlı, Örn: IDADIK)',
-                hintStyle: GoogleFonts.shareTechMono(color: Colors.white24, fontWeight: FontWeight.normal),
+                hintStyle: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white38, fontWeight: FontWeight.normal),
                 filled: true,
-                fillColor: Colors.black,
+                fillColor: TacticalStyles.kSurfaceLowest,
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
                 focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: kTOrange)),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
             ),
             const SizedBox(height: 6),
-            const Text('Boş bırakırsanız rastgele kod oluşturulur.', style: TextStyle(color: Colors.white24, fontSize: 10)),
+            const Text('Boş bırakırsanız rastgele kod oluşturulur.', style: TextStyle(color: Colors.white38, fontSize: 10)),
           ],
         ),
         actions: [
@@ -269,7 +297,7 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: kTOrange, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
             onPressed: () => Navigator.pop(ctx, {'name': nameCtrl.text.trim(), 'code': codeCtrl.text.trim().toUpperCase()}),
-            child: const Text('OLUŞTUR', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+            child: const Text('OLUŞTUR', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -338,13 +366,13 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
             TextField(
               controller: ctrl,
               autofocus: true,
-              style: GoogleFonts.shareTechMono(color: kTOrange, fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kTOrange, fontSize: 18, fontWeight: FontWeight.w700),
               textAlign: TextAlign.center,
               decoration: InputDecoration(
                 hintText: 'XXXXXX',
-                hintStyle: GoogleFonts.shareTechMono(color: Colors.white24),
+                hintStyle: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white24),
                 filled: true,
-                fillColor: Colors.black,
+                fillColor: TacticalStyles.kSurfaceLowest,
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
                 focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: kTOrange)),
               ),
@@ -356,7 +384,7 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: kTOrange, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
             onPressed: () => Navigator.pop(ctx, ctrl.text.trim().toUpperCase()),
-            child: const Text('KATIL', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+            child: const Text('KATIL', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -430,7 +458,12 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Scaffold(backgroundColor: kTBg, body: Center(child: CircularProgressIndicator(color: kTOrange)));
+      return const Scaffold(
+        backgroundColor: TacticalStyles.kSurface,
+        body: Center(
+          child: CircularProgressIndicator(color: TacticalStyles.kPrimaryContainer),
+        ),
+      );
     }
 
     if (_teamId == null) {
@@ -438,55 +471,215 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
     }
 
     return Scaffold(
-      backgroundColor: kTBg,
+      backgroundColor: TacticalStyles.kSurface,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        centerTitle: true,
-        title: RichText(
-          text: const TextSpan(
-            children: [
-              TextSpan(
-                text: 'ACİL DURUM ',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: 1),
+        backgroundColor: TacticalStyles.kSurfaceLowest,
+        elevation: 0,
+        centerTitle: false,
+        title: Row(
+          children: [
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: TacticalStyles.kPrimaryContainer.withOpacity(0.14),
+                border: Border.all(
+                  color: TacticalStyles.kPrimaryContainer.withOpacity(0.35),
+                ),
               ),
-              TextSpan(
-                text: 'EKİBİM',
-                style: TextStyle(color: kTOrange, fontWeight: FontWeight.w900, fontSize: 18, fontStyle: FontStyle.italic, letterSpacing: 2),
+              child: const Icon(
+                Icons.shield_rounded,
+                color: TacticalStyles.kPrimaryContainer,
+                size: 18,
               ),
-            ],
-          ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  RichText(
+                    overflow: TextOverflow.ellipsis,
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: 'ACİL DURUM ',
+                          style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                            color: TacticalStyles.kTextPrimary,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                            letterSpacing: -0.2,
+                          ),
+                        ),
+                        TextSpan(
+                          text: 'EKİBİM',
+                          style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                            color: TacticalStyles.kPrimaryContainer,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Text(
+                    'EKİP: ${_teamName?.toUpperCase() ?? _teamId ?? 'AKTİF'}',
+                    style: TacticalStyles.monoLabel(
+                      color: TacticalStyles.kTextSecondary,
+                      size: 10,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
         actions: [
           // Davet kodu paylaş
           IconButton(
-            icon: const Icon(Icons.person_add_alt_1, color: Colors.white),
+            icon: Container(
+              padding: const EdgeInsets.all(7),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: TacticalStyles.kSurfaceHigh,
+                border: Border.all(color: TacticalStyles.kOutlineVariant),
+              ),
+              child: const Icon(
+                Icons.person_add_alt_1_rounded,
+                color: TacticalStyles.kTextPrimary,
+                size: 17,
+              ),
+            ),
             tooltip: 'Davet Et',
             onPressed: () => _showInviteSheet(),
           ),
           // Grup Bilgisi / Üyeler
           IconButton(
-            icon: const Icon(Icons.info_outline, color: Colors.white),
+            icon: Container(
+              padding: const EdgeInsets.all(7),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: TacticalStyles.kSurfaceHigh,
+                border: Border.all(color: TacticalStyles.kOutlineVariant),
+              ),
+              child: const Icon(
+                Icons.info_outline_rounded,
+                color: TacticalStyles.kTextPrimary,
+                size: 17,
+              ),
+            ),
             tooltip: 'Ekip Bilgisi',
             onPressed: () => _showTeamSettings(),
           ),
           // Ekipten ayrıl
           IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white38, size: 20),
+            icon: Container(
+              padding: const EdgeInsets.all(7),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: TacticalStyles.kErrorContainer.withOpacity(0.22),
+                border: Border.all(color: TacticalStyles.kError.withOpacity(0.25)),
+              ),
+              child: const Icon(
+                Icons.logout_rounded,
+                color: TacticalStyles.kError,
+                size: 17,
+              ),
+            ),
             tooltip: 'Ekipten Ayrıl',
             onPressed: _leaveTeam,
           ),
+          const SizedBox(width: 4),
         ],
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: kTOrange,
-          labelColor: kTOrange,
-          unselectedLabelColor: Colors.white38,
-          tabs: const [
-            Tab(icon: Icon(Icons.chat_bubble_outline, size: 18), text: 'MESAJLAR'),
-            Tab(icon: Icon(Icons.radio, size: 18), text: 'TELSİZ'),
-            Tab(icon: Icon(Icons.map_outlined, size: 18), text: 'CANLI BÖLGE'),
-            Tab(icon: Icon(Icons.radar, size: 18), text: 'RADAR'),
-          ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(56),
+          child: Container(
+            margin: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: TacticalStyles.kSurfaceLowest,
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: TacticalStyles.kGlassBorder),
+            ),
+            child: TabBar(
+              controller: _tabController,
+              dividerColor: Colors.transparent,
+              indicatorSize: TabBarIndicatorSize.tab,
+              indicator: BoxDecoration(
+                color: TacticalStyles.kPrimaryContainer,
+                borderRadius: BorderRadius.circular(999),
+                boxShadow: [
+                  BoxShadow(
+                    color: TacticalStyles.kPrimaryContainer.withOpacity(0.32),
+                    blurRadius: 16,
+                  ),
+                ],
+              ),
+              labelColor: TacticalStyles.kSurfaceLowest,
+              unselectedLabelColor: TacticalStyles.kOnSurfaceVariant,
+              labelStyle: GoogleFonts.jetBrainsMono(
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.6,
+              ),
+              unselectedLabelStyle: GoogleFonts.jetBrainsMono(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.6,
+              ),
+              labelPadding: EdgeInsets.zero,
+              tabs: const [
+                Tab(
+                  height: 36,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.forum_rounded, size: 13),
+                      SizedBox(width: 4),
+                      Text('MESAJLA'),
+                    ],
+                  ),
+                ),
+                Tab(
+                  height: 36,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.cell_tower_rounded, size: 13),
+                      SizedBox(width: 4),
+                      Text('TELSİZ'),
+                    ],
+                  ),
+                ),
+                Tab(
+                  height: 36,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.explore_rounded, size: 13),
+                      SizedBox(width: 4),
+                      Text('CANLI'),
+                    ],
+                  ),
+                ),
+                Tab(
+                  height: 36,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.radar_rounded, size: 13),
+                      SizedBox(width: 4),
+                      Text('RADAR'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
       body: TabBarView(
@@ -520,13 +713,13 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               decoration: BoxDecoration(
-                color: Colors.black,
+                color: TacticalStyles.kSurfaceLowest,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: kTOrange.withOpacity(0.5)),
               ),
               child: Text(
                 _teamId!,
-                style: GoogleFonts.shareTechMono(color: kTOrange, fontSize: 28, fontWeight: FontWeight.bold, letterSpacing: 4),
+                style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kTOrange, fontSize: 28, fontWeight: FontWeight.w700, letterSpacing: 4),
               ),
             ),
             const SizedBox(height: 16),
@@ -540,8 +733,8 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                       Navigator.pop(ctx);
                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Kod kopyalandı!')));
                     },
-                    icon: const Icon(Icons.copy, color: Colors.black, size: 18),
-                    label: const Text('KOPYALA', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                    icon: const Icon(Icons.copy, color: Colors.white, size: 18),
+                    label: const Text('KOPYALA', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                   ),
                 ),
               ],
@@ -727,23 +920,59 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
       children: [
         _buildSafetyDashboard(),
         
-        // Ekip Üyeleri Butonu
+        // Ekip Üyeleri Butonu (Liquid Glass Strip)
         GestureDetector(
           onTap: _showTeamSettings,
           child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white10),
-            ),
+            decoration: TacticalStyles.glassCardDecoration(radius: 16),
             child: Row(
               children: [
-                const Icon(Icons.groups, color: kTOrange, size: 20),
+                Container(
+                  width: 34,
+                  height: 34,
+                  decoration: BoxDecoration(
+                    color: TacticalStyles.kPrimaryContainer.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: TacticalStyles.kPrimaryContainer.withOpacity(0.35),
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.groups_rounded,
+                    color: TacticalStyles.kPrimaryContainer,
+                    size: 18,
+                  ),
+                ),
                 const SizedBox(width: 12),
-                const Expanded(child: Text('Ekip Üyeleri', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13))),
-                Icon(Icons.arrow_forward_ios, color: Colors.white.withOpacity(0.3), size: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Ekip Üyeleri',
+                        style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                          color: TacticalStyles.kTextPrimary,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                        ),
+                      ),
+                      Text(
+                        'AKTİF EKİP ÜYELERİ & ROLLER',
+                        style: TacticalStyles.monoLabel(
+                          color: TacticalStyles.kTextSecondary,
+                          size: 10,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  color: TacticalStyles.kTextSecondary,
+                  size: 20,
+                ),
               ],
             ),
           ),
@@ -764,19 +993,54 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
               }).toList();
               if (msgs.isEmpty) {
                 return Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.chat_bubble_outline, size: 60, color: Colors.white10),
-                      const SizedBox(height: 16),
-                      const Text('Henüz mesaj yok.\nEkibinizle iletişime geçin!', textAlign: TextAlign.center, style: TextStyle(color: Colors.white24, fontSize: 14)),
-                    ],
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 32),
+                    padding: const EdgeInsets.all(28),
+                    decoration: TacticalStyles.glassCardDecoration(radius: 16),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 68,
+                          height: 68,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: TacticalStyles.kSurfaceLowest,
+                            border: Border.all(color: TacticalStyles.kOutlineVariant),
+                          ),
+                          child: const Icon(
+                            Icons.forum_rounded,
+                            size: 30,
+                            color: TacticalStyles.kPrimaryContainer,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Henüz mesaj yok.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                            color: TacticalStyles.kTextPrimary,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Ekibinizle iletişime geçin!',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                            color: TacticalStyles.kTextSecondary,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               }
               return ListView.builder(
                 reverse: true,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 itemCount: msgs.length,
                 itemBuilder: (ctx, i) {
                   final data = msgs[i].data() as Map<String, dynamic>;
@@ -802,12 +1066,21 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                       children: [
                         if (!isMe) ...[
                           CircleAvatar(
-                            radius: 14,
-                            backgroundColor: kTOrange.withOpacity(0.2),
+                            radius: 15,
+                            backgroundColor: TacticalStyles.kPrimaryContainer.withOpacity(0.2),
                             backgroundImage: imgProv,
-                            child: imgProv == null ? Text(sender.isNotEmpty ? sender[0].toUpperCase() : '?', style: const TextStyle(color: kTOrange, fontSize: 11)) : null,
+                            child: imgProv == null
+                                ? Text(
+                                    sender.isNotEmpty ? sender[0].toUpperCase() : '?',
+                                    style: const TextStyle(
+                                      color: TacticalStyles.kPrimary,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  )
+                                : null,
                           ),
-                          const SizedBox(width: 6),
+                          const SizedBox(width: 8),
                         ],
                         Flexible(
                           child: Column(
@@ -815,17 +1088,33 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                             children: [
                               if (!isMe)
                                 Padding(
-                                  padding: const EdgeInsets.only(left: 4, bottom: 2),
+                                  padding: const EdgeInsets.only(left: 4, bottom: 3),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Text(sender.split(' ').first, style: TextStyle(color: kTOrange.withOpacity(0.8), fontSize: 11, fontWeight: FontWeight.bold)),
+                                      Text(
+                                        sender.split(' ').first,
+                                        style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                                          color: TacticalStyles.kPrimary,
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
                                       if (_memberRoles[data['senderId']] == 'leader') ...[
-                                        const SizedBox(width: 4),
+                                        const SizedBox(width: 5),
                                         Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                                          decoration: BoxDecoration(color: kTOrange, borderRadius: BorderRadius.circular(4)),
-                                          child: const Text('REHBER', style: TextStyle(color: Colors.black, fontSize: 7, fontWeight: FontWeight.bold)),
+                                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                          decoration: BoxDecoration(
+                                            color: TacticalStyles.kPrimaryContainer,
+                                            borderRadius: BorderRadius.circular(4),
+                                          ),
+                                          child: Text(
+                                            'REHBER',
+                                            style: TacticalStyles.monoLabel(
+                                              color: Colors.white,
+                                              size: 7.5,
+                                            ),
+                                          ),
                                         ),
                                       ],
                                     ],
@@ -833,16 +1122,25 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                                 ),
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                                constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.72),
+                                constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.74),
                                 decoration: BoxDecoration(
-                                  color: isMe ? kTOrange : kTCard,
+                                  color: data['type'] == 'system_alert'
+                                      ? TacticalStyles.kErrorContainer.withOpacity(0.28)
+                                      : (isMe ? TacticalStyles.kSurfaceHigh : TacticalStyles.kSurfaceContainer),
                                   borderRadius: BorderRadius.only(
-                                    topLeft: const Radius.circular(18),
-                                    topRight: const Radius.circular(18),
-                                    bottomLeft: Radius.circular(isMe ? 18 : 4),
-                                    bottomRight: Radius.circular(isMe ? 4 : 18),
+                                    topLeft: const Radius.circular(16),
+                                    topRight: const Radius.circular(16),
+                                    bottomLeft: Radius.circular(isMe ? 16 : 4),
+                                    bottomRight: Radius.circular(isMe ? 4 : 16),
                                   ),
-                                  border: isMe ? null : Border.all(color: Colors.white10),
+                                  border: Border.all(
+                                    color: data['type'] == 'system_alert'
+                                        ? TacticalStyles.kPrimaryContainer.withOpacity(0.6)
+                                        : (isMe
+                                            ? TacticalStyles.kPrimary.withOpacity(0.45)
+                                            : TacticalStyles.kTertiary.withOpacity(0.35)),
+                                    width: 1,
+                                  ),
                                 ),
                                 child: data['type'] == 'voice' 
                                     ? _buildAudioBubble(data['audioUrl'] ?? '', isMe)
@@ -890,7 +1188,7 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                                                   }
                                                 },
                                                 child: ClipRRect(
-                                                  borderRadius: BorderRadius.circular(8),
+                                                  borderRadius: BorderRadius.circular(10),
                                                   child: data['image'].toString().startsWith('base64:')
                                                       ? Image.memory(
                                                           base64Decode(data['image'].toString().substring(7)),
@@ -908,13 +1206,26 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                                               ),
                                             ),
                                           if (text.isNotEmpty)
-                                            Text(text, style: TextStyle(color: isMe ? Colors.black : Colors.white, fontSize: 14)),
+                                            Text(
+                                              text,
+                                              style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                                                color: Colors.white,
+                                                fontSize: 13.5,
+                                                fontWeight: isMe ? FontWeight.w600 : FontWeight.w400,
+                                              ),
+                                            ),
                                         ],
                                       ),
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(top: 3, left: 4, right: 4),
-                                child: Text(timeStr, style: const TextStyle(color: Colors.white24, fontSize: 10)),
+                                child: Text(
+                                  timeStr,
+                                  style: TacticalStyles.monoValue(
+                                    color: TacticalStyles.kTextSecondary.withOpacity(0.75),
+                                    size: 9.5,
+                                  ),
+                                ),
                               ),
                             ],
                           ),
@@ -929,32 +1240,65 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
           ),
         ),
 
-        // Mesaj gönder
+        // Mesaj gönder (Outdoor Input Dock)
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          decoration: const BoxDecoration(color: Colors.black, border: Border(top: BorderSide(color: Colors.white10))),
+          margin: const EdgeInsets.fromLTRB(12, 4, 12, 16),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          decoration: BoxDecoration(
+            color: TacticalStyles.kSurfaceLow,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: TacticalStyles.kOutlineVariant),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.22),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
           child: Row(
             children: [
               GestureDetector(
                 onTap: _sendEvidence,
                 child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: const BoxDecoration(color: Colors.white10, shape: BoxShape.circle),
-                  child: const Icon(Icons.camera_alt, color: kTOrange, size: 20),
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: TacticalStyles.kSurfaceHigh,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: TacticalStyles.kOutlineVariant,
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.camera_alt_rounded,
+                    color: TacticalStyles.kPrimaryContainer,
+                    size: 19,
+                  ),
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: Container(
-                  decoration: BoxDecoration(color: kTCard, borderRadius: BorderRadius.circular(24), border: Border.all(color: Colors.white10)),
+                  decoration: BoxDecoration(
+                    color: TacticalStyles.kSurfaceLowest,
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(color: TacticalStyles.kOutlineVariant),
+                  ),
                   child: TextField(
                     controller: msgCtrl,
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
-                    decoration: const InputDecoration(
+                    style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                      color: TacticalStyles.kTextPrimary,
+                      fontSize: 13.5,
+                    ),
+                    decoration: InputDecoration(
                       hintText: 'Ekibine mesaj yaz...',
-                      hintStyle: TextStyle(color: Colors.white24),
+                      hintStyle: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                        color: TacticalStyles.kTextSecondary,
+                        fontSize: 13,
+                      ),
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     ),
                   ),
                 ),
@@ -1036,9 +1380,26 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                 },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  width: 44, height: 44,
-                  decoration: BoxDecoration(color: _isRecordingVoice ? Colors.redAccent : Colors.white10, shape: BoxShape.circle),
-                  child: Icon(Icons.mic, color: _isRecordingVoice ? Colors.white : Colors.white54, size: 20),
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: _isRecordingVoice
+                        ? TacticalStyles.kErrorContainer
+                        : TacticalStyles.kSurfaceHigh,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: _isRecordingVoice
+                          ? TacticalStyles.kError
+                          : TacticalStyles.kOutlineVariant,
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.mic_rounded,
+                    color: _isRecordingVoice
+                        ? Colors.white
+                        : TacticalStyles.kTextSecondary,
+                    size: 19,
+                  ),
                 ),
               ),
               const SizedBox(width: 8),
@@ -1073,9 +1434,17 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                   });
                 },
                 child: Container(
-                  width: 44, height: 44,
-                  decoration: const BoxDecoration(color: kTOrange, shape: BoxShape.circle),
-                  child: const Icon(Icons.send, color: Colors.black, size: 20),
+                  width: 42,
+                  height: 42,
+                  decoration: const BoxDecoration(
+                    color: TacticalStyles.kPrimaryContainer,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.send_rounded,
+                    color: Colors.white,
+                    size: 19,
+                  ),
                 ),
               ),
             ],
@@ -1178,26 +1547,32 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
     if (_teamId == null) return const SizedBox.shrink();
     
     return Container(
+      padding: const EdgeInsets.only(bottom: 20),
       decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF1A1A1A), Color(0xFF0D0D0D)],
-        ),
+        color: TacticalStyles.kSurface,
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           // Telsiz Ekranı
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 40),
+            margin: const EdgeInsets.symmetric(horizontal: 28),
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color(0xFF0F1A10),
+              color: TacticalStyles.kSurfaceLow,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.green.withOpacity(0.3), width: 2),
+              border: Border.all(
+                color: _isRecordingVoice
+                    ? TacticalStyles.kError.withOpacity(0.5)
+                    : TacticalStyles.kOutlineVariant,
+                width: 1,
+              ),
               boxShadow: [
-                BoxShadow(color: Colors.green.withOpacity(0.1), blurRadius: 10, spreadRadius: 2),
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.22),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
               ],
             ),
             child: Column(
@@ -1205,30 +1580,63 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('FREQ', style: TextStyle(color: Colors.green, fontSize: 10, fontWeight: FontWeight.bold)),
-                    Text(_isReceivingVoice ? 'RX' : (_isRecordingVoice ? 'TX' : 'STBY'), 
-                      style: TextStyle(
-                        color: _isReceivingVoice ? Colors.green : (_isRecordingVoice ? Colors.red : Colors.green.withOpacity(0.5)),
-                        fontSize: 12, fontWeight: FontWeight.bold
-                      )
+                    Text(
+                      'TELSİZ KANALI',
+                      style: TacticalStyles.monoLabel(
+                        color: TacticalStyles.kTertiary,
+                        size: 10,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: (_isReceivingVoice
+                                ? TacticalStyles.kTertiary
+                                : (_isRecordingVoice
+                                    ? TacticalStyles.kError
+                                    : TacticalStyles.kSurfaceHigh))
+                            .withOpacity(0.22),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text(
+                        _isReceivingVoice
+                            ? 'ALINIYOR'
+                            : (_isRecordingVoice ? 'GÖNDERİLİYOR' : 'HAZIR'),
+                        style: TacticalStyles.monoLabel(
+                          color: _isReceivingVoice
+                              ? TacticalStyles.kTertiary
+                              : (_isRecordingVoice
+                                  ? TacticalStyles.kError
+                                  : TacticalStyles.kTextSecondary),
+                          size: 10,
+                        ),
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 Text(
                   _isReceivingVoice 
                     ? (_receivingVoiceSenderName?.toUpperCase() ?? 'ALINIYOR...') 
                     : (_isRecordingVoice ? 'KONUŞUYORSUNUZ' : (_teamName?.toUpperCase() ?? 'EKİP')), 
-                  style: GoogleFonts.shareTechMono(
-                    color: _isRecordingVoice ? Colors.redAccent : Colors.greenAccent, 
-                    fontSize: 24, 
-                    fontWeight: FontWeight.bold, 
-                    letterSpacing: 2
+                  style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                    color: _isRecordingVoice
+                        ? TacticalStyles.kError
+                        : TacticalStyles.kTextPrimary,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.4,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
-                Text('UHF/VHF CH-1', style: GoogleFonts.shareTechMono(color: Colors.green.withOpacity(0.6), fontSize: 12)),
+                const SizedBox(height: 6),
+                Text(
+                  'EKİP SESLİ İLETİŞİM HATTI',
+                  style: TacticalStyles.monoValue(
+                    color: TacticalStyles.kTextSecondary,
+                    size: 11,
+                  ),
+                ),
               ],
             ),
           ),
@@ -1237,9 +1645,9 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildLedIndicator(color: Colors.red, isOn: _isRecordingVoice, label: 'TX'),
-              const SizedBox(width: 40),
-              _buildLedIndicator(color: Colors.green, isOn: _isReceivingVoice, label: 'RX'),
+              _buildLedIndicator(color: TacticalStyles.kError, isOn: _isRecordingVoice, label: 'GÖNDER'),
+              const SizedBox(width: 48),
+              _buildLedIndicator(color: TacticalStyles.kTertiary, isOn: _isReceivingVoice, label: 'DİNLE'),
             ],
           ),
           
@@ -1304,57 +1712,95 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
               }
             },
             child: AnimatedContainer(
-              duration: const Duration(milliseconds: 100),
-              width: 180,
-              height: 180,
+              duration: const Duration(milliseconds: 120),
+              width: 184,
+              height: 184,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: _isRecordingVoice 
-                    ? [Colors.red.shade800, Colors.red.shade900, Colors.black]
-                    : [const Color(0xFF333333), const Color(0xFF1A1A1A), Colors.black],
-                  stops: const [0.6, 0.9, 1.0],
+                color: _isRecordingVoice
+                    ? TacticalStyles.kPrimaryContainer
+                    : TacticalStyles.kSurfaceHigh,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.35),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+                border: Border.all(
+                  color: _isRecordingVoice
+                      ? TacticalStyles.kPrimary
+                      : TacticalStyles.kOutlineVariant,
+                  width: 2,
                 ),
-                boxShadow: _isRecordingVoice 
-                  ? [BoxShadow(color: Colors.red.withOpacity(0.5), blurRadius: 20, spreadRadius: 5)]
-                  : [BoxShadow(color: Colors.black, blurRadius: 15, spreadRadius: 5, offset: const Offset(0, 5))],
-                border: Border.all(color: Colors.white10, width: 2),
               ),
               child: Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.mic, size: 60, color: _isRecordingVoice ? Colors.white : Colors.white54),
+                    Icon(
+                      Icons.mic_rounded,
+                      size: 56,
+                      color: _isRecordingVoice
+                          ? Colors.white
+                          : TacticalStyles.kPrimaryContainer,
+                    ),
                     const SizedBox(height: 10),
-                    Text('PUSH\nTO TALK', textAlign: TextAlign.center, style: TextStyle(color: _isRecordingVoice ? Colors.white : Colors.white54, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                    Text(
+                      'BASILI TUT\nKONUŞ',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                        color: _isRecordingVoice
+                            ? Colors.white
+                            : TacticalStyles.kTextPrimary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.6,
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
           ),
           
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 40),
-            child: Text('Telsiz sekmesi açıkken gelen tüm mesajlar hoparlörünüzden otomatik çalar.', 
-              textAlign: TextAlign.center, style: TextStyle(color: Colors.white38, fontSize: 11)),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: Text(
+              'Telsiz sekmesi açıkken gelen tüm mesajlar hoparlörünüzden otomatik çalar.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                color: TacticalStyles.kTextSecondary,
+                fontSize: 11,
+              ),
+            ),
           ),
           
           // MESH MODU BUTONU (İnternetsiz İletişim İçin)
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 6),
             child: OutlinedButton.icon(
               style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.blueAccent,
-                side: const BorderSide(color: Colors.blueAccent, width: 1),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                backgroundColor: TacticalStyles.kSecondaryContainer.withOpacity(0.08),
+                foregroundColor: TacticalStyles.kSecondaryContainer,
+                side: BorderSide(
+                  color: TacticalStyles.kSecondaryContainer.withOpacity(0.45),
+                  width: 1,
+                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
               ),
               onPressed: () {
-                // Mesh Ekranına git
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const MeshNetworkScreen()));
               },
-              icon: const Icon(Icons.wifi_tethering, size: 18),
-              label: const Text('İNTERNETSİZ MESH MODUNA GEÇ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1)),
+              icon: const Icon(Icons.wifi_tethering_rounded, size: 18),
+              label: Text(
+                'İNTERNETSİZ MESH MODUNA GEÇ',
+                style: TacticalStyles.monoLabel(
+                  color: TacticalStyles.kSecondaryContainer,
+                  size: 11,
+                ),
+              ),
             ),
           ),
         ],
@@ -1380,6 +1826,249 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
     );
   }
 
+  Future<void> _sendQuickTacticalSignal(String code, String label, String emoji) async {
+    if (_teamId == null) return;
+    try {
+      await FirebaseFirestore.instance
+          .collection('teams')
+          .doc(_teamId)
+          .collection('messages')
+          .add({
+        'type': 'tactical_signal',
+        'signalCode': code,
+        'signalLabel': label,
+        'signalEmoji': emoji,
+        'text': '$emoji TAKTİK SİNYAL: $label',
+        'senderId': _myUid,
+        'senderName': FirebaseAuth.instance.currentUser?.displayName ?? 'Operatör',
+        if (_myLatLng != null) 'lat': _myLatLng!.latitude,
+        if (_myLatLng != null) 'lng': _myLatLng!.longitude,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('$emoji "$label" sinyali ekibe gönderildi!'),
+            backgroundColor: TacticalStyles.kTertiary,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Sinyal gönderilemedi: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _clearMyTacticalSignals() async {
+    if (_teamId == null) return;
+    try {
+      final snap = await FirebaseFirestore.instance
+          .collection('teams')
+          .doc(_teamId)
+          .collection('messages')
+          .where('type', isEqualTo: 'tactical_signal')
+          .get();
+      int removed = 0;
+      for (final doc in snap.docs) {
+        final data = doc.data();
+        if (data['senderId'] == _myUid || _myRole == 'leader') {
+          await doc.reference.delete();
+          removed++;
+        }
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              removed > 0
+                  ? '$removed adet taktik sinyal pini haritadan kaldırıldı.'
+                  : 'Kaldırılabilecek sinyal bulunamadı.',
+            ),
+            backgroundColor: TacticalStyles.kSurfaceHigh,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Sinyaller temizlenemedi: $e')),
+        );
+      }
+    }
+  }
+
+  void _showSignalOptionsSheet(String docId, Map<String, dynamic> sig) {
+    final emoji = (sig['signalEmoji'] ?? '📍').toString();
+    final label = (sig['signalLabel'] ?? 'Sinyal').toString();
+    final senderName = (sig['senderName'] ?? 'Operatör').toString();
+    final canDelete = sig['senderId'] == _myUid || _myRole == 'leader';
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: TacticalStyles.kSurfaceLow,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 38,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.white24,
+                borderRadius: BorderRadius.circular(999),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Text(emoji, style: const TextStyle(fontSize: 28)),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        label,
+                        style: TacticalStyles.headline(
+                          color: TacticalStyles.kOnSurface,
+                          size: 17,
+                        ),
+                      ),
+                      Text(
+                        'Gönderen: $senderName',
+                        style: TacticalStyles.body(
+                          color: TacticalStyles.kOnSurfaceVariant,
+                          size: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            if (canDelete) ...[
+              const SizedBox(height: 18),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: TacticalStyles.kError,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: () async {
+                    await FirebaseFirestore.instance
+                        .collection('teams')
+                        .doc(_teamId)
+                        .collection('messages')
+                        .doc(docId)
+                        .delete();
+                    if (ctx.mounted) Navigator.pop(ctx);
+                  },
+                  icon: const Icon(Icons.delete_outline_rounded, size: 18),
+                  label: const Text(
+                    'BU SİNYALİ HARİTADAN KALDIR',
+                    style: TextStyle(fontWeight: FontWeight.w800),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuickSignalBar() {
+    final signals = [
+      {'code': 'camp', 'label': 'Kamp Kuruldu', 'emoji': '⛺', 'color': TacticalStyles.kTertiary},
+      {'code': 'water', 'label': 'Su Bulundu', 'emoji': '💧', 'color': Colors.lightBlueAccent},
+      {'code': 'blocked', 'label': 'Geçit Kapalı', 'emoji': '⛔', 'color': TacticalStyles.kError},
+      {'code': 'rest', 'label': 'Mola / Yavaşla', 'emoji': '⏸️', 'color': kTOrange},
+    ];
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          ...signals.map((s) {
+            final color = s['color'] as Color;
+            return Padding(
+              padding: const EdgeInsets.only(right: 6),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(999),
+                onTap: () => _sendQuickTacticalSignal(
+                  s['code'] as String,
+                  s['label'] as String,
+                  s['emoji'] as String,
+                ),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: TacticalStyles.kSurfaceLow.withOpacity(0.9),
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(color: color.withOpacity(0.5)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(s['emoji'] as String, style: const TextStyle(fontSize: 12)),
+                      const SizedBox(width: 5),
+                      Text(
+                        s['label'] as String,
+                        style: TacticalStyles.labelMicro(
+                          color: TacticalStyles.kOnSurface,
+                          size: 10,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }),
+          InkWell(
+            borderRadius: BorderRadius.circular(999),
+            onTap: _clearMyTacticalSignals,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: TacticalStyles.kError.withOpacity(0.14),
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: TacticalStyles.kError.withOpacity(0.55)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.layers_clear_rounded, color: TacticalStyles.kError, size: 13),
+                  const SizedBox(width: 5),
+                  Text(
+                    'Pinleri Kaldır',
+                    style: TacticalStyles.labelMicro(
+                      color: TacticalStyles.kError,
+                      size: 10,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildLiveMapTab() {
     if (_teamId == null) return const SizedBox.shrink();
 
@@ -1389,8 +2078,12 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
         return StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance.collection('teams').doc(_teamId).collection('messages').where('isEvidence', isEqualTo: true).snapshots(),
           builder: (ctx, evidenceSnap) {
-            final userDocs = usersSnap.data?.docs ?? [];
-            final evidenceDocs = evidenceSnap.data?.docs ?? [];
+            return StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance.collection('teams').doc(_teamId).collection('messages').where('type', isEqualTo: 'tactical_signal').snapshots(),
+              builder: (ctx, signalSnap) {
+                final userDocs = usersSnap.data?.docs ?? [];
+                final evidenceDocs = evidenceSnap.data?.docs ?? [];
+                final signalDocs = signalSnap.data?.docs ?? [];
 
             // Harita için marker'lar ve izler (trails)
         List<Marker> markers = [];
@@ -1584,9 +2277,57 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
           }
         }
 
-            // Harita merkezi hesapla
-            LatLng center = const LatLng(39.0, 35.0);
-            if (markers.isNotEmpty) {
+        // Taktiksel Hızlı Durum Pinleri
+        for (final sigDoc in signalDocs) {
+          final sig = sigDoc.data() as Map<String, dynamic>;
+          final sLat = (sig['lat'] as num?)?.toDouble();
+          final sLng = (sig['lng'] as num?)?.toDouble();
+          if (sLat == null || sLng == null) continue;
+          final emoji = (sig['signalEmoji'] ?? '📍').toString();
+          final sLabel = (sig['signalLabel'] ?? 'Sinyal').toString();
+          markers.add(
+            Marker(
+              point: LatLng(sLat, sLng),
+              width: 118,
+              height: 56,
+              child: GestureDetector(
+                onTap: () => _showSignalOptionsSheet(sigDoc.id, sig),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: TacticalStyles.kSurfaceLowest.withOpacity(0.94),
+                        borderRadius: BorderRadius.circular(999),
+                        border: Border.all(color: TacticalStyles.kPrimary.withOpacity(0.75)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              '$emoji $sLabel',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TacticalStyles.labelMicro(color: Colors.white, size: 9.5),
+                            ),
+                          ),
+                          const SizedBox(width: 3),
+                          const Icon(Icons.close_rounded, size: 10, color: Colors.white54),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+
+            // Harita merkezi: Öncelikle kullanıcının kendi konumu
+            LatLng center = _myLatLng ?? const LatLng(39.0, 35.0);
+            if (_myLatLng == null && markers.isNotEmpty) {
               double sumLat = 0, sumLng = 0;
               for (final m in markers) {
                 sumLat += m.point.latitude;
@@ -1606,7 +2347,14 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                         mapController: _mapController,
                         options: MapOptions(
                           initialCenter: center,
-                          initialZoom: markers.length > 1 ? 5.0 : 12.0,
+                          initialZoom: _myLatLng != null ? 14.5 : (markers.length > 1 ? 5.0 : 13.0),
+                          onMapReady: () {
+                            if (_myLatLng != null) {
+                              try {
+                                _mapController.move(_myLatLng!, 14.5);
+                              } catch (_) {}
+                            }
+                          },
                         ),
                         children: [
                           TileLayer(
@@ -1624,9 +2372,17 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                           MarkerLayer(markers: markers),
                         ],
                       ),
+                      // Hızlı Taktiksel Durum Kodları (1-Tap Team Signals)
+                      Positioned(
+                        bottom: 10,
+                        left: 10,
+                        right: 10,
+                        child: _buildQuickSignalBar(),
+                      ),
                       // Canlı badge
                       Positioned(
-                        top: 12, right: 12,
+                        top: 12,
+                        right: 12,
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -1635,35 +2391,68 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                                 onTap: _resetTeamMap,
                                 child: Container(
                                   margin: const EdgeInsets.only(right: 8),
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                   decoration: BoxDecoration(
-                                    color: Colors.redAccent.withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(color: Colors.redAccent.withOpacity(0.5)),
+                                    color: TacticalStyles.kSurfaceLow.withOpacity(0.86),
+                                    borderRadius: BorderRadius.circular(999),
+                                    border: Border.all(
+                                      color: TacticalStyles.kError.withOpacity(0.45),
+                                    ),
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      const Icon(Icons.refresh, color: Colors.redAccent, size: 12),
+                                      const Icon(
+                                        Icons.refresh_rounded,
+                                        color: TacticalStyles.kError,
+                                        size: 12,
+                                      ),
                                       const SizedBox(width: 4),
-                                      Text('HARİTAYI SIFIRLA', style: GoogleFonts.shareTechMono(color: Colors.redAccent, fontSize: 10, fontWeight: FontWeight.bold)),
+                                      Text(
+                                        'HARİTAYI SIFIRLA',
+                                        style: TacticalStyles.monoLabel(
+                                          color: TacticalStyles.kError,
+                                          size: 9.5,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
                               ),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                               decoration: BoxDecoration(
-                                color: Colors.black87,
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(color: kTGreen.withOpacity(0.5)),
+                                color: TacticalStyles.kSurfaceLow.withOpacity(0.86),
+                                borderRadius: BorderRadius.circular(999),
+                                border: Border.all(
+                                  color: TacticalStyles.kTertiary.withOpacity(0.45),
+                                ),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Container(width: 6, height: 6, decoration: const BoxDecoration(color: kTGreen, shape: BoxShape.circle)),
+                                  Container(
+                                    width: 7,
+                                    height: 7,
+                                    decoration: BoxDecoration(
+                                      color: TacticalStyles.kTertiary,
+                                      shape: BoxShape.circle,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: TacticalStyles.kTertiary.withOpacity(0.6),
+                                          blurRadius: 8,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                   const SizedBox(width: 6),
-                                  Text('CANLI', style: GoogleFonts.shareTechMono(color: kTGreen, fontSize: 10, fontWeight: FontWeight.bold)),
+                                  Text(
+                                    'CANLI',
+                                    style: TacticalStyles.monoLabel(
+                                      color: TacticalStyles.kTertiary,
+                                      size: 10,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -1672,15 +2461,30 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                       ),
                       // Ekip kodu overlay
                       Positioned(
-                        top: 12, left: 12,
+                        top: 12,
+                        left: 12,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                          decoration: BoxDecoration(color: Colors.black87, borderRadius: BorderRadius.circular(8)),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: TacticalStyles.kSurfaceLow.withOpacity(0.92),
+                            borderRadius: BorderRadius.circular(999),
+                            border: Border.all(color: TacticalStyles.kOutlineVariant),
+                          ),
                           child: Row(
                             children: [
-                              const Icon(Icons.groups, color: kTOrange, size: 14),
+                              const Icon(
+                                Icons.groups_rounded,
+                                color: TacticalStyles.kPrimaryContainer,
+                                size: 15,
+                              ),
                               const SizedBox(width: 6),
-                              Text(_teamName ?? _teamId ?? '', style: GoogleFonts.shareTechMono(color: kTOrange, fontSize: 10, fontWeight: FontWeight.bold)),
+                              Text(
+                                _teamName ?? _teamId ?? '',
+                                style: TacticalStyles.monoLabel(
+                                  color: TacticalStyles.kTextPrimary,
+                                  size: 10,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -1688,22 +2492,29 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                       // ACİL DURUM BANNERI
                       if (anySos)
                         Positioned(
-                          top: 50, left: 12, right: 12,
+                          top: 50,
+                          left: 12,
+                          right: 12,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                             decoration: BoxDecoration(
-                              color: Colors.redAccent.withOpacity(0.9),
-                              borderRadius: BorderRadius.circular(8),
-                              boxShadow: const [BoxShadow(color: Colors.black54, blurRadius: 10)],
+                              color: TacticalStyles.kErrorContainer.withOpacity(0.95),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(color: TacticalStyles.kError),
+                              boxShadow: const [BoxShadow(color: Colors.black38, blurRadius: 12)],
                             ),
                             child: Row(
                               children: [
-                                const Icon(Icons.warning, color: Colors.white, size: 20),
+                                const Icon(Icons.warning_rounded, color: Colors.white, size: 20),
                                 const SizedBox(width: 10),
                                 Expanded(
                                   child: Text(
                                     'ACİL DURUM: $sosName yardım bekliyor',
-                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                                    style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 13,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -1714,19 +2525,75 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                   ),
                 ),
 
-                // Üye listesi
+                // Üye listesi (Aktif Operatifler — Tactical Liquid Glass Carousel)
                 Container(
-                  height: 190,
-                  color: kTBg,
-                  child: userDocs.isEmpty
-                      ? const Center(child: Text('Henüz konum paylaşan üye yok', style: TextStyle(color: Colors.white38, fontSize: 13)))
-                      : ListView(
-                          scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                          children: memberCards,
+                  height: 168,
+                  padding: const EdgeInsets.only(bottom: 12),
+                  decoration: const BoxDecoration(
+                    color: TacticalStyles.kSurface,
+                    border: Border(
+                      top: BorderSide(color: TacticalStyles.kGlassBorder),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'AKTİF OPERATİFLER (${userDocs.length})',
+                              style: TacticalStyles.labelCaps(
+                                color: TacticalStyles.kOnSurfaceVariant,
+                                size: 10,
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.cell_tower_rounded,
+                                  color: TacticalStyles.kSecondaryContainer,
+                                  size: 13,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'MESH AĞI AKTİF',
+                                  style: TacticalStyles.telemetry(
+                                    color: TacticalStyles.kSecondaryContainer,
+                                    size: 9.5,
+                                    weight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
+                      ),
+                      Expanded(
+                        child: userDocs.isEmpty
+                            ? Center(
+                                child: Text(
+                                  'Henüz konum paylaşan üye yok',
+                                  style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                                    color: TacticalStyles.kTextSecondary,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              )
+                            : ListView(
+                                scrollDirection: Axis.horizontal,
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                children: memberCards,
+                              ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
+            );
+              },
             );
           },
         );
@@ -1751,8 +2618,8 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (isSOS) const Text('🔥 SOS', style: TextStyle(color: Colors.redAccent, fontSize: 10, fontWeight: FontWeight.bold)),
-            if (isGuide) Text('REHBER', style: GoogleFonts.shareTechMono(color: kTOrange, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
-            if (isRecording && !isSOS) Text('• TAKİPTE', style: GoogleFonts.shareTechMono(color: kTGreen, fontSize: 8, fontWeight: FontWeight.bold)),
+            if (isGuide) Text('REHBER', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kTOrange, fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
+            if (isRecording && !isSOS) Text('• TAKİPTE', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kTGreen, fontSize: 8, fontWeight: FontWeight.w700)),
             Container(
               width: 36, height: 36,
               decoration: BoxDecoration(
@@ -1760,9 +2627,9 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                 border: Border.all(color: mainColor, width: 2.5),
                 boxShadow: [
                   BoxShadow(
-                    color: mainColor.withOpacity(isSOS ? 0.4 + (0.4 * _pulseController.value) : 0.5),
-                    blurRadius: isSOS ? 8 + (12 * _pulseController.value) : 8,
-                    spreadRadius: isSOS ? (4 * _pulseController.value) : 0,
+                    color: mainColor.withOpacity(isSOS ? 0.4 + (0.4 * _pulseController.value) : 0.35),
+                    blurRadius: isSOS ? 8 + (10 * _pulseController.value) : 6,
+                    spreadRadius: isSOS ? (3 * _pulseController.value) : 0,
                   )
                 ],
               ),
@@ -1775,9 +2642,9 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
               decoration: BoxDecoration(
-                color: Colors.black87,
+                color: TacticalStyles.kSurfaceLowest,
                 borderRadius: BorderRadius.circular(4),
-                border: isSOS ? Border.all(color: Colors.redAccent) : null,
+                border: isSOS ? Border.all(color: Colors.redAccent) : Border.all(color: TacticalStyles.kOutlineVariant),
               ),
               child: Text(name.split(' ').first, style: TextStyle(color: mainColor, fontSize: 9, fontWeight: FontWeight.bold)),
             ),
@@ -1802,76 +2669,126 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
       imgProv = NetworkImage(pic);
     }
     
-    Color borderColor = isSOS ? Colors.redAccent : (isMe ? kTGreen.withOpacity(0.5) : (isRecording ? kTOrange.withOpacity(0.4) : Colors.white12));
+    final Color borderColor = isSOS
+        ? TacticalStyles.kError
+        : (isMe
+            ? TacticalStyles.kTertiary.withOpacity(0.55)
+            : (isRecording
+                ? TacticalStyles.kPrimaryContainer.withOpacity(0.5)
+                : TacticalStyles.kOutlineVariant));
 
     return GestureDetector(
       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ProfileScreen(targetUserId: uid))),
       child: Container(
-        width: 150,
+        width: 175,
         margin: const EdgeInsets.only(right: 10),
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: kTCard,
+          color: TacticalStyles.kSurfaceLow,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: borderColor,
             width: isMe || isRecording || isSOS ? 1.5 : 1,
           ),
-          boxShadow: isSOS ? [BoxShadow(color: Colors.redAccent.withOpacity(0.2), blurRadius: 8)] : (isMe ? [BoxShadow(color: kTGreen.withOpacity(0.1), blurRadius: 8)] : null),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.22),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
               children: [
                 CircleAvatar(
-                  radius: 18,
-                  backgroundColor: kTOrange.withOpacity(0.2),
+                  radius: 15,
+                  backgroundColor: TacticalStyles.kPrimaryContainer.withOpacity(0.2),
                   backgroundImage: imgProv,
-                  child: imgProv == null ? Text(name.isNotEmpty ? name[0].toUpperCase() : '?', style: const TextStyle(color: kTOrange, fontWeight: FontWeight.bold, fontSize: 14)) : null,
+                  child: imgProv == null
+                      ? Text(
+                          name.isNotEmpty ? name[0].toUpperCase() : '?',
+                          style: const TextStyle(
+                            color: TacticalStyles.kPrimary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        )
+                      : null,
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(name.split(' ').first, style: TextStyle(color: isSOS ? Colors.redAccent : (isMe ? kTGreen : Colors.white), fontWeight: FontWeight.bold, fontSize: 13), overflow: TextOverflow.ellipsis),
-                      if (isMe) const Text('BEN', style: TextStyle(color: kTGreen, fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 1)),
-                      if (isGuide) const Text('REHBER', style: TextStyle(color: kTOrange, fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 1)),
-                      if (isSOS) const Text('CANLI KONUM', style: TextStyle(color: Colors.redAccent, fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                      Text(
+                        name.split(' ').first,
+                        style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                          color: isSOS
+                              ? TacticalStyles.kError
+                              : (isMe
+                                  ? TacticalStyles.kTertiary
+                                  : TacticalStyles.kTextPrimary),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 12.5,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        isSOS
+                            ? 'CANLI SOS'
+                            : (isMe
+                                ? 'BEN • AKTİF'
+                                : (isGuide ? 'REHBER' : 'ÜYE')),
+                        style: TacticalStyles.monoLabel(
+                          color: isSOS
+                              ? TacticalStyles.kError
+                              : (isMe
+                                  ? TacticalStyles.kTertiary
+                                  : TacticalStyles.kPrimary),
+                          size: 8.5,
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 10),
-            if (lat != null && lng != null) ...[
-              _buildMiniStat(Icons.location_on, '${lat.toStringAsFixed(4)}°N', kTOrange),
-              const SizedBox(height: 4),
-              _buildMiniStat(Icons.explore, '${lng.toStringAsFixed(4)}°E', Colors.lightBlueAccent),
-              if (elevation != null && elevation > 0) ...[
-                const SizedBox(height: 4),
-                _buildMiniStat(Icons.height, '${elevation.toInt()} m', kTGreen),
-              ],
-            ] else
-              Row(children: [
-                Icon(Icons.location_off, color: Colors.white24, size: 12),
-                const SizedBox(width: 4),
-                const Text('Konum yok', style: TextStyle(color: Colors.white24, fontSize: 11)),
-              ]),
-            if (isRecording) ...[
-              const SizedBox(height: 6),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(color: kTOrange.withOpacity(0.12), borderRadius: BorderRadius.circular(4), border: Border.all(color: kTOrange.withOpacity(0.3))),
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Container(width: 5, height: 5, decoration: const BoxDecoration(color: kTOrange, shape: BoxShape.circle)),
-                  const SizedBox(width: 4),
-                  const Text('TAKİP AKTİF', style: TextStyle(color: kTOrange, fontSize: 8, fontWeight: FontWeight.bold, letterSpacing: 1)),
-                ]),
+            if (lat != null && lng != null)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      '${lat.toStringAsFixed(3)}°N ${lng.toStringAsFixed(3)}°E',
+                      style: TacticalStyles.monoValue(
+                        color: TacticalStyles.kTextSecondary,
+                        size: 9,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  if (elevation != null && elevation > 0)
+                    Text(
+                      '${elevation.toInt()}m',
+                      style: TacticalStyles.monoValue(
+                        color: TacticalStyles.kSecondaryContainer,
+                        size: 9.5,
+                      ),
+                    ),
+                ],
+              )
+            else
+              Text(
+                'KONUM BEKLENİYOR',
+                style: TacticalStyles.monoLabel(
+                  color: TacticalStyles.kTextSecondary.withOpacity(0.6),
+                  size: 8.5,
+                ),
               ),
-            ],
           ],
         ),
       ),
@@ -1890,8 +2807,8 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
     return Scaffold(
       backgroundColor: kTBg,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: Text('EKİP', style: GoogleFonts.outfit(color: kTOrange, fontWeight: FontWeight.bold, fontSize: 18)),
+        backgroundColor: TacticalStyles.kSurfaceLowest,
+        title: Text('EKİP', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kTOrange, fontWeight: FontWeight.w800, fontSize: 18)),
       ),
       body: Center(
         child: Padding(
@@ -1902,19 +2819,19 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: kTOrange.withOpacity(0.06),
+                  color: kTOrange.withOpacity(0.08),
                   shape: BoxShape.circle,
-                  border: Border.all(color: kTOrange.withOpacity(0.2)),
+                  border: Border.all(color: kTOrange.withOpacity(0.25)),
                 ),
                 child: const Icon(Icons.groups_2_outlined, color: kTOrange, size: 60),
               ),
               const SizedBox(height: 28),
-              Text('Ekibiniz Yok', style: GoogleFonts.outfit(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+              Text('Ekibiniz Yok', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontSize: 24, fontWeight: FontWeight.w800)),
               const SizedBox(height: 12),
-              const Text(
+              Text(
                 'Bir ekip kurarak ya da mevcut bir ekibe katılarak ekibinizle anlık konum paylaşabilir ve grup mesajlaşması yapabilirsiniz.',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white54, fontSize: 14, height: 1.6),
+                style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurfaceVariant, fontSize: 14, height: 1.6),
               ),
               const SizedBox(height: 36),
               SizedBox(
@@ -1926,8 +2843,8 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                   onPressed: _createTeam,
-                  icon: const Icon(Icons.add_circle_outline, color: Colors.black),
-                  label: Text('YENİ EKİP KUR', style: GoogleFonts.outfit(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16)),
+                  icon: const Icon(Icons.add_circle_outline, color: Colors.white),
+                  label: Text('YENİ EKİP KUR', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16)),
                 ),
               ),
               const SizedBox(height: 12),
@@ -1942,7 +2859,7 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                   ),
                   onPressed: _joinTeam,
                   icon: const Icon(Icons.login),
-                  label: Text('EKİBE KATIL', style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16)),
+                  label: Text('EKİBE KATIL', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], fontWeight: FontWeight.w700, fontSize: 16)),
                 ),
               ),
             ],
@@ -1962,27 +2879,27 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
           children: [
             const Icon(Icons.radar, size: 80, color: Colors.white10),
             const SizedBox(height: 20),
-            const Text('Canlı Takım Radarı', style: TextStyle(color: kTOrange, fontSize: 24, fontWeight: FontWeight.bold)),
+            Text('Canlı Takım Radarı', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kTOrange, fontSize: 24, fontWeight: FontWeight.w800)),
             const SizedBox(height: 12),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 40),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
               child: Text(
                 'Ekip üyelerinizin mesafe ve yönlerini çevrimdışı pusula teknolojisiyle radar üzerinden takip etmek için Rota+ Premium\'a geçin.',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white54, fontSize: 14, height: 1.5),
+                style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kOnSurfaceVariant, fontSize: 14, height: 1.5),
               ),
             ),
             const SizedBox(height: 36),
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
                 backgroundColor: kTOrange,
-                foregroundColor: Colors.black,
+                foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               onPressed: () => PremiumService.showPremiumRequired(context, 'Canlı Takım Radarı'),
-              icon: const Icon(Icons.stars, color: Colors.black),
-              label: const Text('PREMIUM DESTEĞİ AL', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1)),
+              icon: const Icon(Icons.stars, color: Colors.white),
+              label: Text('PREMIUM DESTEĞİ AL', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], fontWeight: FontWeight.w700, letterSpacing: 0.5)),
             ),
           ],
         ),
@@ -2027,7 +2944,7 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                                 children: [
                                   const CircularProgressIndicator(color: kTOrange),
                                   const SizedBox(height: 16),
-                                  Text("Sizin konumunuz aranıyor...", style: GoogleFonts.shareTechMono(color: Colors.white54)),
+                                  Text("Sizin konumunuz aranıyor...", style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white54)),
                                 ],
                               ),
                             );
@@ -2043,7 +2960,7 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                                 children: [
                                   const Icon(Icons.location_off, color: Colors.redAccent, size: 48),
                                   const SizedBox(height: 16),
-                                  Text("GPS konumu alınamıyor.\nLütfen konumunuzu açın veya hareket edin.", textAlign: TextAlign.center, style: GoogleFonts.shareTechMono(color: Colors.white54)),
+                                  Text("GPS konumu alınamıyor.\nLütfen konumunuzu açın veya hareket edin.", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white54)),
                                 ],
                               ),
                             );
@@ -2102,7 +3019,7 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
           altStr = '\n${elevDiff >= 0 ? '▲' : '▼'}${elevDiff.abs().toInt()}m';
         }
         
-        Color dotColor = isSOS ? Colors.redAccent : kTOrange;
+        Color dotColor = isSOS ? TacticalStyles.kError : kTOrange;
 
         radarPoints.add(
           Align(
@@ -2117,17 +3034,17 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                     decoration: BoxDecoration(
                       color: dotColor,
                       shape: BoxShape.circle,
-                      boxShadow: [BoxShadow(color: dotColor.withOpacity(0.8), blurRadius: isSOS ? 8 : 4, spreadRadius: isSOS ? 4 : 2)],
+                      boxShadow: [BoxShadow(color: dotColor.withOpacity(0.5), blurRadius: isSOS ? 6 : 3)],
                     ),
                   ),
                   const SizedBox(height: 4),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                    decoration: BoxDecoration(color: Colors.black87, borderRadius: BorderRadius.circular(4), border: isSOS ? Border.all(color: Colors.redAccent) : null),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                    decoration: BoxDecoration(color: TacticalStyles.kSurfaceLowest.withOpacity(0.9), borderRadius: BorderRadius.circular(6), border: Border.all(color: isSOS ? TacticalStyles.kError : TacticalStyles.kOutlineVariant)),
                     child: Text(
                       isSOS ? '🔥 SOS\n${name.split(' ').first}\n${distance.toInt()}m$altStr' : '${name.split(' ').first}\n${distance.toInt()}m$altStr', 
                       textAlign: TextAlign.center, 
-                      style: GoogleFonts.shareTechMono(color: isSOS ? Colors.white : Colors.white, fontSize: 9, fontWeight: isSOS ? FontWeight.bold : FontWeight.normal)
+                      style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontSize: 9, fontWeight: isSOS ? FontWeight.w700 : FontWeight.w600)
                     ),
                   ),
                 ],
@@ -2149,21 +3066,21 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: kTGreen.withOpacity(0.05),
-              border: Border.all(color: kTGreen.withOpacity(0.3), width: 2),
+              border: Border.all(color: kTGreen.withOpacity(0.3), width: 1.5),
             ),
           ),
           Container(width: MediaQuery.of(context).size.width * 0.6, height: MediaQuery.of(context).size.width * 0.6, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: kTGreen.withOpacity(0.2), width: 1))),
           Container(width: MediaQuery.of(context).size.width * 0.3, height: MediaQuery.of(context).size.width * 0.3, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: kTGreen.withOpacity(0.1), width: 1))),
           // Hedef (Biz)
-          Container(width: 8, height: 8, decoration: const BoxDecoration(color: kTGreen, shape: BoxShape.circle, boxShadow: [BoxShadow(color: kTGreen, blurRadius: 10)])),
+          Container(width: 8, height: 8, decoration: const BoxDecoration(color: kTGreen, shape: BoxShape.circle)),
           // Çapraz çizgiler
           Container(width: 1, height: MediaQuery.of(context).size.width * 0.9, color: kTGreen.withOpacity(0.2)),
           Container(height: 1, width: MediaQuery.of(context).size.width * 0.9, color: kTGreen.withOpacity(0.2)),
           // Pusula yönleri
-          Positioned(top: MediaQuery.of(context).size.height * 0.05, child: Text('K', style: GoogleFonts.shareTechMono(color: kTGreen, fontWeight: FontWeight.bold))),
-          Positioned(bottom: MediaQuery.of(context).size.height * 0.05, child: Text('G', style: GoogleFonts.shareTechMono(color: kTGreen, fontWeight: FontWeight.bold))),
-          Positioned(right: MediaQuery.of(context).size.width * 0.05, child: Text('D', style: GoogleFonts.shareTechMono(color: kTGreen, fontWeight: FontWeight.bold))),
-          Positioned(left: MediaQuery.of(context).size.width * 0.05, child: Text('B', style: GoogleFonts.shareTechMono(color: kTGreen, fontWeight: FontWeight.bold))),
+          Positioned(top: MediaQuery.of(context).size.height * 0.05, child: Text('K', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kTGreen, fontWeight: FontWeight.w800))),
+          Positioned(bottom: MediaQuery.of(context).size.height * 0.05, child: Text('G', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kTGreen, fontWeight: FontWeight.w800))),
+          Positioned(right: MediaQuery.of(context).size.width * 0.05, child: Text('D', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kTGreen, fontWeight: FontWeight.w800))),
+          Positioned(left: MediaQuery.of(context).size.width * 0.05, child: Text('B', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kTGreen, fontWeight: FontWeight.w800))),
           
           // Radar Dalgası Animasyonu
           AnimatedBuilder(
@@ -2174,7 +3091,7 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                 height: MediaQuery.of(context).size.width * 0.9 * _pulseController.value,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: kTGreen.withOpacity(1.0 - _pulseController.value), width: 2),
+                  border: Border.all(color: kTGreen.withOpacity(1.0 - _pulseController.value), width: 1.5),
                 ),
               );
             },
@@ -2225,9 +3142,9 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
       builder: (context) => Container(
         padding: const EdgeInsets.all(24),
         decoration: const BoxDecoration(
-          color: Color(0xFF0D0D0D),
+          color: TacticalStyles.kSurfaceLow,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          border: Border(top: BorderSide(color: Colors.white10, width: 1)),
+          border: Border(top: BorderSide(color: TacticalStyles.kOutlineVariant, width: 1)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -2242,23 +3159,23 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                     ? ClipOval(child: pic.startsWith('base64:') 
                         ? Image.memory(base64Decode(pic.substring(7)), fit: BoxFit.cover, width: 60, height: 60)
                         : Image.network(pic, fit: BoxFit.cover, width: 60, height: 60))
-                    : const Icon(Icons.person, color: Colors.black, size: 30),
+                    : const Icon(Icons.person, color: Colors.white, size: 30),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(name.toUpperCase(), style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 20, letterSpacing: 1)),
+                      Text(name.toUpperCase(), style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontWeight: FontWeight.w800, fontSize: 20)),
                       Row(
                         children: [
                           if (isGuide) Container(
                             margin: const EdgeInsets.only(right: 8),
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(color: kTOrange.withOpacity(0.1), borderRadius: BorderRadius.circular(4), border: Border.all(color: kTOrange)),
-                            child: Text('REHBER', style: GoogleFonts.shareTechMono(color: kTOrange, fontSize: 9, fontWeight: FontWeight.bold)),
+                            child: Text('REHBER', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kTOrange, fontSize: 9, fontWeight: FontWeight.w700)),
                           ),
-                          Text(isSOS ? 'DURUM: KRİTİK (SOS)' : (isRecording ? 'DURUM: ROTA TAKİBİNDE' : 'DURUM: AKTİF'), style: GoogleFonts.shareTechMono(color: isSOS ? Colors.redAccent : (isRecording ? kTGreen : Colors.white38), fontSize: 10)),
+                          Text(isSOS ? 'DURUM: KRİTİK (SOS)' : (isRecording ? 'DURUM: ROTA TAKİBİNDE' : 'DURUM: AKTİF'), style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: isSOS ? TacticalStyles.kError : (isRecording ? kTGreen : Colors.white38), fontSize: 10, fontWeight: FontWeight.w600)),
                         ],
                       ),
                     ],
@@ -2272,7 +3189,7 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
             // NEREDEN NEREYE
             Container(
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: Colors.white.withOpacity(0.03), borderRadius: BorderRadius.circular(8)),
+              decoration: BoxDecoration(color: TacticalStyles.kSurfaceLowest, borderRadius: BorderRadius.circular(12), border: Border.all(color: TacticalStyles.kOutlineVariant)),
               child: Column(
                 children: [
                   Row(
@@ -2281,7 +3198,7 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                       const SizedBox(width: 8),
                       const Text('BAŞLANGIÇ:', style: TextStyle(color: Colors.white38, fontSize: 9, fontWeight: FontWeight.bold)),
                       const SizedBox(width: 8),
-                      Expanded(child: Text(startName, style: GoogleFonts.shareTechMono(color: Colors.white, fontSize: 10), overflow: TextOverflow.ellipsis)),
+                      Expanded(child: Text(startName, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontSize: 10, fontWeight: FontWeight.w600), overflow: TextOverflow.ellipsis)),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -2291,7 +3208,7 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                       const SizedBox(width: 8),
                       const Text('GÜNCEL HEDEF:', style: TextStyle(color: Colors.white38, fontSize: 9, fontWeight: FontWeight.bold)),
                       const SizedBox(width: 8),
-                      Expanded(child: Text(endName, style: GoogleFonts.shareTechMono(color: Colors.white, fontSize: 10), overflow: TextOverflow.ellipsis)),
+                      Expanded(child: Text(endName, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontSize: 10, fontWeight: FontWeight.w600), overflow: TextOverflow.ellipsis)),
                     ],
                   ),
                 ],
@@ -2310,7 +3227,7 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
             const SizedBox(height: 20),
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: Colors.white.withOpacity(0.05), borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(color: TacticalStyles.kSurfaceLowest, borderRadius: BorderRadius.circular(12), border: Border.all(color: TacticalStyles.kOutlineVariant)),
               child: Column(
                 children: [
                   _buildLocationRow('ENLEM', lat.toStringAsFixed(6)),
@@ -2330,7 +3247,7 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                     },
                     icon: const Icon(Icons.person_search, size: 18),
                     label: const Text('PROFİLİ GÖR'),
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.white10, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14)),
+                    style: ElevatedButton.styleFrom(backgroundColor: TacticalStyles.kSurfaceHigh, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14)),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -2340,7 +3257,7 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                       Navigator.pop(context);
                       // Takip Et Rota Çizme
                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text('Rota hesaplanıyor...', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)), 
+                        content: Text('Rota hesaplanıyor...', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), 
                         backgroundColor: kTOrange,
                       ));
                       
@@ -2357,7 +3274,7 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                           _navigationRoute = Polyline(
                             points: routeInfo.coordinates,
                             strokeWidth: 4.0,
-                            color: Colors.blueAccent,
+                            color: TacticalStyles.kSecondaryContainer,
                           );
                         });
 
@@ -2398,7 +3315,7 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                     },
                     icon: const Icon(Icons.navigation, size: 18),
                     label: const Text('TAKİP ET'),
-                    style: ElevatedButton.styleFrom(backgroundColor: kTOrange, foregroundColor: Colors.black, padding: const EdgeInsets.symmetric(vertical: 14)),
+                    style: ElevatedButton.styleFrom(backgroundColor: kTOrange, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14)),
                   ),
                 ),
               ],
@@ -2415,7 +3332,7 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
       children: [
         Icon(icon, color: kTOrange, size: 20),
         const SizedBox(height: 8),
-        Text(value, style: GoogleFonts.shareTechMono(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+        Text(value, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
         Text(label, style: const TextStyle(color: Colors.white38, fontSize: 9, fontWeight: FontWeight.bold)),
       ],
     );
@@ -2425,8 +3342,8 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: GoogleFonts.shareTechMono(color: Colors.white38, fontSize: 11)),
-        Text(value, style: GoogleFonts.shareTechMono(color: kTGreen, fontSize: 12, fontWeight: FontWeight.bold)),
+        Text(label, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white38, fontSize: 11, fontWeight: FontWeight.w600)),
+        Text(value, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kTGreen, fontSize: 12, fontWeight: FontWeight.w700)),
       ],
     );
   }
@@ -2511,7 +3428,7 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                 children: [
                   Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)))),
                   const SizedBox(height: 20),
-                  Text('EKİP BİLGİSİ', style: GoogleFonts.outfit(color: kTOrange, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                  Text('EKİP BİLGİSİ', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kTOrange, fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
                   const SizedBox(height: 4),
                   Text(_teamName ?? 'İsimsiz Ekip', style: const TextStyle(color: Colors.white54, fontSize: 12)),
                   const SizedBox(height: 24),
@@ -2550,7 +3467,7 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                                 return Container(
                                   margin: const EdgeInsets.only(bottom: 12),
                                   padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(color: kTCard, borderRadius: BorderRadius.circular(12), border: Border.all(color: isLeader ? kTOrange.withOpacity(0.3) : Colors.white10)),
+                                  decoration: BoxDecoration(color: kTCard, borderRadius: BorderRadius.circular(14), border: Border.all(color: isLeader ? kTOrange.withOpacity(0.3) : TacticalStyles.kOutlineVariant)),
                                   child: Row(
                                     children: [
                                       CircleAvatar(
@@ -2640,13 +3557,28 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
     int totalCount = _memberSafetyStatus.length;
     
     String myStatus = _memberSafetyStatus[_myUid] ?? kStatusUnknown;
+    final bool hasAlert = assistanceCount > 0;
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.fromLTRB(16, 10, 16, 4),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: kTCard,
-        border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.05))),
+        color: TacticalStyles.kSurfaceContainer.withOpacity(0.88),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: hasAlert
+              ? TacticalStyles.kPrimaryContainer.withOpacity(0.45)
+              : TacticalStyles.kTertiary.withOpacity(0.35),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.45),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2654,19 +3586,51 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('EKİP GÜVENLİK DURUMU', style: GoogleFonts.shareTechMono(color: Colors.white54, fontSize: 11, letterSpacing: 1)),
+              Row(
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: hasAlert ? TacticalStyles.kPrimaryContainer : TacticalStyles.kTertiary,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: (hasAlert ? TacticalStyles.kPrimaryContainer : TacticalStyles.kTertiary).withOpacity(0.6),
+                          blurRadius: 8,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'EKİP GÜVENLİK DURUMU',
+                    style: TacticalStyles.labelCaps(
+                      color: TacticalStyles.kOnSurface,
+                      size: 10,
+                    ),
+                  ),
+                ],
+              ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: assistanceCount > 0 ? Colors.redAccent.withOpacity(0.2) : Colors.green.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(4),
+                  color: hasAlert
+                      ? TacticalStyles.kPrimaryContainer.withOpacity(0.18)
+                      : TacticalStyles.kTertiary.withOpacity(0.14),
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(
+                    color: hasAlert
+                        ? TacticalStyles.kPrimaryContainer.withOpacity(0.45)
+                        : TacticalStyles.kTertiary.withOpacity(0.35),
+                  ),
                 ),
                 child: Text(
-                  assistanceCount > 0 ? '$assistanceCount YARDIM GEREKLİ' : 'HERKES GÜVENDE',
-                  style: GoogleFonts.shareTechMono(
-                    color: assistanceCount > 0 ? Colors.redAccent : kTGreen,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
+                  hasAlert ? '$assistanceCount KRİTİK SİNYAL' : 'HERKES GÜVENDE',
+                  style: TacticalStyles.telemetry(
+                    color: hasAlert ? TacticalStyles.kPrimary : TacticalStyles.kTertiary,
+                    size: 9,
+                    weight: FontWeight.w700,
                   ),
                 ),
               ),
@@ -2675,23 +3639,27 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
           const SizedBox(height: 12),
           Row(
             children: [
-              _buildStatusIndicator('GÜVENDE', safeCount, totalCount, Colors.green),
+              Expanded(
+                child: _buildStatusIndicator('GÜVENDE', safeCount, totalCount, TacticalStyles.kTertiary),
+              ),
               const SizedBox(width: 8),
-              _buildStatusIndicator('YARDIM', assistanceCount, totalCount, Colors.redAccent),
-              const Spacer(),
+              Expanded(
+                child: _buildStatusIndicator('KRİTİK', assistanceCount, totalCount, TacticalStyles.kPrimaryContainer),
+              ),
+              const SizedBox(width: 10),
               // Kendi durumunu güncelleme
               Row(
                 children: [
                   _buildMyStatusButton(
-                    icon: Icons.check_circle_outline,
-                    color: kTGreen,
+                    icon: Icons.check_circle_outline_rounded,
+                    color: TacticalStyles.kTertiary,
                     isActive: myStatus == kStatusSafe,
                     onTap: () => _updateMySafetyStatus(kStatusSafe),
                   ),
                   const SizedBox(width: 8),
                   _buildMyStatusButton(
                     icon: Icons.warning_amber_rounded,
-                    color: Colors.redAccent,
+                    color: TacticalStyles.kPrimaryContainer,
                     isActive: myStatus == kStatusAssistance,
                     onTap: () => _updateMySafetyStatus(kStatusAssistance),
                   ),
@@ -2706,18 +3674,55 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
 
   Widget _buildStatusIndicator(String label, int count, int total, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
+        color: TacticalStyles.kSurfaceLowest,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.28)),
       ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Container(width: 6, height: 6, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-          const SizedBox(width: 6),
-          Text('$count', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
-          Text('/$total', style: const TextStyle(color: Colors.white38, fontSize: 10)),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TacticalStyles.labelMicro(
+                  color: color,
+                  size: 8.5,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  Text(
+                    '$count',
+                    style: GoogleFonts.spaceGrotesk(
+                      color: TacticalStyles.kOnSurface,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 18,
+                      height: 1.0,
+                    ),
+                  ),
+                  Text(
+                    '/$total',
+                    style: TacticalStyles.telemetry(
+                      color: TacticalStyles.kOutline,
+                      size: 10,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          Icon(
+            label == 'GÜVENDE' ? Icons.verified_user_rounded : Icons.emergency_share_rounded,
+            color: color.withOpacity(0.5),
+            size: 18,
+          ),
         ],
       ),
     );
@@ -2727,15 +3732,15 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 220),
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: isActive ? color.withOpacity(0.2) : Colors.black,
+          color: isActive ? color.withOpacity(0.2) : TacticalStyles.kSurfaceLowest,
           shape: BoxShape.circle,
-          border: Border.all(color: isActive ? color : Colors.white10),
-          boxShadow: isActive ? [BoxShadow(color: color.withOpacity(0.3), blurRadius: 8)] : null,
+          border: Border.all(color: isActive ? color : Colors.white.withOpacity(0.08)),
+          boxShadow: isActive ? [BoxShadow(color: color.withOpacity(0.3), blurRadius: 10)] : null,
         ),
-        child: Icon(icon, color: isActive ? color : Colors.white24, size: 20),
+        child: Icon(icon, color: isActive ? color : TacticalStyles.kTextSecondary, size: 19),
       ),
     );
   }

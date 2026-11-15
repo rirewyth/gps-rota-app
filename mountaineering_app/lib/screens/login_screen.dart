@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../storage_helper.dart';
 import '../database_helper.dart';
@@ -8,11 +8,12 @@ import '../services/cloud_sync_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'onboarding_screen.dart';
+import '../services/tactical_styles.dart';
 
-const Color kOrange = Color(0xFFFF6B00);
-const Color kBackground = Color(0xFF0A0A0A);
-const Color kCardBg = Color(0xFF141414);
-const Color kGreen = Color(0xFF62FF4C);
+const Color kOrange = TacticalStyles.kPrimaryContainer;
+const Color kBackground = TacticalStyles.kSurface;
+const Color kCardBg = TacticalStyles.kSurfaceLow;
+const Color kGreen = TacticalStyles.kTertiary;
 
 class LoginScreen extends StatefulWidget {
   final String? reactivationMessage;
@@ -48,13 +49,13 @@ class _LoginScreenState extends State<LoginScreen> {
           context: context,
           builder: (ctx) => AlertDialog(
             backgroundColor: kCardBg,
-            shape: RoundedRectangleBorder(side: const BorderSide(color: kGreen), borderRadius: BorderRadius.zero),
-            title: Text('HESAP AKTİF EDİLDİ', style: GoogleFonts.shareTechMono(color: kGreen, fontWeight: FontWeight.bold)),
-            content: Text('Tekrar hoş geldiniz! Silme işleminiz iptal edildi ve hesabınız başarıyla aktif edildi.', style: GoogleFonts.shareTechMono(color: Colors.white70)),
+            shape: RoundedRectangleBorder(side: const BorderSide(color: kGreen), borderRadius: BorderRadius.circular(14)),
+            title: Text('HESAP AKTİF EDİLDİ', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kGreen, fontWeight: FontWeight.bold)),
+            content: Text('Tekrar hoş geldiniz! Silme işleminiz iptal edildi ve hesabınız başarıyla aktif edildi.', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white70)),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
-                child: Text('TAMAM', style: GoogleFonts.shareTechMono(color: kGreen)),
+                child: Text('TAMAM', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kGreen, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -216,8 +217,8 @@ class _LoginScreenState extends State<LoginScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: kCardBg,
-        shape: RoundedRectangleBorder(side: const BorderSide(color: kOrange), borderRadius: BorderRadius.circular(8)),
-        title: Text('ŞİFRE SIFIRLAMA', style: GoogleFonts.shareTechMono(color: kOrange, fontWeight: FontWeight.bold)),
+        shape: RoundedRectangleBorder(side: const BorderSide(color: kOrange), borderRadius: BorderRadius.circular(14)),
+        title: Text('ŞİFRE SIFIRLAMA', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kOrange, fontWeight: FontWeight.bold)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -229,10 +230,10 @@ class _LoginScreenState extends State<LoginScreen> {
               style: const TextStyle(color: Colors.white),
               decoration: const InputDecoration(
                 filled: true,
-                fillColor: Colors.black,
+                fillColor: TacticalStyles.kSurfaceLowest,
                 hintText: 'ornek@rota.plus',
                 hintStyle: TextStyle(color: Colors.white24),
-                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white12)),
+                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: TacticalStyles.kOutlineVariant)),
                 focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: kOrange)),
               ),
             ),
@@ -308,32 +309,33 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Column(
                       children: [
                         FadeIn(
-                          duration: const Duration(milliseconds: 1000),
+                          duration: const Duration(milliseconds: 900),
                           child: Container(
-                            width: 140,
-                            height: 140,
+                            width: 144,
+                            height: 144,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              border: Border.all(color: kOrange.withOpacity(0.5), width: 3),
                               boxShadow: [
-                                BoxShadow(color: kOrange.withOpacity(0.3), blurRadius: 25, spreadRadius: 5)
+                                BoxShadow(
+                                  color: kOrange.withOpacity(0.24),
+                                  blurRadius: 32,
+                                  spreadRadius: 4,
+                                ),
                               ],
                             ),
-                            child: ClipOval(
-                              child: Image.asset('assets/icon/tactical_logo.png', fit: BoxFit.cover),
-                            ),
+                            child: Image.asset('assets/icon/tactical_logo.png', fit: BoxFit.contain),
                           ),
                         ),
                         const SizedBox(height: 20),
-                        Text('ROTA+', style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 36, letterSpacing: 2)),
-                        Text('ACİL DURUM APP', style: GoogleFonts.shareTechMono(color: kOrange, fontSize: 16, letterSpacing: 3, fontWeight: FontWeight.bold)),
+                        Text('ROTA+', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontWeight: FontWeight.w900, fontSize: 36, letterSpacing: 2)),
+                        Text('ACİL DURUM APP', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kOrange, fontSize: 16, letterSpacing: 3, fontWeight: FontWeight.bold)),
                       ],
                     ),
                   ),
                   
                   const SizedBox(height: 50),
                   
-                  Text('OPERASYONEL GİRİŞ', style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 24)),
+                  Text('OPERASYONEL GİRİŞ', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontWeight: FontWeight.bold, fontSize: 24)),
                   const SizedBox(height: 8),
                   Text('Güvenli ağ erişimi için kimlik bilgilerinizi doğrulayın.', style: TextStyle(color: Colors.white38, fontSize: 13)),
                   
@@ -379,7 +381,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: _showForgotPasswordDialog,
-                        child: Text('Şifremi Unuttum', style: GoogleFonts.outfit(color: Colors.white54, fontSize: 13, fontWeight: FontWeight.w500)),
+                        child: Text('Şifremi Unuttum', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white54, fontSize: 13, fontWeight: FontWeight.w500)),
                       ),
                     ),
                   ),
@@ -408,7 +410,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           : Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text('SİSTEME ERİŞ', style: GoogleFonts.outfit(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18, letterSpacing: 1.5)),
+                                Text('SİSTEME ERİŞ', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18, letterSpacing: 1.5)),
                                 const SizedBox(width: 12),
                                 const Icon(Icons.security, color: Colors.black, size: 20),
                               ],
@@ -436,7 +438,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           children: [
                             Image.network('https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_\"G\"_logo.svg', width: 24, height: 24, errorBuilder: (c, e, s) => const Icon(Icons.g_mobiledata, color: Colors.black)),
                             const SizedBox(width: 12),
-                            Text('GOOGLE İLE DEVAM ET', style: GoogleFonts.outfit(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 1)),
+                            Text('GOOGLE İLE DEVAM ET', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 1)),
                           ],
                         ),
                       ),
@@ -462,7 +464,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           children: [
                             const Icon(Icons.apple, color: Colors.black, size: 28),
                             const SizedBox(width: 8),
-                            Text('APPLE İLE DEVAM ET', style: GoogleFonts.outfit(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 1)),
+                            Text('APPLE İLE DEVAM ET', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 1)),
                           ],
                         ),
                       ),
@@ -493,7 +495,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           children: [
                             Container(width: 8, height: 8, decoration: const BoxDecoration(color: kGreen, shape: BoxShape.circle)),
                             const SizedBox(width: 10),
-                            Text('SİSTEM DURUMU: OPTİMAL', style: GoogleFonts.shareTechMono(color: Colors.white24, fontSize: 11, letterSpacing: 1)),
+                            Text('SİSTEM DURUMU: OPTİMAL', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white24, fontSize: 11, letterSpacing: 1)),
                           ],
                         ),
                       ],
@@ -513,28 +515,24 @@ class _LoginScreenState extends State<LoginScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: GoogleFonts.shareTechMono(color: kOrange, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+        Text(label, style: TacticalStyles.labelCaps(color: kOrange, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.4)),
         const SizedBox(height: 8),
         Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFF141414),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.white10),
-          ),
+          decoration: TacticalStyles.recessedDecoration(radius: 16),
           child: TextField(
             controller: controller,
             obscureText: isPassword ? _obscure : false,
-            style: const TextStyle(color: Colors.white, fontSize: 15),
+            style: TacticalStyles.body(color: TacticalStyles.kOnSurface, fontSize: 14.5),
             decoration: InputDecoration(
-              prefixIcon: Icon(icon, color: Colors.white38, size: 20),
+              prefixIcon: Icon(icon, color: TacticalStyles.kOnSurfaceVariant, size: 20),
               suffixIcon: isPassword ? IconButton(
-                icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility, color: Colors.white38, size: 20),
+                icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility, color: TacticalStyles.kOnSurfaceVariant, size: 20),
                 onPressed: () => setState(() => _obscure = !_obscure),
               ) : null,
               border: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
               hintText: isPassword ? '••••••••' : 'ornek@rota.plus',
-              hintStyle: const TextStyle(color: Colors.white12),
+              hintStyle: const TextStyle(color: Colors.white24),
             ),
           ),
         ),

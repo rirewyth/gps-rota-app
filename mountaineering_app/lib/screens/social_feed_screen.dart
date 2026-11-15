@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'dart:convert';
 import 'dart:ui' as ui;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,6 +20,7 @@ import 'live_tracking_screen.dart' hide kCardBg, kOrange, kBackground;
 import '../utils/app_state.dart';
 import 'notification_screen.dart';
 import '../services/ad_service.dart';
+import '../services/tactical_styles.dart';
 
 class SocialFeedScreen extends StatefulWidget {
   const SocialFeedScreen({Key? key}) : super(key: key);
@@ -29,9 +30,9 @@ class SocialFeedScreen extends StatefulWidget {
 }
 
 class _SocialFeedScreenState extends State<SocialFeedScreen> {
-  static const Color kOrange = Color(0xFFFF6B00);
-  static const Color kBackground = Color(0xFF0A0A0A);
-  static const Color kCardBg = Color(0xFF141414);
+  static const Color kOrange = TacticalStyles.kPrimaryContainer;
+  static const Color kBackground = TacticalStyles.kSurface;
+  static const Color kCardBg = TacticalStyles.kSurfaceLow;
 
   final ImagePicker _picker = ImagePicker();
   final TextEditingController _postDescController = TextEditingController();
@@ -47,10 +48,15 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
   bool get _isAdmin => _currentUser?.email == adminEmail;
 
   List<String> _blockedUsers = [];
+  late final Stream<QuerySnapshot> _postsStream;
 
   @override
   void initState() {
     super.initState();
+    _postsStream = FirebaseFirestore.instance
+        .collection('posts')
+        .orderBy('timestamp', descending: true)
+        .snapshots();
     _loadBlockedUsers();
   }
 
@@ -305,8 +311,9 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                                       child: Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                         decoration: BoxDecoration(
-                                          color: Colors.black.withOpacity(0.3),
+                                          color: TacticalStyles.kSurfaceLowest,
                                           borderRadius: BorderRadius.circular(12),
+                                          border: Border.all(color: TacticalStyles.kOutlineVariant),
                                         ),
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -338,7 +345,7 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                                           bool confirm = await showDialog(
                                             context: context,
                                             builder: (c) => AlertDialog(
-                                              backgroundColor: const Color(0xFF141414),
+                                              backgroundColor: kCardBg,
                                               title: const Text('Yorumu Sil', style: TextStyle(color: Colors.white)),
                                               content: const Text('Bu yorumu silmek istediğinize emin misiniz?', style: TextStyle(color: Colors.white70)),
                                               actions: [
@@ -369,16 +376,17 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                       decoration: const BoxDecoration(
-                        color: Colors.black,
-                        border: Border(top: BorderSide(color: Colors.white10)),
+                        color: TacticalStyles.kSurfaceLowest,
+                        border: Border(top: BorderSide(color: TacticalStyles.kOutlineVariant)),
                       ),
                       child: Row(
                         children: [
                           Expanded(
                             child: Container(
                               decoration: BoxDecoration(
-                                color: const Color(0xFF1E1E1E),
+                                color: TacticalStyles.kSurfaceHigh,
                                 borderRadius: BorderRadius.circular(24),
+                                border: Border.all(color: TacticalStyles.kOutlineVariant),
                               ),
                               child: TextField(
                                 controller: commentController,
@@ -416,7 +424,7 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                             child: Container(
                               width: 40, height: 40,
                               decoration: const BoxDecoration(color: kOrange, shape: BoxShape.circle),
-                              child: const Icon(Icons.send, color: Colors.black, size: 18),
+                              child: const Icon(Icons.send, color: Colors.white, size: 18),
                             ),
                           ),
                         ],
@@ -492,10 +500,10 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                           height: _selectedImage != null ? 200 : 130,
                           width: double.infinity,
                           decoration: BoxDecoration(
-                            color: Colors.black,
+                            color: TacticalStyles.kSurfaceLowest,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: _selectedImage != null ? kOrange : Colors.white12,
+                              color: _selectedImage != null ? kOrange : TacticalStyles.kOutlineVariant,
                               width: _selectedImage != null ? 2 : 1,
                             ),
                           ),
@@ -544,9 +552,9 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                       // Text input
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.black,
+                          color: TacticalStyles.kSurfaceLowest,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.white12),
+                          border: Border.all(color: TacticalStyles.kOutlineVariant),
                         ),
                         child: TextField(
                           controller: _postDescController,
@@ -582,14 +590,14 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                           child: _isUploading
                               ? const SizedBox(
                                   height: 22, width: 22,
-                                  child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2),
+                                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                                 )
                               : Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    const Icon(Icons.send_rounded, color: Colors.black, size: 20),
+                                    const Icon(Icons.send_rounded, color: Colors.white, size: 20),
                                     const SizedBox(width: 8),
-                                    Text('PAYLAŞ', style: GoogleFonts.outfit(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 1)),
+                                    Text('PAYLAŞ', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16, letterSpacing: 0.5)),
                                   ],
                                 ),
                         ),
@@ -722,7 +730,7 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF141414),
+        backgroundColor: kCardBg,
         title: Text('$userName Kullanıcısını Yasakla', style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
         content: const Text('Bu kullanıcı banlandığında gönderileri gizlenecek.', style: TextStyle(color: Colors.white70)),
         actions: [
@@ -751,7 +759,7 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF141414),
+        backgroundColor: kCardBg,
         title: const Text('Gönderiyi Düzenle', style: TextStyle(color: Colors.white)),
         content: TextField(
           controller: controller,
@@ -760,7 +768,7 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
             hintText: 'Açıklama...',
             hintStyle: const TextStyle(color: Colors.white38),
             filled: true,
-            fillColor: Colors.black,
+            fillColor: TacticalStyles.kSurfaceLowest,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
             focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: kOrange)),
           ),
@@ -806,43 +814,211 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 2,
       child: Scaffold(
-        backgroundColor: kBackground,
+        backgroundColor: TacticalStyles.kSurface,
         appBar: AppBar(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text('ROTA+ ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: 1.5)),
-              Text('ACİL DURUM', style: GoogleFonts.outfit(color: kOrange, fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: 1.5, fontStyle: FontStyle.italic)),
-            ],
-          ),
-          backgroundColor: Colors.black,
+          backgroundColor: TacticalStyles.kSurfaceLowest,
           elevation: 0,
-          bottom: const TabBar(
-            indicatorColor: kOrange,
-            labelColor: kOrange,
-            unselectedLabelColor: Colors.white54,
-            indicatorWeight: 3,
-            labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-            unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal, fontSize: 12),
-            tabs: [
-              Tab(text: 'GENEL'),
-              Tab(text: 'TAKİP EDİLENLER'),
-              Tab(text: 'YANGINLAR'),
+          scrolledUnderElevation: 0,
+          centerTitle: false,
+          titleSpacing: 16,
+          title: Row(
+            children: [
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: TacticalStyles.kPrimaryContainer.withOpacity(0.16),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: TacticalStyles.kPrimaryContainer.withOpacity(0.35),
+                  ),
+                ),
+                child: const Icon(
+                  Icons.rss_feed_rounded,
+                  color: TacticalStyles.kPrimary,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        'ROTA+',
+                        style: TacticalStyles.headline(
+                          color: TacticalStyles.kOnSurface,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 18,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: TacticalStyles.kPrimary.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Text(
+                          'SAHA AKIŞI',
+                          style: TacticalStyles.labelMicro(
+                            color: TacticalStyles.kPrimary,
+                            fontSize: 8.5,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.8,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    'Topluluk & Operasyon Raporları',
+                    style: TacticalStyles.labelCaps(
+                      color: TacticalStyles.kOnSurfaceVariant,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.mark_email_unread_outlined, color: Colors.white),
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DmListScreen())),
+            Padding(
+              padding: const EdgeInsets.only(right: 6),
+              child: GestureDetector(
+                onTap: _showCreatePostSheet,
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: TacticalStyles.kPrimaryContainer.withOpacity(0.20),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: TacticalStyles.kPrimaryContainer.withOpacity(0.45),
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.add_rounded,
+                    color: TacticalStyles.kPrimary,
+                    size: 20,
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 14),
+              child: GestureDetector(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const DmListScreen()),
+                ),
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: TacticalStyles.kSurfaceHigh.withOpacity(0.85),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: TacticalStyles.kGlassBorder),
+                  ),
+                  child: const Icon(
+                    Icons.mark_email_unread_outlined,
+                    color: TacticalStyles.kOnSurface,
+                    size: 17,
+                  ),
+                ),
+              ),
             ),
           ],
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(56),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(14, 2, 14, 10),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(999),
+                child: BackdropFilter(
+                  filter: ui.ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                  child: Container(
+                    height: 44,
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: TacticalStyles.kSurfaceLow.withOpacity(0.85),
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(color: Colors.white.withOpacity(0.12)),
+                    ),
+                    child: TabBar(
+                      dividerColor: Colors.transparent,
+                      indicatorSize: TabBarIndicatorSize.tab,
+                      indicator: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [TacticalStyles.kPrimary, TacticalStyles.kPrimaryContainer],
+                        ),
+                        borderRadius: BorderRadius.circular(999),
+                        boxShadow: [
+                          BoxShadow(
+                            color: TacticalStyles.kPrimaryContainer.withOpacity(0.38),
+                            blurRadius: 14,
+                          ),
+                        ],
+                      ),
+                      labelColor: TacticalStyles.kSurfaceLowest,
+                      unselectedLabelColor: TacticalStyles.kOnSurfaceVariant,
+                  labelStyle: TacticalStyles.labelCaps(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 10.5,
+                    letterSpacing: 0.7,
+                  ),
+                  unselectedLabelStyle: TacticalStyles.labelCaps(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 10.5,
+                    letterSpacing: 0.6,
+                  ),
+                  tabs: const [
+                    Tab(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.public_rounded, size: 14),
+                          SizedBox(width: 6),
+                          Text('GENEL AKIŞ'),
+                        ],
+                      ),
+                    ),
+                    Tab(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.groups_rounded, size: 14),
+                          SizedBox(width: 6),
+                          Text('TAKİP EDİLENLER'),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: _showCreatePostSheet,
-          backgroundColor: kOrange,
-          child: const Icon(Icons.add, color: Colors.black),
+        floatingActionButton: Padding(
+          padding: const EdgeInsets.only(bottom: 78),
+          child: FloatingActionButton.small(
+            onPressed: _showCreatePostSheet,
+            backgroundColor: TacticalStyles.kPrimaryContainer,
+            elevation: 8,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+              side: BorderSide(color: TacticalStyles.kPrimary.withOpacity(0.45)),
+            ),
+            child: const Icon(Icons.add_rounded, color: Colors.white, size: 22),
+          ),
         ),
         body: Column(
           children: [
@@ -852,7 +1028,6 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                 children: [
                   _buildSocialFeedTab(onlyFollowing: false),
                   _buildFollowingFeedWrapper(),
-                  _buildFiresFeedTab(),
                 ],
               ),
             ),
@@ -963,12 +1138,12 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                 decoration: BoxDecoration(
                   color: kCardBg,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: statusColor.withOpacity(0.4), width: 1.5),
+                  border: Border.all(color: statusColor.withOpacity(0.4), width: 1),
                   boxShadow: [
                     BoxShadow(
-                      color: statusColor.withOpacity(0.2),
-                      blurRadius: 10,
-                      spreadRadius: 1,
+                      color: Colors.black.withOpacity(0.22),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
                     )
                   ],
                 ),
@@ -1104,15 +1279,14 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                       child: Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1A1A1A),
+                          color: TacticalStyles.kSurfaceLow,
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: sevColor.withOpacity(0.5), width: 1.5),
+                          border: Border.all(color: sevColor.withOpacity(0.45), width: 1),
                           boxShadow: [
                             BoxShadow(
-                              color: sevColor.withOpacity(0.2),
-                              blurRadius: 15,
-                              spreadRadius: -5,
-                              offset: const Offset(0, 5),
+                              color: Colors.black.withOpacity(0.22),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
                             ),
                           ],
                         ),
@@ -1142,11 +1316,11 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                                           children: [
                                             Text(
                                               (d['title'] ?? '').toUpperCase(),
-                                              style: GoogleFonts.outfit(
+                                              style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
                                                 color: sevColor,
-                                                fontWeight: FontWeight.w900,
+                                                fontWeight: FontWeight.w700,
                                                 fontSize: 13,
-                                                letterSpacing: 1.2,
+                                                letterSpacing: 0.4,
                                               ),
                                             ),
                                             const Spacer(),
@@ -1168,8 +1342,8 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                                           child: SingleChildScrollView(
                                             child: Text(
                                               d['body'] ?? '',
-                                              style: GoogleFonts.outfit(
-                                                color: Colors.white.withOpacity(0.85),
+                                              style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                                                color: TacticalStyles.kTextPrimary.withOpacity(0.9),
                                                 fontSize: 12,
                                                 height: 1.4,
                                               ),
@@ -1215,9 +1389,9 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
 
   Widget _buildSocialFeedTab({bool onlyFollowing = false, List<String>? followingList}) {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('posts').orderBy('timestamp', descending: true).snapshots(),
+      stream: _postsStream,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+        if (!snapshot.hasData && snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator(color: kOrange));
         }
         if (snapshot.hasError) {
@@ -1274,6 +1448,7 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
         }
 
         return ListView.builder(
+          key: PageStorageKey<String>(onlyFollowing ? 'feed_following_list' : 'feed_all_list'),
           itemCount: feedItems.length,
           itemBuilder: (context, index) {
             final item = feedItems[index];
@@ -1316,12 +1491,32 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
             }
 
             return Container(
-              margin: const EdgeInsets.only(bottom: 2),
+              margin: const EdgeInsets.fromLTRB(14, 8, 14, 8),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    TacticalStyles.kSurfaceHigh.withOpacity(0.88),
+                    TacticalStyles.kSurfaceLow.withOpacity(0.94),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.white.withOpacity(0.11), width: 0.9),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.38),
+                    blurRadius: 18,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              clipBehavior: Clip.antiAlias,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    padding: const EdgeInsets.fromLTRB(14, 12, 8, 10),
                     child: Builder(builder: (ctx) {
                       final cached = _userCache[userId];
                       String picUrl = cached?['profile_pic_url'] ?? '';
@@ -1340,130 +1535,170 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                                 }
                               }
                             },
-                            child: CircleAvatar(
-                              radius: 20,
-                              backgroundColor: kOrange.withOpacity(0.2),
-                              backgroundImage: picUrl.startsWith('base64:')
-                                  ? MemoryImage(base64Decode(picUrl.substring(7)))
-                                  : (picUrl.isNotEmpty ? NetworkImage(picUrl) : null) as ImageProvider?,
-                              child: picUrl.isEmpty
-                                  ? Text(user.isNotEmpty ? user[0].toUpperCase() : '?', style: const TextStyle(color: kOrange, fontWeight: FontWeight.bold))
-                                  : null,
-                            ),
-                          ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () {
-                                  if (userId.isNotEmpty) {
-                                    if (isOwnProfile) {
-                                      Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen()));
-                                    } else {
-                                      Navigator.push(context, MaterialPageRoute(builder: (_) => ProfileScreen(targetUserId: userId)));
-                                    }
-                                  }
-                                },
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        _buildUserName(user, userEmail, isPremium),
-                                        const SizedBox(width: 4),
-                                        if (!isVerified && isPremium) const Icon(Icons.stars, color: Colors.amber, size: 14),
-                                        if (isVerified)
-                                          Container(
-                                            margin: const EdgeInsets.only(left: 2),
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              boxShadow: [BoxShadow(color: Colors.blueAccent.withOpacity(0.6), blurRadius: 6)],
-                                            ),
-                                            child: const Icon(Icons.verified, color: Colors.blueAccent, size: 15),
-                                          ),
-                                        if (postType == 'route')
-                                          Container(
-                                            margin: const EdgeInsets.only(left: 6),
-                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFF62FF4C).withOpacity(0.15),
-                                              borderRadius: BorderRadius.circular(6),
-                                              border: Border.all(color: const Color(0xFF62FF4C).withOpacity(0.4)),
-                                            ),
-                                            child: const Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Icon(Icons.route, size: 10, color: Color(0xFF62FF4C)),
-                                                SizedBox(width: 3),
-                                                Text('ROTA', style: TextStyle(fontSize: 9, color: Color(0xFF62FF4C), fontWeight: FontWeight.bold)),
-                                              ],
-                                            ),
-                                          ),
-                                      ],
-                                    ),
-                                  ],
+                            child: Container(
+                              padding: const EdgeInsets.all(1.5),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: TacticalStyles.kPrimaryContainer.withOpacity(0.55),
+                                  width: 1.5,
                                 ),
                               ),
+                              child: CircleAvatar(
+                                radius: 18,
+                                backgroundColor: TacticalStyles.kSurfaceHigh,
+                                backgroundImage: picUrl.startsWith('base64:')
+                                    ? MemoryImage(base64Decode(picUrl.substring(7)))
+                                    : (picUrl.isNotEmpty ? NetworkImage(picUrl) : null) as ImageProvider?,
+                                child: picUrl.isEmpty
+                                    ? Text(
+                                        user.isNotEmpty ? user[0].toUpperCase() : '?',
+                                        style: TacticalStyles.headline(
+                                          color: TacticalStyles.kPrimary,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      )
+                                    : null,
+                              ),
                             ),
-                              PopupMenuButton<String>(
-                                icon: const Icon(Icons.more_vert, color: Colors.white54),
-                                onSelected: (value) async {
-                                  if (value == 'delete') {
-                                    await FirebaseFirestore.instance.collection('posts').doc(docId).delete();
-                                  } else if (value == 'edit') {
-                                    _showEditPostDialog(docId, desc);
-                                  } else if (value == 'report') {
-                                    _reportPost(docId, userId);
-                                  } else if (value == 'block') {
-                                    _blockUser(userId);
-                                  } else if (value == 'ban' && _isAdmin) {
-                                    _banUser(userId, user);
-                                  } else if (value == 'admin_delete' && _isAdmin) {
-                                    _adminDeletePost(docId);
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                if (userId.isNotEmpty) {
+                                  if (isOwnProfile) {
+                                    Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen()));
+                                  } else {
+                                    Navigator.push(context, MaterialPageRoute(builder: (_) => ProfileScreen(targetUserId: userId)));
                                   }
-                                },
-                                itemBuilder: (_) => [
-                                  if (isMyPost) ...[
-                                    const PopupMenuItem(value: 'edit', child: Text('Düzenle')),
-                                    const PopupMenuItem(value: 'delete', child: Text('Sil', style: TextStyle(color: Colors.red))),
-                                  ],
-                                  if (_isAdmin && !isMyPost) ...[
-                                    const PopupMenuItem(
-                                      value: 'admin_delete',
-                                      child: Row(children: [Icon(Icons.delete, color: Colors.red, size: 16), SizedBox(width: 8), Text('Admin: Sil', style: TextStyle(color: Colors.red))]),
+                                }
+                              },
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      _buildUserName(user, userEmail, isPremium),
+                                      const SizedBox(width: 5),
+                                      if (!isVerified && isPremium)
+                                        const Icon(Icons.stars_rounded, color: Colors.amber, size: 14),
+                                      if (isVerified)
+                                        const Icon(
+                                          Icons.verified_rounded,
+                                          color: TacticalStyles.kSecondaryContainer,
+                                          size: 15,
+                                        ),
+                                      if (postType == 'route')
+                                        Container(
+                                          margin: const EdgeInsets.only(left: 6),
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: TacticalStyles.kTertiary.withOpacity(0.15),
+                                            borderRadius: BorderRadius.circular(999),
+                                            border: Border.all(color: TacticalStyles.kTertiary.withOpacity(0.4)),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Icon(Icons.route_rounded, size: 10, color: TacticalStyles.kTertiary),
+                                              const SizedBox(width: 3),
+                                              Text(
+                                                'ROTA KAYDI',
+                                                style: TacticalStyles.labelMicro(
+                                                  fontSize: 8.5,
+                                                  color: TacticalStyles.kTertiary,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    isVerified ? 'DOĞRULANMIŞ OPERATÖR' : 'SAHA OPERATÖRÜ',
+                                    style: TacticalStyles.labelMicro(
+                                      color: TacticalStyles.kOutline,
+                                      fontSize: 8.5,
                                     ),
-                                    const PopupMenuItem(
-                                      value: 'ban',
-                                      child: Row(children: [Icon(Icons.block, color: Colors.orange, size: 16), SizedBox(width: 8), Text('Admin: Yasakla', style: TextStyle(color: Colors.orange))]),
-                                    ),
-                                  ],
-                                  if (_currentUser != null && !isMyPost) ...[
-                                    const PopupMenuItem(
-                                      value: 'report',
-                                      child: Row(children: [Icon(Icons.flag, color: Colors.orange, size: 16), SizedBox(width: 8), Text('Şikayet Et', style: TextStyle(color: Colors.orange))]),
-                                    ),
-                                    const PopupMenuItem(
-                                      value: 'block',
-                                      child: Row(children: [Icon(Icons.block, color: Colors.red, size: 16), SizedBox(width: 8), Text('Kullanıcıyı Engelle', style: TextStyle(color: Colors.red))]),
-                                    ),
-                                  ],
+                                  ),
                                 ],
-                              )
-                          ],
-                        );
-                      }),
+                              ),
+                            ),
+                          ),
+                          PopupMenuButton<String>(
+                            color: TacticalStyles.kSurfaceHigh,
+                            icon: const Icon(Icons.more_horiz_rounded, color: TacticalStyles.kOnSurfaceVariant),
+                            onSelected: (value) async {
+                              if (value == 'delete') {
+                                await FirebaseFirestore.instance.collection('posts').doc(docId).delete();
+                              } else if (value == 'edit') {
+                                _showEditPostDialog(docId, desc);
+                              } else if (value == 'report') {
+                                _reportPost(docId, userId);
+                              } else if (value == 'block') {
+                                _blockUser(userId);
+                              } else if (value == 'ban' && _isAdmin) {
+                                _banUser(userId, user);
+                              } else if (value == 'admin_delete' && _isAdmin) {
+                                _adminDeletePost(docId);
+                              }
+                            },
+                            itemBuilder: (_) => [
+                              if (isMyPost) ...[
+                                const PopupMenuItem(value: 'edit', child: Text('Düzenle', style: TextStyle(color: Colors.white))),
+                                const PopupMenuItem(value: 'delete', child: Text('Sil', style: TextStyle(color: Colors.red))),
+                              ],
+                              if (_isAdmin && !isMyPost) ...[
+                                const PopupMenuItem(
+                                  value: 'admin_delete',
+                                  child: Row(children: [Icon(Icons.delete, color: Colors.red, size: 16), SizedBox(width: 8), Text('Admin: Sil', style: TextStyle(color: Colors.red))]),
+                                ),
+                                const PopupMenuItem(
+                                  value: 'ban',
+                                  child: Row(children: [Icon(Icons.block, color: Colors.orange, size: 16), SizedBox(width: 8), Text('Admin: Yasakla', style: TextStyle(color: Colors.orange))]),
+                                ),
+                              ],
+                              if (_currentUser != null && !isMyPost) ...[
+                                const PopupMenuItem(
+                                  value: 'report',
+                                  child: Row(children: [Icon(Icons.flag, color: Colors.orange, size: 16), SizedBox(width: 8), Text('Şikayet Et', style: TextStyle(color: Colors.orange))]),
+                                ),
+                                const PopupMenuItem(
+                                  value: 'block',
+                                  child: Row(children: [Icon(Icons.block, color: Colors.red, size: 16), SizedBox(width: 8), Text('Kullanıcıyı Engelle', style: TextStyle(color: Colors.red))]),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ],
+                      );
+                    }),
                   ),
 
                   // Content
                   if (imageUrl.isNotEmpty)
-                    GestureDetector(
-                      onDoubleTap: () => _toggleLike(docId, likes),
-                      child: Container(
-                        width: double.infinity,
-                        constraints: const BoxConstraints(maxHeight: 400),
-                        color: Colors.black,
-                        child: imageUrl.startsWith('base64:')
-                            ? Image.memory(base64Decode(imageUrl.substring(7)), fit: BoxFit.cover)
-                            : Image.network(imageUrl, fit: BoxFit.cover),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(14),
+                        child: GestureDetector(
+                          onDoubleTap: () => _toggleLike(docId, likes),
+                          child: Container(
+                            width: double.infinity,
+                            constraints: const BoxConstraints(maxHeight: 380),
+                            decoration: BoxDecoration(
+                              color: TacticalStyles.kSurfaceLowest,
+                              border: Border.all(color: TacticalStyles.kGlassBorder),
+                            ),
+                            child: imageUrl.startsWith('base64:')
+                                ? Image.memory(base64Decode(imageUrl.substring(7)), fit: BoxFit.cover)
+                                : Image.network(imageUrl, fit: BoxFit.cover),
+                          ),
+                        ),
                       ),
                     )
                   else if (postType == 'route' && routeData != null)
@@ -1472,52 +1707,89 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                     Container(
                       width: double.infinity,
                       margin: const EdgeInsets.symmetric(horizontal: 12),
-                      padding: const EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [const Color(0xFF141414), kOrange.withOpacity(0.05)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.white10),
+                        color: TacticalStyles.kSurfaceLowest,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: TacticalStyles.kGlassBorder),
                       ),
-                      child: Text('"$desc"', style: const TextStyle(color: Colors.white70, fontSize: 16, fontStyle: FontStyle.italic, height: 1.5)),
-                    )
-                  else
-                    Container(
-                      height: 100,
-                      width: double.infinity,
-                      color: kCardBg,
-                      child: Center(child: Icon(Icons.campaign, color: kOrange.withOpacity(0.15), size: 64)),
+                      child: Text(
+                        desc,
+                        style: TacticalStyles.body(
+                          color: TacticalStyles.kOnSurface,
+                          fontSize: 14.5,
+                          height: 1.5,
+                        ),
+                      ),
                     ),
 
-                  // Action row
+                  if (desc.isNotEmpty && imageUrl.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(14, 10, 14, 2),
+                      child: RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: '$user  ',
+                              style: TacticalStyles.headline(
+                                color: TacticalStyles.kPrimary,
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            TextSpan(
+                              text: desc,
+                              style: TacticalStyles.body(
+                                color: TacticalStyles.kOnSurface,
+                                fontSize: 13.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                  // Action row (Tactical Capsule Pills)
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
                     child: Row(
                       children: [
                         GestureDetector(
                           onTap: () => _toggleLike(docId, likes),
                           onLongPress: () => _showLikesDialog(likes),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: isLiked
+                                  ? TacticalStyles.kPrimaryContainer.withOpacity(0.18)
+                                  : TacticalStyles.kSurfaceLowest,
+                              borderRadius: BorderRadius.circular(999),
+                              border: Border.all(
+                                color: isLiked
+                                    ? TacticalStyles.kPrimaryContainer.withOpacity(0.45)
+                                    : TacticalStyles.kGlassBorder,
+                              ),
+                            ),
                             child: Row(
                               children: [
                                 Icon(
-                                  isLiked ? Icons.favorite : Icons.favorite_border,
-                                  color: isLiked ? Colors.redAccent : Colors.white70,
-                                  size: 24,
+                                  isLiked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                                  color: isLiked
+                                      ? TacticalStyles.kPrimaryContainer
+                                      : TacticalStyles.kOnSurfaceVariant,
+                                  size: 17,
                                 ),
-                                const SizedBox(width: 5),
+                                const SizedBox(width: 6),
                                 GestureDetector(
                                   onTap: () => _showLikesDialog(likes),
                                   child: Text(
                                     '${likes.length}',
-                                    style: TextStyle(
-                                      color: isLiked ? Colors.redAccent : Colors.white70,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
+                                    style: TacticalStyles.telemetry(
+                                      color: isLiked
+                                          ? TacticalStyles.kPrimary
+                                          : TacticalStyles.kOnSurface,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 12,
                                     ),
                                   ),
                                 ),
@@ -1525,20 +1797,40 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: 8),
                         GestureDetector(
                           onTap: () => _showCommentsBottomSheet(docId),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: TacticalStyles.kSurfaceLowest,
+                              borderRadius: BorderRadius.circular(999),
+                              border: Border.all(color: TacticalStyles.kGlassBorder),
+                            ),
                             child: StreamBuilder<QuerySnapshot>(
-                              stream: FirebaseFirestore.instance.collection('posts').doc(docId).collection('comments').snapshots(),
+                              stream: FirebaseFirestore.instance
+                                  .collection('posts')
+                                  .doc(docId)
+                                  .collection('comments')
+                                  .snapshots(),
                               builder: (ctx, cSnap) {
                                 final count = cSnap.data?.docs.length ?? 0;
                                 return Row(
                                   children: [
-                                    const Icon(Icons.chat_bubble_outline, color: Colors.white70, size: 22),
-                                    const SizedBox(width: 5),
-                                    Text('$count', style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.bold, fontSize: 14)),
+                                    const Icon(
+                                      Icons.forum_outlined,
+                                      color: TacticalStyles.kOnSurfaceVariant,
+                                      size: 16,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      '$count',
+                                      style: TacticalStyles.telemetry(
+                                        color: TacticalStyles.kOnSurface,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 12,
+                                      ),
+                                    ),
                                   ],
                                 );
                               },
@@ -1548,30 +1840,27 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                         const Spacer(),
                         Builder(
                           builder: (btnCtx) {
-                            return IconButton(
-                              icon: const Icon(Icons.share_outlined, color: Colors.white54, size: 22),
-                              onPressed: () => _sharePost(user, desc, docId, btnCtx),
+                            return GestureDetector(
+                              onTap: () => _sharePost(user, desc, docId, btnCtx),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: TacticalStyles.kSurfaceLowest,
+                                  borderRadius: BorderRadius.circular(999),
+                                  border: Border.all(color: TacticalStyles.kGlassBorder),
+                                ),
+                                child: const Icon(
+                                  Icons.ios_share_rounded,
+                                  color: TacticalStyles.kOnSurfaceVariant,
+                                  size: 16,
+                                ),
+                              ),
                             );
-                          }
+                          },
                         ),
                       ],
                     ),
                   ),
-
-                  if (desc.isNotEmpty && imageUrl.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                      child: RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(text: '$user ', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                            TextSpan(text: desc, style: const TextStyle(color: Colors.white70)),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                  const Divider(color: Colors.white10, height: 1),
                 ],
               ),
             );
@@ -1629,10 +1918,10 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF141414),
+        color: TacticalStyles.kSurfaceLow,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: kOrange.withOpacity(0.4)),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.5), blurRadius: 15)],
+        border: Border.all(color: TacticalStyles.kOutlineVariant),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.22), blurRadius: 12, offset: const Offset(0, 4))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1651,8 +1940,8 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(name.toUpperCase(), style: GoogleFonts.shareTechMono(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18, letterSpacing: 1)),
-                      const Text('RESMİ ROTA VERİSİ', style: TextStyle(color: Colors.white38, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                      Text(name.toUpperCase(), style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kTextPrimary, fontWeight: FontWeight.w700, fontSize: 16, letterSpacing: 0.2)),
+                      Text('RESMİ ROTA VERİSİ', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kTextSecondary, fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 0.4)),
                     ],
                   ),
                 ),
@@ -1698,12 +1987,27 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _saveSharedRoute(name, points ?? []),
+                    icon: const Icon(Icons.bookmark_add_outlined, size: 18),
+                    label: const Text('KAYDET', style: TextStyle(fontWeight: FontWeight.bold)),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: TacticalStyles.kTertiary,
+                      side: BorderSide(color: TacticalStyles.kTertiary.withValues(alpha: 0.55)),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: kOrange,
                       foregroundColor: Colors.black,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                     onPressed: () async {
                       if (points != null) {
@@ -1734,12 +2038,38 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
     );
   }
 
+  Future<void> _saveSharedRoute(String name, List coords) async {
+    if (coords.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Bu rotada kaydedilecek koordinat bulunamadı.')),
+        );
+      }
+      return;
+    }
+    final parsedPoints = coords
+        .map((e) => {
+              'lat': (e['lat'] as num).toDouble(),
+              'lng': (e['lng'] as num).toDouble(),
+            })
+        .toList();
+    await DatabaseHelper.instance.rotaKaydet(name, parsedPoints);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('"$name" kayıtlı rotalarınıza eklendi!'),
+          backgroundColor: TacticalStyles.kTertiary,
+        ),
+      );
+    }
+  }
+
   // Zorluk seviyesi hesapla
   Map<String, dynamic> _calcDifficulty(double distKm, double elevGain) {
-    if (distKm <= 5 && elevGain <= 300) return {'label': 'KOLAY', 'color': const Color(0xFF62FF4C), 'icon': Icons.sentiment_satisfied_alt};
+    if (distKm <= 5 && elevGain <= 300) return {'label': 'KOLAY', 'color': TacticalStyles.kTertiary, 'icon': Icons.sentiment_satisfied_alt};
     if (distKm <= 15 && elevGain <= 800) return {'label': 'ORTA', 'color': Colors.amberAccent, 'icon': Icons.sentiment_neutral};
-    if (distKm <= 30 && elevGain <= 1500) return {'label': 'ZOR', 'color': const Color(0xFFFF6B00), 'icon': Icons.sentiment_dissatisfied};
-    return {'label': 'EXTREME', 'color': Colors.redAccent, 'icon': Icons.whatshot};
+    if (distKm <= 30 && elevGain <= 1500) return {'label': 'ZOR', 'color': kOrange, 'icon': Icons.sentiment_dissatisfied};
+    return {'label': 'EXTREME', 'color': TacticalStyles.kError, 'icon': Icons.whatshot};
   }
 
   Widget _buildSocialRouteCard(Map<String, dynamic> routeData) {
@@ -1765,11 +2095,11 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        color: TacticalStyles.kSurfaceLow,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: TacticalStyles.kOutlineVariant),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10)),
+          BoxShadow(color: Colors.black.withOpacity(0.22), blurRadius: 12, offset: const Offset(0, 4)),
         ],
       ),
       child: Column(
@@ -1795,7 +2125,7 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                   children: [
                     Text(
                       name,
-                      style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+                      style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kTextPrimary, fontWeight: FontWeight.w700, fontSize: 17),
                     ),
                     const SizedBox(height: 4),
                     Container(
@@ -1807,12 +2137,27 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                       ),
                       child: Text(
                         'Canlı Takip',
-                        style: GoogleFonts.outfit(color: kOrange, fontSize: 11, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kOrange, fontSize: 11, fontWeight: FontWeight.w600),
                       ),
                     ),
                   ],
                 ),
               ),
+              OutlinedButton.icon(
+                onPressed: () => _saveSharedRoute(
+                  routeData['name'] ?? 'İsimsiz Rota',
+                  routeData['coordinates'] is List ? routeData['coordinates'] : [],
+                ),
+                icon: const Icon(Icons.bookmark_add_outlined, size: 16),
+                label: const Text('Kaydet'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: kOrange,
+                  side: BorderSide(color: kOrange.withValues(alpha: 0.6)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                ),
+              ),
+              const SizedBox(width: 8),
               OutlinedButton.icon(
                 onPressed: () async {
                   final String rName = routeData['name'] ?? 'İsimsiz Rota';
@@ -1829,8 +2174,8 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                 icon: const Icon(Icons.directions_run, size: 16),
                 label: const Text('Yürü'),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: const Color(0xFF62FF4C),
-                  side: const BorderSide(color: Color(0xFF62FF4C)),
+                  foregroundColor: TacticalStyles.kTertiary,
+                  side: const BorderSide(color: TacticalStyles.kTertiary),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 ),
@@ -1845,11 +2190,11 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
             children: [
               const Column(
                 children: [
-                  Icon(Icons.trip_origin, color: Colors.greenAccent, size: 18),
+                  Icon(Icons.trip_origin, color: TacticalStyles.kTertiary, size: 18),
                   SizedBox(height: 4),
-                  SizedBox(width: 2, height: 20, child: DecoratedBox(decoration: BoxDecoration(color: Colors.white10))),
+                  SizedBox(width: 2, height: 20, child: DecoratedBox(decoration: BoxDecoration(color: TacticalStyles.kOutlineVariant))),
                   SizedBox(height: 4),
-                  Icon(Icons.flag, color: Colors.redAccent, size: 18),
+                  Icon(Icons.flag, color: TacticalStyles.kError, size: 18),
                 ],
               ),
               const SizedBox(width: 14),
@@ -1859,12 +2204,12 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                   children: [
                     Text(
                       routeData['from'] ?? 'Canlı Takip Başlangıcı',
-                      style: GoogleFonts.outfit(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
+                      style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kTextPrimary, fontSize: 14, fontWeight: FontWeight.w500),
                     ),
                     const SizedBox(height: 26),
                     Text(
                       routeData['to'] ?? 'Canlı Takip Bitişi',
-                      style: GoogleFonts.outfit(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
+                      style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kTextPrimary, fontSize: 14, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -1880,9 +2225,9 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
             runSpacing: 10,
             children: [
               _buildStatChip('${distance.toInt()} m', Icons.straighten, kOrange),
-              _buildStatChip('${duration ~/ 60} dk', Icons.timer_outlined, Colors.cyanAccent),
-              _buildStatChip('${elevation.toInt()} m İrtifa', Icons.height, Colors.purpleAccent),
-              _buildStatChip('$steps adım', Icons.directions_walk, Colors.yellowAccent),
+              _buildStatChip('${duration ~/ 60} dk', Icons.timer_outlined, TacticalStyles.kSecondaryContainer),
+              _buildStatChip('${elevation.toInt()} m İrtifa', Icons.height, TacticalStyles.kTertiary),
+              _buildStatChip('$steps adım', Icons.directions_walk, Colors.amberAccent),
             ],
           ),
 
@@ -1895,17 +2240,17 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
+                  color: TacticalStyles.kSurfaceHigh,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   '${coords.length} nokta',
-                  style: GoogleFonts.outfit(color: Colors.white60, fontSize: 12),
+                  style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kTextSecondary, fontSize: 12),
                 ),
               ),
               Text(
                 dateStr,
-                style: GoogleFonts.outfit(color: Colors.white38, fontSize: 12),
+                style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kTextSecondary, fontSize: 12),
               ),
             ],
           ),
@@ -1928,26 +2273,44 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
           
           const SizedBox(height: 16),
           // Rota Başlat Butonu
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () async {
-                final noktalar = coords.map((e) => {'lat': (e['lat'] as num).toDouble(), 'lng': (e['lng'] as num).toDouble()}).toList();
-                final id = await DatabaseHelper.instance.rotaKaydet(name, noktalar);
-                await DatabaseHelper.instance.rotayiAktifYap(id);
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Rota aktifleştirildi!'), backgroundColor: kOrange));
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const LiveTrackingScreen()));
-                }
-              },
-              icon: const Icon(Icons.directions_walk, color: Colors.black, size: 18),
-              label: const Text('Bu Rotayı Yürü', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: kOrange,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                padding: const EdgeInsets.symmetric(vertical: 14),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => _saveSharedRoute(name, coords),
+                  icon: const Icon(Icons.bookmark_add_outlined, size: 18),
+                  label: Text('Kaydet', style: TacticalStyles.headline(color: TacticalStyles.kTertiary, size: 13)),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: TacticalStyles.kTertiary,
+                    side: BorderSide(color: TacticalStyles.kTertiary.withValues(alpha: 0.6)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                ),
               ),
-            ),
+              const SizedBox(width: 10),
+              Expanded(
+                flex: 2,
+                child: ElevatedButton.icon(
+                  onPressed: () async {
+                    final noktalar = coords.map((e) => {'lat': (e['lat'] as num).toDouble(), 'lng': (e['lng'] as num).toDouble()}).toList();
+                    final id = await DatabaseHelper.instance.rotaKaydet(name, noktalar);
+                    await DatabaseHelper.instance.rotayiAktifYap(id);
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Rota aktifleştirildi!'), backgroundColor: kOrange));
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => const LiveTrackingScreen()));
+                    }
+                  },
+                  icon: const Icon(Icons.directions_walk, color: Colors.white, size: 18),
+                  label: Text('Bu Rotayı Yürü', style: TacticalStyles.headline(color: Colors.white, size: 13)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: kOrange,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -1958,9 +2321,9 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.05),
+        color: color.withOpacity(0.08),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.4), width: 1),
+        border: Border.all(color: color.withOpacity(0.35), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -1969,7 +2332,7 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
           const SizedBox(width: 6),
           Text(
             text,
-            style: GoogleFonts.outfit(color: color, fontSize: 13, fontWeight: FontWeight.bold),
+            style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: color, fontSize: 13, fontWeight: FontWeight.w700),
           ),
         ],
       ),
@@ -2000,9 +2363,9 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF141414),
+        color: TacticalStyles.kSurfaceLow,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: kOrange.withOpacity(0.4)),
+        border: Border.all(color: TacticalStyles.kOutlineVariant),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2013,7 +2376,7 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
               children: [
                 const Icon(Icons.history, color: kOrange, size: 20),
                 const SizedBox(width: 12),
-                Expanded(child: Text(name.toUpperCase(), style: GoogleFonts.shareTechMono(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16))),
+                Expanded(child: Text(name.toUpperCase(), style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kTextPrimary, fontWeight: FontWeight.w700, fontSize: 15))),
               ],
             ),
           ),
@@ -2044,6 +2407,17 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                     ),
                   ),
                 if (coords.isNotEmpty) const SizedBox(width: 10),
+                Expanded(
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: TacticalStyles.kTertiary,
+                      side: BorderSide(color: TacticalStyles.kTertiary.withValues(alpha: 0.55)),
+                    ),
+                    onPressed: () => _saveSharedRoute(name, coords),
+                    child: const Text('KAYDET'),
+                  ),
+                ),
+                const SizedBox(width: 8),
                 Expanded(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(backgroundColor: kOrange, foregroundColor: Colors.black),
@@ -2113,19 +2487,19 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
         height: MediaQuery.of(ctx).size.height * 0.9,
-        decoration: const BoxDecoration(color: Color(0xFF0A0A0A), borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+        decoration: const BoxDecoration(color: TacticalStyles.kSurface, borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
         child: Column(children: [
           Container(margin: const EdgeInsets.symmetric(vertical: 12), width: 40, height: 4, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2))),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(children: [
-              const Icon(Icons.route, color: Color(0xFF62FF4C), size: 20),
+              const Icon(Icons.route, color: TacticalStyles.kTertiary, size: 20),
               const SizedBox(width: 8),
-              Expanded(child: Text(routeName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16))),
+              Expanded(child: Text(routeName, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kTextPrimary, fontWeight: FontWeight.w700, fontSize: 16))),
               IconButton(icon: const Icon(Icons.close, color: Colors.white54), onPressed: () => Navigator.pop(ctx)),
             ]),
           ),
-          const Divider(color: Colors.white10),
+          const Divider(color: TacticalStyles.kOutlineVariant),
           Expanded(child: _RouteMapViewer(coords: coords)),
         ]),
       ),
@@ -2158,7 +2532,7 @@ class _RouteMapViewerState extends State<_RouteMapViewer> {
     // Rota Çizimi
     final line = mbx.PolylineAnnotationOptions(
       geometry: mbx.LineString(coordinates: points.map((p) => mbx.Position(p.longitude, p.latitude)).toList()),
-      lineColor: const Color(0xFF62FF4C).value,
+      lineColor: TacticalStyles.kTertiary.value,
       lineWidth: 3.5,
     );
     await polylineManager?.create(line);
@@ -2167,7 +2541,7 @@ class _RouteMapViewerState extends State<_RouteMapViewer> {
     final startMarker = mbx.CircleAnnotationOptions(
       geometry: mbx.Point(coordinates: mbx.Position(points.first.longitude, points.first.latitude)),
       circleRadius: 6.0,
-      circleColor: const Color(0xFF62FF4C).value,
+      circleColor: TacticalStyles.kTertiary.value,
       circleStrokeWidth: 2.0,
       circleStrokeColor: Colors.white.value,
     );
@@ -2177,7 +2551,7 @@ class _RouteMapViewerState extends State<_RouteMapViewer> {
       final endMarker = mbx.CircleAnnotationOptions(
         geometry: mbx.Point(coordinates: mbx.Position(points.last.longitude, points.last.latitude)),
         circleRadius: 6.0,
-        circleColor: Colors.redAccent.value,
+        circleColor: TacticalStyles.kError.value,
         circleStrokeWidth: 2.0,
         circleStrokeColor: Colors.white.value,
       );
@@ -2240,14 +2614,15 @@ class _FeedMiniMap extends StatelessWidget {
         ),
         children: [
           fm.TileLayer(
-            urlTemplate: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-            subdomains: const ['a', 'b', 'c', 'd'],
+            urlTemplate:
+                'https://api.mapbox.com/styles/v1/mapbox/dark-v11/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1Ijoic2VyY2Fub3JhbGwiLCJhIjoiY21vdGxneTR1MDZkNjJ1czl5OG4xZGRtNSJ9.aZd3CyiISCcxlcR0hXkhhQ',
+            userAgentPackageName: 'com.rotaplus',
           ),
           fm.PolylineLayer(
             polylines: [
               fm.Polyline(
                 points: points,
-                color: const Color(0xFF62FF4C),
+                color: TacticalStyles.kTertiary,
                 strokeWidth: 3.5,
               ),
             ],
@@ -2257,13 +2632,13 @@ class _FeedMiniMap extends StatelessWidget {
               fm.Marker(
                 point: points.first,
                 width: 14, height: 14,
-                child: Container(decoration: BoxDecoration(color: const Color(0xFF62FF4C), shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 2))),
+                child: Container(decoration: BoxDecoration(color: TacticalStyles.kTertiary, shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 2))),
               ),
               if (points.length > 1)
                 fm.Marker(
                   point: points.last,
                   width: 14, height: 14,
-                  child: Container(decoration: BoxDecoration(color: Colors.redAccent, shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 2))),
+                  child: Container(decoration: BoxDecoration(color: TacticalStyles.kError, shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 2))),
                 ),
             ],
           ),
@@ -2305,9 +2680,9 @@ class _InlineAdWidgetState extends State<_InlineAdWidget> {
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: const Color(0xFF141414),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        color: TacticalStyles.kSurfaceLow,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: TacticalStyles.kOutlineVariant),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2340,10 +2715,10 @@ class _InlineAdWidgetState extends State<_InlineAdWidget> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF141414),
+        backgroundColor: TacticalStyles.kSurfaceLow,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         title: const Row(children: [
-          Icon(Icons.directions_run, color: Color(0xFF62FF4C), size: 22),
+          Icon(Icons.directions_run, color: TacticalStyles.kTertiary, size: 22),
           SizedBox(width: 8),
           Expanded(child: Text('Bu Rotayı Yürü', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
         ]),
@@ -2351,7 +2726,7 @@ class _InlineAdWidgetState extends State<_InlineAdWidget> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('${routeData['name'] ?? 'Bu rota'}', style: const TextStyle(color: Color(0xFFFF6B00), fontWeight: FontWeight.bold, fontSize: 16)),
+            Text('${routeData['name'] ?? 'Bu rota'}', style: const TextStyle(color: TacticalStyles.kPrimaryContainer, fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 12),
             const Text('Bu rotayı yürümek için "Takip" sekmesinden GPS takibini başlatın ve rotanız boyunca ilerlediğinizde istatistikleriniz kaydedilecektir.', style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.5)),
             const SizedBox(height: 12),
@@ -2361,7 +2736,7 @@ class _InlineAdWidgetState extends State<_InlineAdWidget> {
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('KAPAT', style: TextStyle(color: Colors.white38))),
           ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF62FF4C), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+            style: ElevatedButton.styleFrom(backgroundColor: TacticalStyles.kTertiaryContainer, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
             onPressed: () async {
               Navigator.pop(ctx);
               final coordsRaw = routeData['coordinates'] as List?;
@@ -2381,8 +2756,8 @@ class _InlineAdWidgetState extends State<_InlineAdWidget> {
                 ));
               }
             },
-            icon: const Icon(Icons.play_arrow, color: Colors.black, size: 18),
-            label: const Text('KAYDET', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+            icon: const Icon(Icons.play_arrow, color: Colors.white, size: 18),
+            label: const Text('KAYDET', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ],
       ),

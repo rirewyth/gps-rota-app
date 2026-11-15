@@ -1,14 +1,15 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'profile_screen.dart';
+import '../services/tactical_styles.dart';
 
-const Color kOrangeU = Color(0xFFFF6B00);
-const Color kBgU = Color(0xFF0A0A0A);
-const Color kCardU = Color(0xFF141414);
+const Color kOrangeU = TacticalStyles.kPrimaryContainer;
+const Color kBgU = TacticalStyles.kSurface;
+const Color kCardU = TacticalStyles.kSurfaceLow;
 
 class UsersScreen extends StatefulWidget {
   const UsersScreen({Key? key}) : super(key: key);
@@ -155,7 +156,7 @@ class _UsersScreenState extends State<UsersScreen> {
             const SizedBox(height: 24),
             Text(
               'Ekip Listesi',
-              style: GoogleFonts.outfit(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+              style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             const Text(
@@ -186,19 +187,22 @@ class _UsersScreenState extends State<UsersScreen> {
     return Scaffold(
       backgroundColor: kBgU,
       appBar: AppBar(
+        centerTitle: true,
         title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Text('KULLANICI ARA & EKİP', style: GoogleFonts.outfit(color: kOrangeU, fontWeight: FontWeight.bold, fontSize: 18)),
-            if (_teamId != null)
+            TacticalStyles.appBarPill('KULLANICI & EKİP', icon: Icons.group_add_outlined),
+            if (_teamId != null) ...[
+              const SizedBox(height: 3),
               Text(
                 'Kod: $_teamId',
-                style: GoogleFonts.shareTechMono(color: Colors.white38, fontSize: 10),
+                style: TacticalStyles.labelMicro(color: Colors.white38, size: 9.5),
                 overflow: TextOverflow.ellipsis,
               ),
+            ],
           ],
         ),
-        backgroundColor: Colors.black,
+        backgroundColor: TacticalStyles.kSurfaceLowest,
         iconTheme: const IconThemeData(color: Colors.white),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60),
@@ -255,7 +259,7 @@ class _UsersScreenState extends State<UsersScreen> {
           children: [
             const Icon(Icons.search_off, color: Colors.white24, size: 48),
             const SizedBox(height: 16),
-            Text('Kullanıcı bulunamadı', style: GoogleFonts.outfit(color: Colors.white38)),
+            Text('Kullanıcı bulunamadı', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white38)),
           ],
         ),
       );
@@ -337,7 +341,7 @@ class _UsersScreenState extends State<UsersScreen> {
         color: kCardU,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: isAdmin ? const Color(0xFFFFD700).withOpacity(0.4) : Colors.white12,
+          color: isAdmin ? const Color(0xFFFFD700).withOpacity(0.4) : TacticalStyles.kOutlineVariant,
         ),
         boxShadow: isAdmin ? [BoxShadow(color: const Color(0xFFFFD700).withOpacity(0.15), blurRadius: 8)] : null,
       ),
@@ -369,7 +373,7 @@ class _UsersScreenState extends State<UsersScreen> {
                 child: Container(
                   width: 16,
                   height: 16,
-                  decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.black),
+                  decoration: const BoxDecoration(shape: BoxShape.circle, color: TacticalStyles.kSurfaceLowest),
                   child: const Icon(Icons.verified, color: Colors.blueAccent, size: 14),
                 ),
               ),
@@ -394,7 +398,7 @@ class _UsersScreenState extends State<UsersScreen> {
                       color: isBanned ? Colors.redAccent.withOpacity(0.6) : Colors.white,
                       fontWeight: FontWeight.bold)),
             if (username.isNotEmpty)
-              Text('@$username', style: GoogleFonts.shareTechMono(color: kOrangeU, fontSize: 11)),
+              Text('@$username', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: kOrangeU, fontSize: 11, fontWeight: FontWeight.w600)),
           ],
         ),
         subtitle: Padding(

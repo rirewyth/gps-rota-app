@@ -5,15 +5,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'profile_screen.dart';
 import 'chat_screen.dart';
+import '../services/tactical_styles.dart';
 
 const String _kAdminEmailNotif = 'sercanoral65@gmail.com';
 
 class NotificationScreen extends StatelessWidget {
   const NotificationScreen({Key? key}) : super(key: key);
 
-  static const Color kOrange = Color(0xFFFF6B00);
-  static const Color kBackground = Color(0xFF0A0A0A);
-  static const Color kCardBg = Color(0xFF141414);
+  static const Color kOrange = TacticalStyles.kPrimaryContainer;
+  static const Color kBackground = TacticalStyles.kSurface;
+  static const Color kCardBg = TacticalStyles.kSurfaceLow;
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +29,9 @@ class NotificationScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: kBackground,
       appBar: AppBar(
-        title: Text('Acil Durum Bildirimleri', style: GoogleFonts.outfit(color: kOrange, fontWeight: FontWeight.bold, fontSize: 20)),
-        backgroundColor: Colors.black,
+        centerTitle: true,
+        title: TacticalStyles.appBarPill('BİLDİRİMLER', icon: Icons.notifications_active_outlined),
+        backgroundColor: TacticalStyles.kSurfaceLowest,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
@@ -50,7 +52,7 @@ class NotificationScreen extends StatelessWidget {
                 await doc.reference.update({'isRead': true});
               }
             },
-            child: const Text('Tümünü Oku', style: TextStyle(color: kOrange, fontSize: 12)),
+            child: Text('Tümünü Oku', style: TacticalStyles.labelCaps(color: kOrange, size: 10.5)),
           ),
         ],
       ),
@@ -120,8 +122,12 @@ class NotificationScreen extends StatelessWidget {
                   }
                 },
                 child: Container(
-                  color: isRead ? Colors.transparent : kOrange.withOpacity(0.05),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                  decoration: TacticalStyles.glassCardDecoration(
+                    radius: 16,
+                    borderColor: isRead ? null : kOrange.withValues(alpha: 0.45),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   child: Row(
                     children: [
                       // Avatar
@@ -228,7 +234,7 @@ class NotificationScreen extends StatelessWidget {
         builder: (ctx, setD) {
           bool sending = false;
           return AlertDialog(
-            backgroundColor: const Color(0xFF141414),
+            backgroundColor: kCardBg,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             title: Row(children: const [
               Icon(Icons.campaign, color: kOrange, size: 24),
@@ -260,7 +266,7 @@ class NotificationScreen extends StatelessWidget {
                     hintText: 'Acil durum mesajını girin...',
                     hintStyle: const TextStyle(color: Colors.white38),
                     filled: true,
-                    fillColor: Colors.black,
+                    fillColor: TacticalStyles.kSurfaceLowest,
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
                     focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: kOrange)),
                     contentPadding: const EdgeInsets.all(14),

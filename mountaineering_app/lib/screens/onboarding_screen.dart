@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:animate_do/animate_do.dart';
@@ -6,12 +6,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../storage_helper.dart';
+import '../services/tactical_styles.dart';
 import 'dart:math' as math;
 
-const Color _kOrange = Color(0xFFFF6B00);
-const Color _kGreen = Color(0xFF62FF4C);
-const Color _kBg = Color(0xFF0A0A0A);
-const Color _kCard = Color(0xFF141414);
+const Color _kOrange = TacticalStyles.kPrimaryContainer;
+const Color _kGreen = TacticalStyles.kTertiary;
+const Color _kBg = TacticalStyles.kSurface;
+const Color _kCard = TacticalStyles.kSurfaceLow;
 
 class OnboardingScreen extends StatefulWidget {
   final String nextRoute;
@@ -259,7 +260,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               shaderCallback: (b) => const LinearGradient(colors: [_kOrange, Color(0xFFFFD700)]).createShader(b),
               child: Text('ROTA+\'ya\nHoş Geldin!',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.outfit(color: Colors.white, fontSize: 36, fontWeight: FontWeight.w900, height: 1.2),
+                style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontSize: 36, fontWeight: FontWeight.w900, height: 1.2),
               ),
             ),
           ),
@@ -319,7 +320,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('KAN GRUBU', style: GoogleFonts.shareTechMono(color: _kOrange, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                Text('KAN GRUBU', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: _kOrange, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
                 const SizedBox(height: 10),
                 Wrap(
                   spacing: 8, runSpacing: 8,
@@ -333,7 +334,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                         decoration: BoxDecoration(
                           color: selected ? _kOrange : _kCard,
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: selected ? _kOrange : Colors.white12),
+                          border: Border.all(color: selected ? _kOrange : TacticalStyles.kOutlineVariant),
                         ),
                         child: Text(k, style: TextStyle(color: selected ? Colors.black : Colors.white70, fontWeight: FontWeight.bold, fontSize: 14)),
                       ),
@@ -489,7 +490,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   ),
                   child: Text(
                     slide['tag'] as String,
-                    style: GoogleFonts.shareTechMono(
+                    style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
                       color: color,
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
@@ -513,7 +514,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   child: Text(
                     slide['title'] as String,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.outfit(
+                    style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
                       color: Colors.white,
                       fontSize: 32,
                       fontWeight: FontWeight.w900,
@@ -591,7 +592,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 child: ShaderMask(
                   shaderCallback: (b) => const LinearGradient(colors: [_kGreen, Color(0xFF00FFAA)]).createShader(b),
                   child: Text('HAZIRSIN!',
-                    style: GoogleFonts.outfit(color: Colors.white, fontSize: 44, fontWeight: FontWeight.w900, letterSpacing: 3),
+                    style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontSize: 44, fontWeight: FontWeight.w900, letterSpacing: 3),
                   ),
                 ),
               ),
@@ -630,7 +631,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22)),
+            Text(title, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22)),
             Text(subtitle, style: const TextStyle(color: Colors.white38, fontSize: 12)),
           ],
         ),
@@ -642,11 +643,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: GoogleFonts.shareTechMono(color: _kOrange, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+        Text(label, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: _kOrange, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
         const SizedBox(height: 8),
         Container(
           height: 60,
-          decoration: BoxDecoration(color: _kCard, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.white10)),
+          decoration: TacticalStyles.recessedDecoration(radius: 16),
           child: Row(
             children: [
               Expanded(
@@ -680,10 +681,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: GoogleFonts.shareTechMono(color: _kOrange, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+        Text(label, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: _kOrange, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
         const SizedBox(height: 8),
         Container(
-          decoration: BoxDecoration(color: _kCard, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.white10)),
+          decoration: TacticalStyles.recessedDecoration(radius: 16),
           child: TextField(
             controller: ctrl,
             keyboardType: isPhone ? TextInputType.phone : TextInputType.name,
@@ -702,7 +703,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   }
 
   Widget _buildNavButton(String label, Color bg, VoidCallback onTap, {Color textColor = Colors.white, IconData? icon}) {
-    return GestureDetector(
+    return TacticalPressable(
       onTap: onTap,
       child: Container(
         width: double.infinity,
@@ -717,7 +718,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(label, style: GoogleFonts.outfit(color: textColor, fontWeight: FontWeight.bold, fontSize: 15, letterSpacing: 1)),
+            Text(label, style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: textColor, fontWeight: FontWeight.bold, fontSize: 15, letterSpacing: 1)),
             if (icon != null) ...[const SizedBox(width: 8), Icon(icon, color: textColor, size: 18)],
           ],
         ),

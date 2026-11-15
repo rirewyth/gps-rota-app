@@ -13,11 +13,12 @@ import '../services/cloud_sync_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../utils/location_permission_helper.dart';
+import '../services/tactical_styles.dart';
 
-const Color kOrange = Color(0xFFFF6B00);
-const Color kBackground = Color(0xFF0A0A0A);
-const Color kCardBg = Color(0xFF141414);
-const Color kGreen = Color(0xFF62FF4C);
+const Color kOrange = TacticalStyles.kPrimaryContainer;
+const Color kBackground = TacticalStyles.kSurface;
+const Color kCardBg = TacticalStyles.kSurfaceLow;
+const Color kGreen = TacticalStyles.kTertiary;
 
 class MapScreen extends StatefulWidget {
   final LatLng? focusLocation;
@@ -185,17 +186,17 @@ class _MapScreenState extends State<MapScreen> {
             const SizedBox(height: 8),
             TextField(
               controller: isimController,
-              style: const TextStyle(color: Colors.white),
+              style: const TextStyle(color: TacticalStyles.kOnSurface),
               decoration: const InputDecoration(
                 filled: true,
-                fillColor: Color(0xFF0A0A0A),
-                border: OutlineInputBorder(borderSide: BorderSide(color: Colors.white12)),
-                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white12)),
+                fillColor: TacticalStyles.kSurfaceLowest,
+                border: OutlineInputBorder(borderSide: BorderSide(color: TacticalStyles.kOutlineVariant)),
+                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: TacticalStyles.kOutlineVariant)),
                 focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: kOrange)),
               ),
             ),
             const SizedBox(height: 16),
-            const Text('Hedef Dağ / Zirve:', style: TextStyle(color: Colors.white70, fontSize: 12)),
+            const Text('Hedef Dağ / Zirve:', style: TextStyle(color: TacticalStyles.kOnSurfaceVariant, fontSize: 12)),
             const SizedBox(height: 8),
             StatefulBuilder(
               builder: (BuildContext context, StateSetter setStateDialog) {
@@ -205,11 +206,11 @@ class _MapScreenState extends State<MapScreen> {
                     DropdownButtonFormField<String>(
                       value: manuelMod ? 'MANUEL GIRME' : MountainDB.turkishMountains.first.name,
                       dropdownColor: kCardBg,
-                      style: const TextStyle(color: Colors.white, fontSize: 13),
+                      style: const TextStyle(color: TacticalStyles.kOnSurface, fontSize: 13),
                       decoration: const InputDecoration(
                         filled: true,
-                        fillColor: Color(0xFF0A0A0A),
-                        border: OutlineInputBorder(borderSide: BorderSide(color: Colors.white12)),
+                        fillColor: TacticalStyles.kSurfaceLowest,
+                        border: OutlineInputBorder(borderSide: BorderSide(color: TacticalStyles.kOutlineVariant)),
                       ),
                       items: [
                         ...MountainDB.turkishMountains.map((m) => DropdownMenuItem(value: m.name, child: Text(m.name))),
@@ -233,9 +234,9 @@ class _MapScreenState extends State<MapScreen> {
                           style: const TextStyle(color: kOrange, fontWeight: FontWeight.bold),
                           decoration: const InputDecoration(
                             hintText: 'Zirve adını buraya yazın...',
-                            hintStyle: TextStyle(color: Colors.white24),
+                            hintStyle: TextStyle(color: TacticalStyles.kOnSurfaceVariant),
                             filled: true,
-                            fillColor: Color(0xFF1E1E1E),
+                            fillColor: TacticalStyles.kSurfaceHigh,
                             border: OutlineInputBorder(borderSide: BorderSide(color: kOrange)),
                           ),
                         ),
@@ -243,12 +244,12 @@ class _MapScreenState extends State<MapScreen> {
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        const Icon(Icons.nature, color: Colors.green),
+                        const Icon(Icons.nature, color: kGreen),
                         const SizedBox(width: 8),
-                        const Expanded(child: Text('Orman / Arazi Rotası', style: TextStyle(color: Colors.white))),
+                        const Expanded(child: Text('Orman / Arazi Rotası', style: TextStyle(color: TacticalStyles.kOnSurface))),
                         Switch(
                           value: isForestRoute,
-                          activeColor: Colors.green,
+                          activeColor: kGreen,
                           onChanged: (v) => setStateDialog(() => isForestRoute = v),
                         ),
                       ],
@@ -262,7 +263,7 @@ class _MapScreenState extends State<MapScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('İPTAL', style: TextStyle(color: Colors.white38)),
+            child: const Text('İPTAL', style: TextStyle(color: TacticalStyles.kOnSurfaceVariant)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: kOrange),
@@ -291,7 +292,7 @@ class _MapScreenState extends State<MapScreen> {
               });
               _notify('✓ "$isim" rotası kaydedildi ve aktif yapıldı!');
             },
-            child: const Text('KAYDET', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+            child: const Text('KAYDET', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -311,13 +312,13 @@ class _MapScreenState extends State<MapScreen> {
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-            color: Colors.black,
+            color: TacticalStyles.kSurfaceLowest,
             child: Row(
               children: [
                 const Text('KAYITLI ROTALAR',
                   style: TextStyle(color: kOrange, fontWeight: FontWeight.w900, letterSpacing: 1)),
                 const Spacer(),
-                Text('${rotalar.length} rota', style: const TextStyle(color: Colors.white38, fontSize: 11)),
+                Text('${rotalar.length} rota', style: const TextStyle(color: TacticalStyles.kOnSurfaceVariant, fontSize: 11)),
               ],
             ),
           ),
@@ -751,15 +752,15 @@ class _MapScreenState extends State<MapScreen> {
             top: 0, left: 0, right: 0,
             child: Container(
               padding: const EdgeInsets.fromLTRB(16, 50, 8, 10),
-              color: Colors.black.withOpacity(0.85),
+              color: TacticalStyles.kSurfaceLowest.withOpacity(0.92),
               child: Row(
                 children: [
                   const Text('CANLI HARİTA',
-                    style: TextStyle(color: kOrange, fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: 2)),
+                    style: TextStyle(color: kOrange, fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
                   const Spacer(),
                   // Harita Stili Seçici
                   IconButton(
-                    icon: Icon(Icons.layers, color: _currentMapStyle == 'osm' ? Colors.white60 : kOrange),
+                    icon: Icon(Icons.layers, color: _currentMapStyle == 'osm' ? TacticalStyles.kOnSurfaceVariant : kOrange),
                     onPressed: _showMapStyleSelector,
                     tooltip: 'Harita Görünümü',
                   ),
@@ -775,7 +776,7 @@ class _MapScreenState extends State<MapScreen> {
               child: FloatingActionButton.extended(
                 heroTag: 'fires_btn',
                 onPressed: _showFiresList,
-                backgroundColor: Colors.redAccent.withOpacity(0.9),
+                backgroundColor: TacticalStyles.kErrorContainer,
                 icon: const Icon(Icons.local_fire_department, color: Colors.white),
                 label: Text('${_fireMarkers.length} Yangın', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ),
@@ -787,25 +788,29 @@ class _MapScreenState extends State<MapScreen> {
               bottom: 80, left: 12,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                color: Colors.black.withOpacity(0.8),
+                decoration: BoxDecoration(
+                  color: TacticalStyles.kSurfaceLow.withOpacity(0.95),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: TacticalStyles.kOutlineVariant),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(children: [
-                      Container(width: 16, height: 3, color: Colors.blueAccent),
+                      Container(width: 16, height: 3, color: TacticalStyles.kSecondaryContainer),
                       const SizedBox(width: 6),
                       Text(_aktifRota!['isim'] as String,
-                        style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                        style: const TextStyle(color: TacticalStyles.kOnSurface, fontSize: 10, fontWeight: FontWeight.bold)),
                     ]),
                     const SizedBox(height: 4),
                     Row(children: [
                       Container(width: 8, height: 8, decoration: const BoxDecoration(color: kGreen, shape: BoxShape.circle)),
                       const SizedBox(width: 4),
-                      const Text('Başlangıç', style: TextStyle(color: Colors.white54, fontSize: 9)),
+                      const Text('Başlangıç', style: TextStyle(color: TacticalStyles.kOnSurfaceVariant, fontSize: 9)),
                       const SizedBox(width: 8),
-                      Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.redAccent, shape: BoxShape.circle)),
+                      Container(width: 8, height: 8, decoration: const BoxDecoration(color: TacticalStyles.kError, shape: BoxShape.circle)),
                       const SizedBox(width: 4),
-                      const Text('Bitiş', style: TextStyle(color: Colors.white54, fontSize: 9)),
+                      const Text('Bitiş', style: TextStyle(color: TacticalStyles.kOnSurfaceVariant, fontSize: 9)),
                     ]),
                   ],
                 ),
@@ -817,7 +822,7 @@ class _MapScreenState extends State<MapScreen> {
         onPressed: _konumGetir,
         mini: true,
         backgroundColor: kOrange,
-        child: const Icon(Icons.my_location, color: Colors.black),
+        child: const Icon(Icons.my_location, color: Colors.white),
       ),
     );
   }

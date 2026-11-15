@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'notification_screen.dart';
 import 'profile_screen.dart';
+import '../services/tactical_styles.dart';
 
 class ChatScreen extends StatefulWidget {
   final String targetUserId;
@@ -32,7 +33,9 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   StreamSubscription? _myDocSub;
   StreamSubscription? _theirDocSub;
 
-  static const Color kOrange = Color(0xFFFF6B00);
+  static const Color kOrange = TacticalStyles.kPrimaryContainer;
+  static const Color kBackground = TacticalStyles.kSurface;
+  static const Color kCardBg = TacticalStyles.kSurfaceLow;
 
   @override
   void initState() {
@@ -148,7 +151,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   void _showMessageOptions(BuildContext context, String msgId, String msgText, bool isMe) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF141414),
+      backgroundColor: kCardBg,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (ctx) => SafeArea(
         child: Column(
@@ -192,14 +195,14 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF141414),
+        backgroundColor: kCardBg,
         title: const Text('Mesajı Düzenle', style: TextStyle(color: kOrange)),
         content: TextField(
           controller: ctrl,
           style: const TextStyle(color: Colors.white),
           maxLines: 4,
           decoration: InputDecoration(
-            filled: true, fillColor: Colors.black,
+            filled: true, fillColor: TacticalStyles.kSurfaceLowest,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
             focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: kOrange)),
           ),
@@ -252,7 +255,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     final myUid = _auth.currentUser?.uid ?? '';
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
+      backgroundColor: kBackground,
       appBar: AppBar(
         title: StreamBuilder<DocumentSnapshot>(
           stream: FirebaseFirestore.instance.collection('users').doc(widget.targetUserId).snapshots(),
@@ -282,7 +285,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(widget.targetUserName, style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                      Text(widget.targetUserName, style: TacticalStyles.headline(color: Colors.white, size: 16)),
                       _buildOnlineStatus(data),
                     ],
                   ),
@@ -291,9 +294,14 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
             );
           },
         ),
-        backgroundColor: Colors.black,
-        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: TacticalStyles.kSurfaceLowest,
+        iconTheme: const IconThemeData(color: TacticalStyles.kOnSurface),
         elevation: 0,
+        scrolledUnderElevation: 0,
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(1),
+          child: SizedBox(height: 1, child: ColoredBox(color: TacticalStyles.kOutlineVariant)),
+        ),
       ),
       body: !_chatIdReady
           ? const Center(child: CircularProgressIndicator(color: kOrange))
@@ -314,7 +322,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                           child: Column(mainAxisSize: MainAxisSize.min, children: [
                             Icon(Icons.waving_hand, size: 48, color: kOrange.withOpacity(0.4)),
                             const SizedBox(height: 12),
-                            Text('İlk mesajı sen gönder! 👋', style: GoogleFonts.outfit(color: Colors.white38, fontSize: 15)),
+                            Text('İlk mesajı sen gönder! 👋', style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: Colors.white38, fontSize: 15)),
                           ]),
                         );
                       }
@@ -372,19 +380,56 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                                       crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                                       children: [
                                         Container(
-                                          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
+                                          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.72),
                                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                                          decoration: BoxDecoration(
-                                            gradient: isMe ? const LinearGradient(colors: [Color(0xFFFF6B00), Color(0xFFFF8C42)], begin: Alignment.topLeft, end: Alignment.bottomRight) : null,
-                                            color: isMe ? null : const Color(0xFF1E1E1E),
-                                            borderRadius: BorderRadius.only(
-                                              topLeft: const Radius.circular(18),
-                                              topRight: const Radius.circular(18),
-                                              bottomLeft: isMe ? const Radius.circular(18) : const Radius.circular(4),
-                                              bottomRight: isMe ? const Radius.circular(4) : const Radius.circular(18),
+                                          decoration: isMe
+                                              ? BoxDecoration(
+                                                  gradient: const LinearGradient(
+                                                    colors: [kOrange, TacticalStyles.kPrimary],
+                                                    begin: Alignment.topLeft,
+                                                    end: Alignment.bottomRight,
+                                                  ),
+                                                  borderRadius: const BorderRadius.only(
+                                                    topLeft: Radius.circular(18),
+                                                    topRight: Radius.circular(18),
+                                                    bottomLeft: Radius.circular(18),
+                                                    bottomRight: Radius.circular(4),
+                                                  ),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: kOrange.withOpacity(0.22),
+                                                      blurRadius: 12,
+                                                      offset: const Offset(0, 4),
+                                                    ),
+                                                  ],
+                                                )
+                                              : BoxDecoration(
+                                                  gradient: const LinearGradient(
+                                                    begin: Alignment.topLeft,
+                                                    end: Alignment.bottomRight,
+                                                    colors: [
+                                                      Color(0xD927272E),
+                                                      Color(0xCC1C1C22),
+                                                      Color(0xD9141419),
+                                                    ],
+                                                  ),
+                                                  borderRadius: const BorderRadius.only(
+                                                    topLeft: Radius.circular(18),
+                                                    topRight: Radius.circular(18),
+                                                    bottomLeft: Radius.circular(4),
+                                                    bottomRight: Radius.circular(18),
+                                                  ),
+                                                  border: Border.all(color: TacticalStyles.kOutlineVariant),
+                                                ),
+                                          child: Text(
+                                            text,
+                                            style: TacticalStyles.body(
+                                              color: isDeleted ? Colors.white38 : Colors.white,
+                                              fontSize: 13.5,
+                                            ).copyWith(
+                                              fontStyle: isDeleted ? FontStyle.italic : FontStyle.normal,
                                             ),
                                           ),
-                                          child: Text(text, style: TextStyle(color: isDeleted ? Colors.white38 : Colors.white, fontSize: 14, fontStyle: isDeleted ? FontStyle.italic : FontStyle.normal)),
                                         ),
                                         const SizedBox(height: 3),
                                         Row(mainAxisSize: MainAxisSize.min, children: [
@@ -407,7 +452,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                     ? Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(16),
-                        decoration: const BoxDecoration(color: Colors.black, border: Border(top: BorderSide(color: Colors.white10))),
+                        decoration: const BoxDecoration(color: TacticalStyles.kSurfaceLowest, border: Border(top: BorderSide(color: TacticalStyles.kOutlineVariant))),
                         child: Text(
                           _iBlockedThem 
                               ? 'Kullanıcının engellemesini kaldırmadan mesaj gönderemezsiniz.' 
@@ -418,24 +463,44 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                       )
                     : Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                        decoration: const BoxDecoration(color: Colors.black, border: Border(top: BorderSide(color: Colors.white10))),
+                        decoration: const BoxDecoration(color: TacticalStyles.kSurfaceLowest, border: Border(top: BorderSide(color: TacticalStyles.kOutlineVariant))),
                         child: Row(
                           children: [
                             Expanded(
                               child: Container(
-                                decoration: BoxDecoration(color: const Color(0xFF1E1E1E), borderRadius: BorderRadius.circular(24), border: Border.all(color: Colors.white12)),
+                                decoration: TacticalStyles.recessedDecoration(radius: 24),
                                 child: TextField(
                                   controller: _msgController,
-                                  style: const TextStyle(color: Colors.white),
+                                  style: TacticalStyles.body(color: TacticalStyles.kOnSurface, fontSize: 13.5),
                                   maxLines: 4, minLines: 1,
-                                  decoration: const InputDecoration(hintText: 'Mesaj yaz...', hintStyle: TextStyle(color: Colors.white38), border: InputBorder.none, contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10)),
+                                  decoration: InputDecoration(
+                                    hintText: 'Mesaj yaz...',
+                                    hintStyle: TacticalStyles.body(color: TacticalStyles.kOutline, fontSize: 13),
+                                    border: InputBorder.none,
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                  ),
                                 ),
                               ),
                             ),
                             const SizedBox(width: 8),
-                            GestureDetector(
+                            TacticalPressable(
                               onTap: _sendMessage,
-                              child: Container(width: 44, height: 44, decoration: const BoxDecoration(color: kOrange, shape: BoxShape.circle), child: const Icon(Icons.send, color: Colors.black, size: 20)),
+                              child: Container(
+                                width: 44,
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [kOrange, TacticalStyles.kPrimary],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(color: kOrange.withOpacity(0.32), blurRadius: 10, offset: const Offset(0, 3)),
+                                  ],
+                                ),
+                                child: const Icon(Icons.send_rounded, color: Colors.white, size: 19),
+                              ),
                             ),
                           ],
                         ),

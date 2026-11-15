@@ -85,18 +85,22 @@
             android:value="2" />
 
 
-        <!-- Default Notification Icon & Color -->
+        <!-- Default Notification Icon, Color & Channel -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_notification" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/notification_icon_color" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="rota_plus_fcm_channel" />
 
         <!-- Geolocator Arka Plan Servisi -->
         <service
             android:name="com.baseflow.geolocator.GeolocatorLocationService"
             android:foregroundServiceType="location"
+            android:stopWithTask="false"
             android:exported="false" />
 
         <!-- Flutter Background Service -->
