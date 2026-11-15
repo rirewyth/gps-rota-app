@@ -9,8 +9,6 @@ workflows:
       flutter: default
       xcode: latest
       cocoapods: default
-      vars:
-        APP_STORE_CONNECT_ALTOOL_ADDITIONAL_ARGUMENTS: "--use-old-altool"
     scripts:
       - name: Install Certificates
         script: |
@@ -64,12 +62,13 @@ workflows:
         script: flutter packages pub get
       - name: Build iOS IPA
         script: flutter build ipa --release --export-options-plist=$HOME/export_options.plist
+      - name: Publish IPA to App Store Connect & TestFlight
+        script: |
+          app-store-connect publish \
+            --path build/ios/ipa/*.ipa \
+            --altool-additional-arguments="--apple-id 6778343329"
     artifacts:
       - build/ios/ipa/*.ipa
-    publishing:
-      app_store_connect:
-        auth: integration
-        submit_to_testflight: true
 
   build-android:
     name: Build Android App Bundle (Google Play Store)

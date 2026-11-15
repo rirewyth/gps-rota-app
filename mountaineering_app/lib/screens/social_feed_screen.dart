@@ -2105,7 +2105,7 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Üst Bilgi: Runner İkonu + Başlık + Badge + Paylaş
+          // Üst Bilgi: Runner İkonu + Başlık + Badge
           Row(
             children: [
               Container(
@@ -2125,11 +2125,13 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                   children: [
                     Text(
                       name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], color: TacticalStyles.kTextPrimary, fontWeight: FontWeight.w700, fontSize: 17),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
                         color: kOrange.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(6),
@@ -2143,47 +2145,59 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                   ],
                 ),
               ),
-              OutlinedButton.icon(
-                onPressed: () => _saveSharedRoute(
-                  routeData['name'] ?? 'İsimsiz Rota',
-                  routeData['coordinates'] is List ? routeData['coordinates'] : [],
-                ),
-                icon: const Icon(Icons.bookmark_add_outlined, size: 16),
-                label: const Text('Kaydet'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: kOrange,
-                  side: BorderSide(color: kOrange.withValues(alpha: 0.6)),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            ],
+          ),
+
+          const SizedBox(height: 12),
+
+          // Aksiyon Butonları: Kaydet + Yürü (tam genişlikte, yazıları sıkıştırmaz)
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => _saveSharedRoute(
+                    routeData['name'] ?? 'İsimsiz Rota',
+                    routeData['coordinates'] is List ? routeData['coordinates'] : [],
+                  ),
+                  icon: const Icon(Icons.bookmark_add_outlined, size: 16),
+                  label: const Text('Kaydet'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: kOrange,
+                    side: BorderSide(color: kOrange.withValues(alpha: 0.6)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  ),
                 ),
               ),
-              const SizedBox(width: 8),
-              OutlinedButton.icon(
-                onPressed: () async {
-                  final String rName = routeData['name'] ?? 'İsimsiz Rota';
-                  final List rCoords = routeData['coordinates'] is List ? routeData['coordinates'] : [];
-                  if (rCoords.isEmpty) return;
-                  final noktalar = rCoords.map((e) => {'lat': (e['lat'] as num).toDouble(), 'lng': (e['lng'] as num).toDouble()}).toList();
-                  final id = await DatabaseHelper.instance.rotaKaydet(rName, noktalar);
-                  await DatabaseHelper.instance.rotayiAktifYap(id);
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Rota aktifleştirildi!'), backgroundColor: kOrange));
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => const LiveTrackingScreen()));
-                  }
-                },
-                icon: const Icon(Icons.directions_run, size: 16),
-                label: const Text('Yürü'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: TacticalStyles.kTertiary,
-                  side: const BorderSide(color: TacticalStyles.kTertiary),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              const SizedBox(width: 10),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () async {
+                    final String rName = routeData['name'] ?? 'İsimsiz Rota';
+                    final List rCoords = routeData['coordinates'] is List ? routeData['coordinates'] : [];
+                    if (rCoords.isEmpty) return;
+                    final noktalar = rCoords.map((e) => {'lat': (e['lat'] as num).toDouble(), 'lng': (e['lng'] as num).toDouble()}).toList();
+                    final id = await DatabaseHelper.instance.rotaKaydet(rName, noktalar);
+                    await DatabaseHelper.instance.rotayiAktifYap(id);
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Rota aktifleştirildi!'), backgroundColor: kOrange));
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => const LiveTrackingScreen()));
+                    }
+                  },
+                  icon: const Icon(Icons.directions_run, size: 16),
+                  label: const Text('Yürü'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: TacticalStyles.kTertiary,
+                    side: const BorderSide(color: TacticalStyles.kTertiary),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  ),
                 ),
               ),
             ],
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 18),
 
           // Güzergah: Başlangıç ve Bitiş
           Row(

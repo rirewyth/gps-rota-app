@@ -536,7 +536,9 @@ class _HomeDashboardState extends State<HomeDashboard>
 
   void _startCompass() {
     _compassStream = FlutterCompass.events?.listen((event) {
-      if (mounted) setState(() => _heading = event.heading);
+      final raw = event.heading;
+      final normalized = raw != null ? ((raw % 360) + 360) % 360 : null;
+      if (mounted) setState(() => _heading = normalized);
     });
   }
 
@@ -3195,38 +3197,42 @@ class _HomeDashboardState extends State<HomeDashboard>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Flexible(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.alphabetic,
-                    children: [
-                      Flexible(
-                        child: Text(
+                Expanded(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Text(
                           value,
+                          maxLines: 1,
                           style: TacticalStyles.displayHero(
                             color: TacticalStyles.kOnSurface,
-                            fontSize: 36,
+                            fontSize: 34,
                             fontWeight: FontWeight.w700,
                             height: 1.05,
                           ),
-                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                      const SizedBox(width: 5),
-                      Text(
-                        unit,
-                        style: TacticalStyles.headline(
-                          color: isAltitude
-                              ? TacticalStyles.kPrimary
-                              : TacticalStyles.kPrimaryContainer,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
+                        const SizedBox(width: 4),
+                        Text(
+                          unit,
+                          maxLines: 1,
+                          style: TacticalStyles.headline(
+                            color: isAltitude
+                                ? TacticalStyles.kPrimary
+                                : TacticalStyles.kPrimaryContainer,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-                if (!isAltitude)
+                if (!isAltitude) ...[
+                  const SizedBox(width: 6),
                   Container(
                     width: 52,
                     height: 52,
@@ -3269,6 +3275,7 @@ class _HomeDashboardState extends State<HomeDashboard>
                       ],
                     ),
                   ),
+                ],
               ],
             ),
           ),
