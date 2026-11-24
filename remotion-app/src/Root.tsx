@@ -13,6 +13,12 @@ import { YercekimiVideo } from "./YercekimiVideo";
 import yercekimiData from "./yercekimi_metadata.json";
 import { YercekimiVideoV2 } from "./YercekimiVideoV2";
 import yercekimiV2Data from "./yercekimi_v2_metadata.json";
+import { RotaPlusMotion } from "./RotaPlusMotion";
+import rotaPlusData from "./rotaplus_metadata.json";
+import { RotaPlusAd } from "./RotaPlusAd";
+import adData from "./ad_metadata.json";
+import { RotaPlusUltimate } from "./RotaPlusUltimate";
+import ultimateData from "./ultimate_metadata.json";
 
 // Each <Composition> is an entry in the sidebar!
 
@@ -97,6 +103,30 @@ export const RemotionRoot: React.FC = () => {
         id="YercekimiV2"
         component={YercekimiVideoV2}
         durationInFrames={yercekimiV2Data.totalFrames}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+      <Composition
+        id="RotaPlusMotion"
+        component={RotaPlusMotion}
+        durationInFrames={rotaPlusData.totalFrames}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+      <Composition
+        id="RotaPlusAd"
+        component={RotaPlusAd}
+        durationInFrames={adData.totalFrames}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+      <Composition
+        id="RotaPlusUltimate"
+        component={RotaPlusUltimate}
+        durationInFrames={ultimateData.totalFrames}
         fps={30}
         width={1080}
         height={1920}

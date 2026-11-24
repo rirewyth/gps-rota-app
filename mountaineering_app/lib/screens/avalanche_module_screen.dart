@@ -1,7 +1,10 @@
 ﻿import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:vibration/vibration.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -47,6 +50,10 @@ class _AvalancheModuleScreenState extends State<AvalancheModuleScreen> with Sing
   static const String _kPiezoToneUri = 'data:audio/wav;base64,UklGRkIYAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YR4YAAAAAJoAyAEjAqIAnf3R+mz6gf0GAxYIbQl5BZ390fWo8qL2bwA4C/4Q7g3NAgT1++sn7cv4WgkeFscXlgy++f/oo+NS7bwBchY9ICoZHAS16/TcUuDp9HcQfSTWJe4SCPW228TUs+TmA0QifC/RI44EteHGzfTT3vFaGCczkDN9GH7v/M0Vxsnc7QakLrI+2i0iBArXer4UyKvv/iAWQu1APx0i6dy/n7eb1dAKjTvWTUA31gK7yxqvvLxU7l4qPlHjTS8h+eFcsWupqc8+D9ZGS1nxPKMAAcTSpmS4gO9DLz9WBFDXH/nea68cqtTRwBFfSA1ZCzsW/iHCnKb0uQTyaTHnVtZOcR2d3FWu3qoJ1D8U2Um7WBo5iftPwHmmkruL9IUzfVeXTQQbSNpRrbOrR9a6FkNLWFgcN/34ir5ppj+9FfeWNQFYSUySGPvXXqyZrI7YLxmeTOJXEzVy9tO8a6b6vqD5nDdyWOpKGxa31Xyrka3c2qAb6U1ZV/8y6fMpu4Cmw8As/Jc50Vh8SaATe9OsqmuM90LHiNPv1bgMGPxjrmoppjCuv6GOx5Z/kcgEUjR7qmzr5HfbyBNUBJWuC7g7gK44qZ6xEYBaD1YWXJGnQ4gz0Gp3bD14c0iZ1FUVYUsYOyEti+nacbUAz0/gFnXRBcMAc2nqBeyYOQkJW9ShFRJKuXpFrWOp2TIYAYGQZVZLUOOCe3KHqhis9HmcidnU6JTBShu57ez/6dqyusIwUKXWXZBAwfkyKinvbRG6bkpTVSvUrgl/ORpsoOoe8x1C25Eh1mxP3cE5sZFpye2wev3KyJVq1FjI4/iKrEZqZfO/A0MRmRZ3z3qAfXE86aht0DuLC7kVZVQByEp4Pyvwam90IAQnEcuWf87Xf8Pw7WmKrnC8FcwlVakTgce0d4dssKuotWsEURD5lBFNCr9wMgqsnPEMPVlKmFIJEDeFsHiE7/qvQLfVRDsN4ZB9ije+ybSTsFc0RP5NyPrOQQyghCD53DM2cym5yIODCw6Mksecvsv3ITQvN0a/E0bPCtKJPgKEu0q2oPbie8XC64fDCNLFOT71ubD347pRP6uEl0cARdCBmrzOeji6ab2NQfZEgUU/Aoz/RLyAu/I9JH/XglYDS8KYwKH+pP26vf6/H8ClAUvBWMCXv/d/Tj+Zv8=';
   Position? _currentPos;
   String _userName = 'Dağcı';
+  StreamSubscription<Position>? _receiverPosSub;
+  double? _beaconLat;
+  double? _beaconLng;
+  bool _beepLoopRunning = false;
 
   @override
   void initState() {
@@ -58,10 +65,19 @@ class _AvalancheModuleScreenState extends State<AvalancheModuleScreen> with Sing
 
   Future<void> _initAudio() async {
     try {
-      await _audioPlayer.setAudioSource(AudioSource.uri(Uri.parse(_kPiezoToneUri)));
+      final b64 = _kPiezoToneUri.split(',').last;
+      final bytes = base64Decode(b64);
+      final dir = await getTemporaryDirectory();
+      final wavFile = File('${dir.path}/arva_beep.wav');
+      await wavFile.writeAsBytes(bytes, flush: true);
+      await _audioPlayer.setAudioSource(AudioSource.file(wavFile.path));
       await _audioPlayer.setVolume(1.0);
     } catch (e) {
       debugPrint("Audio init error: $e");
+      try {
+        await _audioPlayer.setAudioSource(AudioSource.uri(Uri.parse(_kPiezoToneUri)));
+        await _audioPlayer.setVolume(1.0);
+      } catch (_) {}
     }
   }
 
@@ -154,9 +170,23 @@ class _AvalancheModuleScreenState extends State<AvalancheModuleScreen> with Sing
         Strategy.P2P_STAR,
         onEndpointFound: (id, name, serviceId) {
           if (name.contains('ROTA_CIG_BEACON')) {
+            final coordMatch = RegExp(r'\((-?\d+(?:\.\d+)?),\s*(-?\d+(?:\.\d+)?)\)').firstMatch(name);
+            double initialDist = 14.0;
+            if (coordMatch != null) {
+              _beaconLat = double.tryParse(coordMatch.group(1) ?? '');
+              _beaconLng = double.tryParse(coordMatch.group(2) ?? '');
+              if (_beaconLat != null && _beaconLng != null && _currentPos != null) {
+                initialDist = Geolocator.distanceBetween(
+                  _currentPos!.latitude,
+                  _currentPos!.longitude,
+                  _beaconLat!,
+                  _beaconLng!,
+                ).clamp(0.5, 100.0);
+              }
+            }
             setState(() {
               _discoveredBeaconName = name.replaceAll('ROTA_CIG_BEACON:', '');
-              _estimatedDistance = 14.0;
+              _estimatedDistance = initialDist;
             });
             _startProximityBeeping();
           }
@@ -173,7 +203,28 @@ class _AvalancheModuleScreenState extends State<AvalancheModuleScreen> with Sing
       debugPrint("BLE Disc Error: $e");
     }
 
-    // Simüle edilmiş yaklaşma & dedektör ötüşü başlat
+    // Canli GPS konum akisi ile yaklasma/uzaklasma mesafesini otomatik guncelle
+    _receiverPosSub?.cancel();
+    _receiverPosSub = Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.bestForNavigation,
+        distanceFilter: 1,
+      ),
+    ).listen((pos) {
+      if (!mounted || !_isActive || _currentMode != AvalancheMode.receiver) return;
+      _currentPos = pos;
+      if (_beaconLat != null && _beaconLng != null) {
+        final dist = Geolocator.distanceBetween(
+          pos.latitude,
+          pos.longitude,
+          _beaconLat!,
+          _beaconLng!,
+        ).clamp(0.5, 100.0);
+        setState(() => _estimatedDistance = dist);
+      }
+    }, onError: (_) {});
+
+    // Dedektör ötüşü başlat
     _startProximityBeeping();
   }
 
@@ -181,31 +232,41 @@ class _AvalancheModuleScreenState extends State<AvalancheModuleScreen> with Sing
   void _startProximityBeeping() {
     _receiverBeepLoopTimer?.cancel();
 
-    _receiverBeepLoopTimer = Timer.periodic(const Duration(milliseconds: 300), (timer) {
+    _receiverBeepLoopTimer = Timer.periodic(const Duration(milliseconds: 200), (timer) {
       if (!_isActive || _currentMode != AvalancheMode.receiver) {
         timer.cancel();
         return;
       }
 
-      // Yaklaştıkça bip sıklığı artar: 15m -> 800ms, 5m -> 400ms, 1m -> 150ms
-      final int intervalMs = math.max(120, (_estimatedDistance * 45).round());
+      // Uzakken seyrek (~1400ms), yaklastikca hizlanan (~140ms) dinamik bip sikligi
+      final int intervalMs = (_estimatedDistance * 45).round().clamp(140, 1400);
       if (_beepIntervalMs != intervalMs) {
         _beepIntervalMs = intervalMs;
       }
     });
 
     // Akustik dedektör ötüş döngüsü
-    _runDynamicBeepLoop();
+    if (!_beepLoopRunning) {
+      _runDynamicBeepLoop();
+    }
   }
 
   void _runDynamicBeepLoop() async {
-    while (_isActive && _currentMode == AvalancheMode.receiver) {
-      try {
-        _playAudibleTone();
-        Vibration.vibrate(duration: 60);
-      } catch (_) {}
+    _beepLoopRunning = true;
+    try {
+      while (_isActive && _currentMode == AvalancheMode.receiver) {
+        try {
+          if (_isAudibleSoundActive) {
+            _playAudibleTone();
+          }
+          Vibration.vibrate(duration: 60);
+        } catch (_) {}
 
-      await Future.delayed(Duration(milliseconds: _beepIntervalMs));
+        final waitMs = (_estimatedDistance * 45).round().clamp(140, 1400);
+        await Future.delayed(Duration(milliseconds: waitMs));
+      }
+    } finally {
+      _beepLoopRunning = false;
     }
   }
 
@@ -213,11 +274,17 @@ class _AvalancheModuleScreenState extends State<AvalancheModuleScreen> with Sing
     _transceiverAudioTimer?.cancel();
     _transceiverVibeTimer?.cancel();
     _receiverBeepLoopTimer?.cancel();
+    _receiverPosSub?.cancel();
+    _receiverPosSub = null;
     try {
       Nearby().stopAdvertising();
       Nearby().stopDiscovery();
     } catch (_) {}
-    setState(() => _isActive = false);
+    if (mounted) {
+      setState(() => _isActive = false);
+    } else {
+      _isActive = false;
+    }
   }
 
   @override

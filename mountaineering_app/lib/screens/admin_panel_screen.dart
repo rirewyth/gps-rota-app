@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
 import 'profile_screen.dart';
 import '../services/routing_service.dart';
 import '../services/tactical_styles.dart';
@@ -29,6 +30,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
   final TextEditingController _duyuruIcerikCtrl = TextEditingController();
   String _duyuruSeviye = 'normal'; // normal | warning | critical
   bool _duyuruGonderiyor = false;
+  String? _duyuruImageBase64;
 
   // Fire marker
   final TextEditingController _fireNameCtrl = TextEditingController();
@@ -56,7 +58,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 8, vsync: this);
+    _tabController = TabController(length: 9, vsync: this);
     _loadAll();
   }
 
@@ -216,6 +218,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                       Tab(icon: Icon(Icons.campaign, size: 18), text: 'DUYURULAR'),
                       Tab(icon: Icon(Icons.report, size: 18), text: 'ŞİKAYETLER'),
                       Tab(icon: Icon(Icons.local_fire_department, size: 18), text: 'YANGINLAR'),
+                      Tab(icon: Icon(Icons.warning_amber_rounded, size: 18), text: 'İHBARLAR'),
                     ],
                   ),
                 ),
@@ -232,6 +235,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                       _buildAnnouncementsTab(),
                       _buildReportsTab(),
                       _buildFiresTab(),
+                      _buildDisasterIncidentsTab(),
                     ],
                   ),
                 ),
@@ -559,7 +563,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                   ),
                   children: [
                     TileLayer(
-                      urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      urlTemplate: 'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
                       subdomains: const ['a', 'b', 'c'],
                       userAgentPackageName: 'com.rota_plus.mountaineering.app',
                     ),
@@ -832,6 +836,50 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                   ),
                 ),
                 const SizedBox(height: 10),
+                // Fotoğraf Ekleme (Opsiyonel)
+                Row(
+                  children: [
+                    OutlinedButton.icon(
+                      onPressed: () async {
+                        final picked = await ImagePicker().pickImage(
+                          source: ImageSource.gallery,
+                          maxWidth: 1024,
+                          imageQuality: 70,
+                        );
+                        if (picked == null) return;
+                        final bytes = await picked.readAsBytes();
+                        setS(() => _duyuruImageBase64 = base64Encode(bytes));
+                      },
+                      icon: const Icon(Icons.add_photo_alternate_outlined, color: kOrange, size: 18),
+                      label: Text(
+                        _duyuruImageBase64 == null ? 'Fotoğraf Ekle' : 'Fotoğrafı Değiştir',
+                        style: const TextStyle(color: kOrange, fontSize: 12, fontWeight: FontWeight.bold),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: kOrange.withOpacity(0.5)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                    ),
+                    if (_duyuruImageBase64 != null) ...[
+                      const SizedBox(width: 10),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(6),
+                        child: Image.memory(
+                          base64Decode(_duyuruImageBase64!),
+                          width: 42,
+                          height: 42,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Colors.redAccent, size: 18),
+                        tooltip: 'Fotoğrafı Kaldır',
+                        onPressed: () => setS(() => _duyuruImageBase64 = null),
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 10),
                 // Seviye Seçimi
                 Row(
                   children: [
@@ -979,6 +1027,19 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                                       style: const TextStyle(
                                           color: Colors.white70, fontSize: 12)),
                                 ),
+                              if ((d['imageBase64'] ?? '').toString().isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.memory(
+                                      base64Decode(d['imageBase64']),
+                                      height: 110,
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
                               if (ts != null)
                                 Padding(
                                   padding: const EdgeInsets.only(top: 4),
@@ -1026,10 +1087,12 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
         'title': baslik,
         'body': icerik,
         'level': _duyuruSeviye,
+        'imageBase64': _duyuruImageBase64 ?? '',
         'timestamp': FieldValue.serverTimestamp(),
       });
       _duyuruBaslikCtrl.clear();
       _duyuruIcerikCtrl.clear();
+      setS(() => _duyuruImageBase64 = null);
       _showSnack('✓ Duyuru yayınlandı!');
     } catch (e) {
       _showSnack('Hata: $e', error: true);
@@ -1572,6 +1635,152 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Hata: $e'), backgroundColor: Colors.red));
     }
   }
+
+  // ── İHBARLAR SEKME (DEPREM / SEL / YANGIN) ─────────────────────────────────
+  Widget _buildDisasterIncidentsTab() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('disaster_reports')
+          .snapshots(),
+      builder: (context, snap) {
+        if (snap.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator(color: kOrange));
+        }
+        final docs = (snap.data?.docs ?? []).toList()
+          ..sort((a, b) {
+            final ta = (a.data() as Map<String, dynamic>)['timestamp'] as Timestamp?;
+            final tb = (b.data() as Map<String, dynamic>)['timestamp'] as Timestamp?;
+            return (tb?.millisecondsSinceEpoch ?? 0).compareTo(ta?.millisecondsSinceEpoch ?? 0);
+          });
+
+        if (docs.isEmpty) {
+          return const Center(
+            child: Text('Henüz afet/olay ihbarı yok.', style: TextStyle(color: Colors.white54)),
+          );
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.all(12),
+          itemCount: docs.length,
+          itemBuilder: (ctx, i) {
+            final doc = docs[i];
+            final d = doc.data() as Map<String, dynamic>;
+            final type = (d['disasterType'] ?? 'İhbar').toString();
+            final name = (d['reporterName'] ?? 'Operatör').toString();
+            final phone = (d['reporterPhone'] ?? '-').toString();
+            final reporterIp = (d['reporterIp'] ?? '').toString();
+            final summary = (d['summary'] ?? '').toString();
+            final dtStr = (d['dateTimeStr'] ?? '').toString();
+            final fullAddress = (d['fullAddress'] ?? '').toString();
+            final lat = (d['lat'] as num?)?.toDouble();
+            final lng = (d['lng'] as num?)?.toDouble();
+            final imgB64 = (d['imageBase64'] ?? '').toString();
+            final status = (d['status'] ?? 'YENİ').toString();
+
+            final Color badgeColor = status == 'ÇÖZÜLDÜ'
+                ? kGreen
+                : (status == 'SEVK EDİLDİ' ? Colors.cyanAccent : kOrange);
+
+            return Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(14),
+              decoration: TacticalStyles.glassCardDecoration(
+                radius: 14,
+                borderColor: badgeColor.withValues(alpha: 0.4),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: Colors.redAccent.withValues(alpha: 0.18),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: Colors.redAccent.withValues(alpha: 0.5)),
+                        ),
+                        child: Text(
+                          type.toUpperCase(),
+                          style: const TextStyle(color: Colors.redAccent, fontSize: 10.5, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: badgeColor.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          status,
+                          style: TextStyle(color: badgeColor, fontSize: 10, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      const Spacer(),
+                      if (dtStr.isNotEmpty)
+                        Text(dtStr, style: const TextStyle(color: Colors.white54, fontSize: 11)),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text('👤 $name   •   📞 $phone', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13)),
+                  if (reporterIp.isNotEmpty) ...[
+                    const SizedBox(height: 3),
+                    Text('🌐 IP: $reporterIp', style: const TextStyle(color: Colors.white54, fontSize: 11)),
+                  ],
+                  if (fullAddress.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text('🏠 $fullAddress', style: const TextStyle(color: Colors.amberAccent, fontSize: 12)),
+                  ],
+                  if (lat != null && lng != null) ...[
+                    const SizedBox(height: 4),
+                    Text('📍 ${lat.toStringAsFixed(5)}, ${lng.toStringAsFixed(5)}', style: const TextStyle(color: Colors.cyanAccent, fontSize: 11.5)),
+                  ],
+                  const SizedBox(height: 8),
+                  Text(summary, style: const TextStyle(color: Colors.white70, fontSize: 13, height: 1.4)),
+                  if (imgB64.isNotEmpty) ...[
+                    const SizedBox(height: 10),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.memory(
+                        base64Decode(imgB64),
+                        width: double.infinity,
+                        height: 170,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      for (final st in ['İNCELENİYOR', 'SEVK EDİLDİ', 'ÇÖZÜLDÜ'])
+                        Padding(
+                          padding: const EdgeInsets.only(right: 6),
+                          child: OutlinedButton(
+                            onPressed: () => doc.reference.update({'status': st}),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              minimumSize: Size.zero,
+                              side: const BorderSide(color: Colors.white24),
+                            ),
+                            child: Text(st, style: const TextStyle(color: Colors.white70, fontSize: 10)),
+                          ),
+                        ),
+                      const Spacer(),
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 18),
+                        onPressed: () => doc.reference.delete(),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 }
 
 class _AdminMapPickerScreen extends StatefulWidget {
@@ -1612,7 +1821,7 @@ class _AdminMapPickerScreenState extends State<_AdminMapPickerScreen> {
         ),
         children: [
           TileLayer(
-            urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            urlTemplate: 'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
             subdomains: const ['a', 'b', 'c'],
             userAgentPackageName: 'RotaPlus_Tactical_v1.0',
           ),

@@ -1,0 +1,84 @@
+{
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "totalFrames": 1805,
+  "totalDurationSec": 60.166666666666664,
+  "scenes": [
+    {
+      "id": "u_hook",
+      "dur_sec": 7.945104,
+      "title": "ŞEBEKE TAMAMEN ÇÖKTÜĞÜNDE!",
+      "sub": "Peki şimdi ne yapacaksın?",
+      "tag": "KRİZ SENARYOSU",
+      "startFrame": 0,
+      "endFrame": 238,
+      "durationFrames": 238
+    },
+    {
+      "id": "u_mesh",
+      "dur_sec": 7.571604000000001,
+      "title": "DOĞA MESH AĞI & P2P",
+      "sub": "Sıfır baz istasyonu. Telefonlar arası doğrudan telsiz ve konum bağı.",
+      "tag": "ÇEVRİMDIŞI İLETİŞİM",
+      "screen": "s10_mesh.jpg",
+      "startFrame": 238,
+      "endFrame": 465,
+      "durationFrames": 227
+    },
+    {
+      "id": "u_deprem",
+      "dur_sec": 11.176,
+      "title": "DEPREM & ENKAZ ALTI",
+      "sub": "Sesin kısılsa bile BLE radarı ve akustik arama yerini ekiplere bildirir.",
+      "tag": "AFET PROTOKOLÜ",
+      "screen": "s04_deprem.jpg",
+      "startFrame": 465,
+      "endFrame": 800,
+      "durationFrames": 335
+    },
+    {
+      "id": "u_gps",
+      "dur_sec": 7.873521,
+      "title": "DOĞRUDAN UYDU GPS",
+      "sub": "İnternetsiz izohipsli sahra haritasında adım adım rota ve irtifa takibi.",
+      "tag": "SEYRÜSEFER",
+      "screen": "s03_rota.jpg",
+      "startFrame": 800,
+      "endFrame": 1036,
+      "durationFrames": 236
+    },
+    {
+      "id": "u_autosos",
+      "dur_sec": 9.563021,
+      "title": "AUTO-SOS & HAREKETSİZLİK",
+      "sub": "Düşme veya bayılma anında 20 saniye içinde otomatik siren ve acil SMS.",
+      "tag": "DEADMAN SWITCH",
+      "screen": "s02_takip.jpg",
+      "startFrame": 1036,
+      "endFrame": 1323,
+      "durationFrames": 287
+    },
+    {
+      "id": "u_ilkyardim",
+      "dur_sec": 8.522542,
+      "title": "ÇEVRİMDIŞI İLK YARDIM",
+      "sub": "Turnike, kanama ve dağcılık düğümleri internetsiz elinin altında.",
+      "tag": "ACİL MÜDAHALE",
+      "screen": "s05_ilkyardim.jpg",
+      "startFrame": 1323,
+      "endFrame": 1579,
+      "durationFrames": 256
+    },
+    {
+      "id": "u_outro",
+      "dur_sec": 7.540354,
+      "title": "ROTA+",
+      "sub": "Acil durum kapını çalmadan önce telefonunda mutlaka olmalı.",
+      "tag": "HEMEN İNDİR",
+      "startFrame": 1579,
+      "endFrame": 1805,
+      "durationFrames": 226
+    }
+  ]
+}

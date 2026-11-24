@@ -1,13 +1,13 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Rota+ | Trekking & Doğa Navigasyon Platformu</title>
-<meta name="description" content="Rota+ — Türkiye'nin en gelişmiş trekking ve dağcılık uygulaması. Canlı ekip takibi, offline harita, rota planlama ve konum paylaşımı.">
+<meta name="description" content="Rota+ — Trekking ve dağcılık için rota kaydı, ekip takibi, çevrimdışı protokoller ve SOS desteği.">
 <meta name="keywords" content="trekking uygulaması, dağcılık, canlı konum takip, rota planlama, offline harita, ekip takibi, GPS, doğa sporları">
 <meta name="robots" content="index, follow">
-<meta name="theme-color" content="#FF4B1F">
+<meta name="theme-color" content="#080B0D">
 <meta property="og:title" content="Rota+ | Trekking & Doğa Navigasyon Platformu">
 <meta property="og:description" content="Canlı ekip haritası, offline rota indirme ve takip etme, konum paylaşımı ve tüm dağcılık araçları tek platformda.">
 <meta property="og:type" content="website">
@@ -18,7 +18,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Rota+ | Trekking & Doğa Navigasyon Platformu">
 <meta name="twitter:description" content="Canlı ekip haritası, offline rota rehberi, konum paylaşımı. Google Play'de indir.">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"MobileApplication","name":"Rota+","operatingSystem":"Android","applicationCategory":"SportsApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"TRY"},"description":"Trekking ve doğa sporları için navigasyon platformu. Canlı ekip takibi, rota planlama ve offline harita.","inLanguage":"tr"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"MobileApplication","name":"Rota+","operatingSystem":"Android, iOS","applicationCategory":"SportsApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"TRY"},"description":"Trekking ve doğa sporları için rota kaydı, ekip takibi, çevrimdışı protokoller ve SOS desteği.","inLanguage":"tr"}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
@@ -886,20 +886,22 @@ footer p{font-size:.8rem;color:var(--text3);margin-left:auto}
   footer p{margin-left:0;flex-basis:100%}
 }
 </style>
+<link rel="stylesheet" href="site-experience.css">
 </head>
 <body>
 
 <nav id="nav">
   <div class="nav-wrap">
     <div class="logo">ROTA<span>+</span></div>
-    <div class="nav-links">
-      <a href="#systems">Sistemler</a>
+    <div class="nav-links" id="primaryNav">
+      <a href="#showcase">Özellikler</a>
       <a href="#sos">SOS Sistemi</a>
       <a href="#protocols">Protokoller</a>
-      <a href="privacy.html" target="_blank">Gizlilik</a>
+      <a href="https://acildurumapp.com/privacy.html" target="_blank" rel="noopener noreferrer">Gizlilik</a>
       <a href="support.html">Bize Ulaşın</a>
-      <a href="komuta-merkezi.html" style="color: var(--cyan); font-weight: 600;">Komuta Merkezi</a>
+      <a href="#how">Nasıl Çalışır?</a>
     </div>
+    <button class="nav-toggle" type="button" aria-label="Menüyü aç" aria-expanded="false" aria-controls="primaryNav">☰</button>
     <a href="#download" class="nav-btn">İndir</a>
   </div>
 </nav>
@@ -908,6 +910,7 @@ footer p{font-size:.8rem;color:var(--text3);margin-left:auto}
 <section id="hero">
   <canvas id="c"></canvas>
   <div class="hero-center">
+    <div class="hero-copy">
     <div class="tag"><span class="blink"></span>TREKKİNG &amp; DAĞCILIK/DOĞA NAVİGASYON PLATFORMU</div>
     <h1>Kritik anlarda<br>izinizi kaybetmekten korkmayın —<br><span class="o">biz yanınızdayız.</span></h1>
     <p>SOS sistemi, gerçek zamanlı ekip takibi, çevrimdışı hayatta kalma protokolleri ve akıllı rota planlaması — tek platformda. İnternet olmadan çalışır.</p>
@@ -918,6 +921,23 @@ footer p{font-size:.8rem;color:var(--text3);margin-left:auto}
       </a>
       <a href="#how" class="btn-o">Nasıl Çalışır?</a>
     </div>
+    </div>
+    <div class="hero-visual" id="heroVisual" aria-label="Etkileşimli topoğrafik rota önizlemesi">
+      <div class="terrain-shell">
+        <svg class="terrain-svg" viewBox="0 0 680 480" role="img" aria-label="Dağ silueti ve örnek rota çizgisi">
+          <defs><linearGradient id="ridgeFill" x1=".2" x2=".8" y1="0" y2="1"><stop stop-color="#8cc8b5" stop-opacity=".32"/><stop offset="1" stop-color="#0a1517" stop-opacity=".04"/></linearGradient></defs>
+          <path class="ridge" d="M4 327 88 246l54 32 82-116 50 66 77-130 49 92 64-70 51 80 71-42 92 94v149H4z"/>
+          <path class="contour" d="M10 320c85-97 160-91 234-37s134 55 207 8 130-48 225 10M10 342c85-97 160-91 234-37s134 55 207 8 130-48 225 10M15 365c85-97 160-91 234-37s134 55 207 8 130-48 220 10M27 389c85-97 160-91 234-37s134 55 207 8 130-48 210 10M65 286c48-49 94-53 143-28m123-42c62-47 105-47 150-15m29 46c38-25 75-31 123-9"/>
+          <path class="trail-shadow" d="M76 382c68-31 88-116 177-100s95 67 162 27 74-103 172-105"/>
+          <path class="trail" pathLength="1" d="M76 382c68-31 88-116 177-100s95 67 162 27 74-103 172-105"/>
+          <path d="M471 128v-25l19 12z" fill="#ff5500"/><path d="M471 103v52" stroke="#ffbe9e" stroke-width="2"/>
+        </svg>
+        <button class="route-pin p1" type="button" data-title="Başlangıç" data-copy="Bu, rotanın temsili başlangıç noktasıdır." aria-label="Başlangıç rota noktasını göster"></button><button class="route-pin p2" type="button" data-title="Rota izi" data-copy="Turuncu çizgi, kaydedilmiş rota izini temsil eder." aria-label="Rota izini göster"></button><button class="route-pin p3" type="button" data-title="Zirve" data-copy="Bu 3D görünüm bir örnek sahnedir; canlı konum göstermez." aria-label="Zirve rota noktasını göster"></button>
+        <div class="terrain-label one">ROTA ÖNİZLEMESİ</div><div class="terrain-label two">GPS · DEMO</div><div class="terrain-label three">YÜKSEKLİK EĞRİSİ</div>
+      </div>
+      <div class="hero-hud"><div class="hud-head"><span>ROTA+ FIELD VIEW</span><span class="hud-demo">DEMO ARAYÜZÜ</span></div><div class="hud-line"><span>Durum</span><strong class="cyan">Örnek görünüm</strong></div><div class="hud-line"><span>Konum</span><strong>Canlı konum değil</strong></div><div class="hud-line"><span>İz</span><strong>Topoğrafik rota</strong></div></div>
+      <div class="hero-visual-caption">Sahneyi keşfetmek için imleci hareket ettirin</div>
+    </div>
   </div>
   <div class="scroll-hint">
     <span>AŞAĞI KAYDIRIN</span>
@@ -925,46 +945,31 @@ footer p{font-size:.8rem;color:var(--text3);margin-left:auto}
   </div>
   <div class="strip">
     <div class="strip-inner">
-      <span>SOS AKTİF</span>
+      <span>TEK TUŞ SOS</span>
       <span>CANLI TAKİP</span>
-      <span>GPS UYDU BAĞLANTI</span>
+      <span>ROTA KAYDI</span>
       <span>ENKAZ PROTOKOLÜ</span>
       <span>SESLİ SOS</span>
       <span>OFFLİNE REHBER</span>
-      <span>EKİP RADAR</span>
-      <span>SOS AKTİF</span>
+      <span>360° RADAR</span>
+      <span>TEK TUŞ SOS</span>
       <span>CANLI TAKİP</span>
-      <span>GPS UYDU BAĞLANTI</span>
+      <span>ROTA KAYDI</span>
       <span>ENKAZ PROTOKOLÜ</span>
       <span>SESLİ SOS</span>
       <span>OFFLİNE REHBER</span>
-      <span>EKİP RADAR</span>
+      <span>360° RADAR</span>
     </div>
   </div>
 </section>
 
-<!-- STATS -->
-<section id="stats">
+<!-- Verified product facts; remove unverified acquisition and SOS-success metrics. -->
+<section id="stats" aria-label="Uygulama kapsamı">
   <div class="sw stats-wrap">
-    <div class="stat-item" data-target="10000" data-suffix="+">
-      <div class="stat-num" id="s1">0</div>
-      <div class="stat-label">İndirme</div>
-    </div>
-    <div class="stat-sep"></div>
-    <div class="stat-item" data-target="99" data-suffix="%">
-      <div class="stat-num" id="s2">0</div>
-      <div class="stat-label">SOS Başarı Oranı</div>
-    </div>
-    <div class="stat-sep"></div>
-    <div class="stat-item" data-target="26" data-suffix="+">
-      <div class="stat-num" id="s3">0</div>
-      <div class="stat-label">Aktif Sistem &amp; Modül</div>
-    </div>
-    <div class="stat-sep"></div>
-    <div class="stat-item" data-target="7" data-suffix="/24">
-      <div class="stat-num" id="s4">0</div>
-      <div class="stat-label">SOS Hazır</div>
-    </div>
+    <div class="stat-item"><div class="stat-num">12</div><div class="stat-label">Uygulama özelliği</div></div><div class="stat-sep"></div>
+    <div class="stat-item"><div class="stat-num">4</div><div class="stat-label">Çevrimdışı protokol</div></div><div class="stat-sep"></div>
+    <div class="stat-item"><div class="stat-num">GPS</div><div class="stat-label">Rota ve ekip görünümü</div></div><div class="stat-sep"></div>
+    <div class="stat-item"><div class="stat-num">SMS</div><div class="stat-label">SOS konum bildirimi</div></div>
   </div>
 </section>
 
@@ -1102,187 +1107,7 @@ footer p{font-size:.8rem;color:var(--text3);margin-left:auto}
   </div>
 </section>
 
-<!-- SYSTEMS COMMAND GRID -->
-<section id="systems">
-  <div class="sw">
-    <div class="sec-tag">MODÜLER MİMARİ // TÜM SİSTEMLER</div>
-    <h2>ROTA+ Ekosistemi —<br><span class="o">26+ Aktif Saha &amp; Afet Modülü</span></h2>
-    <p class="sec-desc">Temel hayatta kalma, afet ve navigasyon sistemleri herkese ücretsizdir. İleri seviye ekspedisyon, AI ve meteoroloji araçları ROTA+ Premium ile açılır.</p>
 
-    <div class="sys-tabs">
-      <button class="sys-tab active" data-sys="acil">🆘 Acil Durum &amp; Afet (7)</button>
-      <button class="sys-tab" data-sys="nav">🧭 Navigasyon, Harita &amp; AR (7)</button>
-      <button class="sys-tab" data-sys="ekip">📡 Ekip, Telsiz &amp; Sosyal (5)</button>
-      <button class="sys-tab" data-sys="pro">⚡ PRO Ekspedisyon &amp; Analiz (7)</button>
-    </div>
-
-    <!-- 1. ACİL DURUM & AFET -->
-    <div id="sys-acil" class="sys-panel active">
-      <div class="sys-card">
-        <div class="sys-card-top"><span class="sys-ico">🆘</span><span class="sys-badge sos">ACİL / ÜCRETSİZ</span></div>
-        <h3>Otomatik Koordinatlı SOS &amp; SMS</h3>
-        <p>Android'de kullanıcı onayı beklemeden arka planda direkt SMS, iOS'te yerel mesaj ekranıyla acil kişilere GPS koordinatı, rakım ve pil bilgisi yollar.</p>
-      </div>
-      <div class="sys-card">
-        <div class="sys-card-top"><span class="sys-ico">🌋</span><span class="sys-badge sos">AFET / ÜCRETSİZ</span></div>
-        <h3>Canlı Deprem Akışı &amp; Uyarı</h3>
-        <p>Kandilli Rasathanesi verisiyle son depremleri canlı takip eder; bulunduğun konuma mesafe ve dalga varış hesabıyla anlık bildirim verir.</p>
-      </div>
-      <div class="sys-card">
-        <div class="sys-card-top"><span class="sys-ico">❄️</span><span class="sys-badge sos">AFET / ÜCRETSİZ</span></div>
-        <h3>Çığ Güvenliği &amp; ARVA Modülü</h3>
-        <p>Eğim açısı, kar tabakası ve hava koşullarına göre çığ risk değerlendirmesi sunar; gömülme durumunda ARVA arama rehberi sağlar.</p>
-      </div>
-      <div class="sys-card">
-        <div class="sys-card-top"><span class="sys-ico">🚨</span><span class="sys-badge sos">ACİL / ÜCRETSİZ</span></div>
-        <h3>Düşme &amp; Darbe Algılayıcı</h3>
-        <p>İvmeölçer sensörüyle sert düşmeyi (G-force) algılar; 20 sn içinde iptal edilmezse siren ve koordinatlı SOS başlatır.</p>
-      </div>
-      <div class="sys-card">
-        <div class="sys-card-top"><span class="sys-ico">🎙️</span><span class="sys-badge sos">SESLİ / ÜCRETSİZ</span></div>
-        <h3>Sesli SOS &amp; Komut Asistanı</h3>
-        <p>"Yardım" veya "Help" anahtar kelimelerini algılayarak SOS tetikler; eldivenle ekrana dokunamadığında sesle rakım/pil okur, feneri yakar.</p>
-      </div>
-      <div class="sys-card">
-        <div class="sys-card-top"><span class="sys-ico">📶</span><span class="sys-badge sos">OFFLINE / ÜCRETSİZ</span></div>
-        <h3>Offline Mesh Ağ &amp; İlk Yardım</h3>
-        <p>Şebeke olmadan yakındaki cihazlarla Mesh iletişim kurar; hipotermi, kırık ve kanama müdahaleleri için çevrimdışı ilk yardım rehberi sunar.</p>
-      </div>
-      <div class="sys-card">
-        <div class="sys-card-top"><span class="sys-ico">🪪</span><span class="sys-badge sos">KİMLİK / ÜCRETSİZ</span></div>
-        <h3>Acil Durum QR Kimlik Kartı</h3>
-        <p>Kan grubu, kronik hastalık, alerjiler ve acil durum kişilerini internetsiz okunabilen yüksek kontrastlı QR kimlik kartında saklar.</p>
-      </div>
-    </div>
-
-    <!-- 2. NAVİGASYON, HARİTA & AR -->
-    <div id="sys-nav" class="sys-panel">
-      <div class="sys-card">
-        <div class="sys-card-top"><span class="sys-ico">🗺️</span><span class="sys-badge nav">HARİTA</span></div>
-        <h3>3D Arazi &amp; Taktiksel Katmanlar</h3>
-        <p>Mapbox 3D arazi kabartması, uydu, topoğrafik ve taktiksel gece harita stilleriyle arazi yapısını ve sırt hatlarını gerçekçi görselleştirir.</p>
-      </div>
-      <div class="sys-card">
-        <div class="sys-card-top"><span class="sys-ico">📥</span><span class="sys-badge nav">OFFLINE</span></div>
-        <h3>Çevrimdışı Harita İndirme</h3>
-        <p>Tırmanış veya keşif öncesi seçilen dağ ve vadi bölgelerinin harita karolarını cihaza indirerek şebeke olmadan da detaylı harita kullanımı sağlar.</p>
-      </div>
-      <div class="sys-card">
-        <div class="sys-card-top"><span class="sys-ico">📡</span><span class="sys-badge">ÜCRETSİZ</span></div>
-        <h3>İz Takip &amp; Geri Dönüş Radarı</h3>
-        <p>Harita veya internet kopsa bile pusula ve GPS iz noktalarıyla geldiğin yolu radar üzerinde gösterir, sesli dönüş yönlendirmesi yapar.</p>
-      </div>
-      <div class="sys-card">
-        <div class="sys-card-top"><span class="sys-ico">🎥</span><span class="sys-badge nav">3D / MP4 / GPX</span></div>
-        <h3>3D Flyover MP4 &amp; Rota Planlayıcı</h3>
-        <p>Türkiye dağ veritabanıyla rota planlar, Naismith tırmanış süresini hesaplar, yürüyüşü 1x–10x hızda MP4 videoya ve GPX dosyasına dönüştürür.</p>
-      </div>
-      <div class="sys-card">
-        <div class="sys-card-top"><span class="sys-ico">🏔️</span><span class="sys-badge">ÜCRETSİZ</span></div>
-        <h3>Peak AR Zirve Tanıma &amp; Pusula</h3>
-        <p>Kamerayı ufka doğrulttuğunda çevredeki zirvelerin adını, rakımını, mesafesini ve kerteriz açısını canlı artırılmış gerçeklikle ekrana yansıtır.</p>
-      </div>
-      <div class="sys-card">
-        <div class="sys-card-top"><span class="sys-ico">💧</span><span class="sys-badge">ÜCRETSİZ</span></div>
-        <h3>Su, Sığınak &amp; İniş Noktaları</h3>
-        <p>Overpass verileriyle çevredeki çeşme, pınar, dağ evi, sığınak ve helikopter iniş noktalarını çekip çevrimdışı önbellekte saklar.</p>
-      </div>
-      <div class="sys-card">
-        <div class="sys-card-top"><span class="sys-ico">🧭</span><span class="sys-badge nav">VERİTABANI</span></div>
-        <h3>Türkiye Dağları &amp; POI Rehberi</h3>
-        <p>Kaçkar, Erciyes, Ağrı, Aladağlar ve onlarca rotanın zirve, kamp ve kritik geçiş noktalarını yerleşik veritabanında sunar.</p>
-      </div>
-    </div>
-
-    <!-- 3. EKİP, TELSİZ & SOSYAL -->
-    <div id="sys-ekip" class="sys-panel">
-      <div class="sys-card">
-        <div class="sys-card-top"><span class="sys-ico">👥</span><span class="sys-badge">ÜCRETSİZ</span></div>
-        <h3>Canlı Ekip Haritası &amp; Radarı</h3>
-        <p>Grup tırmanışlarında ekip arkadaşlarının anlık konumunu, aradaki mesafeyi ve yön kerterizini canlı radar ve harita üzerinde takip eder.</p>
-      </div>
-      <div class="sys-card">
-        <div class="sys-card-top"><span class="sys-ico">⛺</span><span class="sys-badge">ÜCRETSİZ</span></div>
-        <h3>Kamp Pinleri &amp; Bulut Senkron</h3>
-        <p>Ana kamp, su ikmali, tehlike veya toplanma noktalarını haritaya pinleyip ekibin tüm cihazlarıyla anlık senkronize eder.</p>
-      </div>
-      <div class="sys-card">
-        <div class="sys-card-top"><span class="sys-ico">📻</span><span class="sys-badge">ÜCRETSİZ</span></div>
-        <h3>Ekip Telsizi &amp; Özel Mesajlaşma</h3>
-        <p>Ekip içi grup kanalları, anlık bildirimler ve birebir doğrudan mesajlaşma (DM) ile saha koordinasyonunu kesintisiz sürdürür.</p>
-      </div>
-      <div class="sys-card">
-        <div class="sys-card-top"><span class="sys-ico">📸</span><span class="sys-badge">TOPLULUK</span></div>
-        <h3>Dağcı Sosyal Akışı &amp; Takip Ağı</h3>
-        <p>Tırmanış fotoğraflarını ve rota özetlerini topluluk akışında paylaş, diğer dağcıları takip et ve saha deneyimlerini keşfet.</p>
-      </div>
-      <div class="sys-card">
-        <div class="sys-card-top"><span class="sys-ico">☑️</span><span class="sys-badge">PROFİL</span></div>
-        <h3>İstatistikler &amp; Onaylı Mavi Tik</h3>
-        <p>Toplam mesafe, kazanılan irtifa, tamamlanan rotalar ve doğrulanmış dağcı rozetini (Onaylı Mavi Tik) profilinde sergiler.</p>
-      </div>
-    </div>
-
-    <!-- 4. PRO EKSPEDİSYON & ANALİZ -->
-    <div id="sys-pro" class="sys-panel">
-      <div class="sys-card">
-        <div class="sys-card-top"><span class="sys-ico">🤖</span><span class="sys-badge pro">PREMIUM PRO</span></div>
-        <h3>AI Rota Danışmanı</h3>
-        <p>Anlık konumunu, hızını, rotadan sapma mesafeni ve yakındaki dağ noktalarını analiz ederek canlı yapay zeka saha notları ve uyarılar üretir.</p>
-      </div>
-      <div class="sys-card">
-        <div class="sys-card-top"><span class="sys-ico">🛡️</span><span class="sys-badge pro">PREMIUM PRO</span></div>
-        <h3>Otomatik Hareketsizlik SOS</h3>
-        <p>Dead Man's Switch: Seçtiğin süre (10/15/30 dk) boyunca hareket algılanmazsa 30 sn onay sonrası otomatik SOS tetikler.</p>
-      </div>
-      <div class="sys-card">
-        <div class="sys-card-top"><span class="sys-ico">🌙</span><span class="sys-badge pro">PREMIUM PRO</span></div>
-        <h3>Night Ops &amp; Hayalet Modu</h3>
-        <p>Gece tırmanışlarında göz uyumunu koruyan kırmızı taktiksel arayüz (Night Ops) ve görünmez takip için Hayalet Modu sunar.</p>
-      </div>
-      <div class="sys-card">
-        <div class="sys-card-top"><span class="sys-ico">🎒</span><span class="sys-badge pro">PREMIUM PRO</span></div>
-        <h3>Ekipman &amp; Kalori Planlayıcı</h3>
-        <p>Ekspedisyon süresi ve irtifaya göre teknik çanta listesi, toplam yük (kg), günlük su (L) ve kalori (kcal) hesabı yapar.</p>
-      </div>
-      <div class="sys-card">
-        <div class="sys-card-top"><span class="sys-ico">🏅</span><span class="sys-badge pro">PREMIUM PRO</span></div>
-        <h3>Zirve Pasaportu &amp; Sertifika</h3>
-        <p>GPS koordinatlı zirve kayıtları tutar, alpinist rütbeleri verir ve paylaşılabilir PNG Zirve Sertifikası üretir.</p>
-      </div>
-      <div class="sys-card">
-        <div class="sys-card-top"><span class="sys-ico">🌪️</span><span class="sys-badge pro">PREMIUM PRO</span></div>
-        <h3>Barometre, Fırtına &amp; Hava Radarı</h3>
-        <p>24 saatlik yüzey basıncı (hPa) eğrisi, 3 saatlik ani basınç düşüşü fırtına alarmı, oksijen oranı ve detaylı hava durumu sunar.</p>
-      </div>
-      <div class="sys-card">
-        <div class="sys-card-top"><span class="sys-ico">🔦</span><span class="sys-badge pro">PREMIUM PRO</span></div>
-        <h3>Güneş/Ay, Hipotermi &amp; Mors Feneri</h3>
-        <p>Offline gün ışığı sayacı, altın saat kamp limiti, Wind Chill donma süresi hesabı ve telefon flaşıyla özel Mors kodu yayını yapar.</p>
-      </div>
-    </div>
-
-    <div class="flyover-bar">
-      <div>
-        <div class="sec-tag" style="margin-bottom:10px">3D ROTA OYNATICI // MP4 &amp; GPX</div>
-        <h3>Yürüdüğün Rotayı <span class="o">MP4 Video</span> Olarak Paylaş</h3>
-        <p>ROTA+ Flyover oynatıcı ile parkurunu uydu haritası üzerinde 1x–10x hızda oynat, cihaz üzerinde doğrudan MP4 videoya dönüştür veya Garmin/Strava uyumlu GPX olarak dışa aktar.</p>
-        <div class="flyover-chips">
-          <span class="flyover-chip">MP4 Video Çıktısı</span>
-          <span class="flyover-chip">GPX 1.1 Dışa Aktarım</span>
-          <span class="flyover-chip">Naismith Süre Analizi</span>
-          <span class="flyover-chip">&gt;30° Dik Eğim Uyarısı</span>
-        </div>
-      </div>
-      <div class="flyover-telemetry">
-        <div class="flyover-stat"><small>NAISMITH SÜRE</small><strong>4s 25dk</strong></div>
-        <div class="flyover-stat"><small>ORT. EĞİM</small><strong>%18.4</strong></div>
-        <div class="flyover-stat"><small>MAKS. AÇI</small><strong style="color:var(--amber)">32°</strong></div>
-        <div class="flyover-stat"><small>RAKIM KAZANIM</small><strong style="color:var(--green)">+1.180 m</strong></div>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- STICKY CTA -->
 <div class="sticky-cta" id="stickyCta">
@@ -1302,6 +1127,7 @@ footer p{font-size:.8rem;color:var(--text3);margin-left:auto}
       <div class="sec-tag red-tag">ACİL DURUM SİSTEMİ</div>
       <h2>SOS — <span class="r">Hayatınız</span><br>Bir Tuşta</h2>
       <p style="color:var(--text2);font-size:.95rem;line-height:1.7;margin-bottom:0">Rota+ SOS sistemi aktifleştiğinde GPS koordinatlarınız, rakımınız ve varsa sağlık bilgileriniz acil kişilerinize SMS ile gönderilir. Ekibiniz anlık harita üzerinde uyarı alır.</p>
+      <div class="demo-label">AŞAĞIDAKİ AKIŞ DEMODUR · GERÇEK SOS GÖNDERMEZ</div>
       <!-- Step nav dots -->
       <div class="sos-step-nav">
         <button class="step-dot active" onclick="showStep(1)" title="SOS Butonu">1</button>
@@ -1474,9 +1300,10 @@ footer p{font-size:.8rem;color:var(--text3);margin-left:auto}
           <div class="sos-icon">🆘</div>
         </div>
         <div class="sos-info">
-          <div class="sos-coord">37.8742° K, 32.4931° D</div>
-          <div class="sos-alt">Rakım: 2.847m</div>
-          <div class="sos-status">SMS GÖNDERİLDİ ✓</div>
+          <div class="demo-label">DEMO ARAYÜZÜ · GERÇEK SOS GÖNDERİLMEZ</div>
+          <div class="sos-coord">Örnek GPS koordinatı</div>
+          <div class="sos-alt">Örnek irtifa bilgisi</div>
+          <div class="sos-status">ÖRNEK SMS DURUMU</div>
         </div>
       </div>
     </div>
@@ -1498,7 +1325,7 @@ footer p{font-size:.8rem;color:var(--text3);margin-left:auto}
     <div id="enkaz" class="pcontent active">
       <div class="prow critical"><div class="pt">0–5 DK</div><div class="pb"><strong>Panik Yapmayın.</strong> Uygulama içerisinde deprem sekmesinden ses dinleme ve hareketsizlik sensörü özelliğini aktifleştir, derin nefes al. Hareket etmeyin — enkaz daha fazla çökebilir. Durumu değerlendirin.</div></div>
       <div class="prow"><div class="pt">5–15 DK</div><div class="pb"><strong>SOS Aktifleştir.</strong> GPS konumunuz kurtarma ekiplerine ve yakınlarınıza SMS ile iletilir.</div></div>
-      <div class="prow"><div class="pt">15–60 DK</div><div class="pb"><strong>Sinyal Ver.</strong> "Sesimi duyan var mı?" çağrısını duyana kadar enerjini sarfetme. Ses çıkarma kapasiteni koru. Işık kaynağı varsa yanakla.</div></div>
+      <div class="prow"><div class="pt">15–60 DK</div><div class="pb"><strong>Sinyal Ver.</strong> "Sesimi duyan var mı?" çağrısını duyana kadar enerjini sarfetme. Ses çıkarma kapasiteni koru. Işık kaynağı varsa düzenli sos ver.</div></div>
       <div class="prow"><div class="pt">1–6 SAAT</div><div class="pb"><strong>Enerjini Koru.</strong> Gereksiz hareket etme. Vücut ısını koru. Kuru zemin bul. Yakın alanda su şişesi bulundur ve sıvı takviyesi al. Hareketsiz kal.</div></div>
       <div class="prow"><div class="pt">6+ SAAT</div><div class="pb"><strong>Sistematik Yardım Bekle.</strong> Sakin kal, kurtarma ekipleri yolda. Her saat düzenli sinyal ver, fiziksel durumunu değerlendir.</div></div>
     </div>
@@ -1523,6 +1350,7 @@ footer p{font-size:.8rem;color:var(--text3);margin-left:auto}
   </div>
 </section>
 
+  <p class="protocol-note">Bu bölüm mevcut acil durum bilgilendirmelerini gösterir. Acil durumda 112’yi arayın; uygulama resmî acil müdahale hizmetlerinin yerine geçmez.</p>
 <!-- HOW -->
 <section id="how">
   <div class="sw">
@@ -1716,7 +1544,7 @@ footer p{font-size:.8rem;color:var(--text3);margin-left:auto}
           <span>Hangi telefon modelleriyle çalışır?</span>
           <span class="faq-icon">+</span>
         </button>
-        <div class="faq-a">Rota+, Android 8.0 (Oreo) ve üzeri tüm Android cihazlarla uyumludur. GPS donanımı olan tüm akıllı telefonlarda sorunsuz çalışır. Uygulama boyutu yaklaşık 74 MB'tır.</div>
+        <div class="faq-a">Rota+, Android 8.0 ve üzeri ile iOS 15.0 ve üzeri cihazlarla uyumludur. Uygulama boyutu yaklaşık 210 MB'tır.</div>
       </div>
     </div>
   </div>
@@ -1728,31 +1556,24 @@ footer p{font-size:.8rem;color:var(--text3);margin-left:auto}
     <h2>"Felaket başa gelmeden evvel koruyucu tedbirleri almak gerekir, başa geldikten sonra dövünmenin yararı yoktur."<span class="o">İndirin ve hazırlıklı olun.</span></h2>
     <p>Temel özellikler herkese açık. Gelişmiş mod için Premium Üyelik mevcuttur.</p>
     <div class="dl-btns-row">
-      <a href="https://play.google.com/store/apps/details?id=com.rotaplus" target="_blank" class="dl-btn">
+      <a href="https://play.google.com/store/apps/details?id=com.rotaplus" target="_blank" rel="noopener noreferrer" class="dl-btn">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.3.17.64.24.99.2L15.83 12 3.18.04C2.83 0 2.49.07 2.19.24 1.57.6 1.2 1.28 1.2 2.04v19.92c0 .76.37 1.44.99 1.8z"/></svg>
         <div>
           <small>Google Play'de İndir</small>
           <strong>ROTA+ UYGULAMASINI İNDİR</strong>
         </div>
       </a>
-      <div class="dl-btn ios-soon">
-        <svg width="26" height="28" viewBox="0 0 24 28" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-          <!-- Apple logo SVG path -->
-          <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.37 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-        </svg>
-        <div>
-          <small style="color:rgba(255,255,255,0.45)">Yakında iOS'tayız</small>
-          <strong>APP STORE'DA YAKINDA</strong>
-        </div>
-        <span class="ios-badge">COMING SOON</span>
-      </div>
+      <a class="dl-btn ios-link" href="https://apps.apple.com/app/rota-plus-emniyetteyim/id6778343329" target="_blank" rel="noopener noreferrer">
+        <svg width="26" height="28" viewBox="0 0 24 28" fill="currentColor" aria-hidden="true"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.37 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        <div><small>App Store'dan İndir</small><strong>ROTA+ iOS UYGULAMASI</strong></div>
+      </a>
     </div>
     <div class="app-meta">
-      <span>Android 8.0+</span><span>•</span><span>~74 MB</span><span>•</span><span>Türkçe</span><span>•</span><span>Temel: Ücretsiz</span><span>•</span><span>Premium: Mevcut</span>
+      <span>Android 8.0+ · iOS 15.0+</span><span>•</span><span>~210 MB</span><span>•</span><span>Türkçe</span><span>•</span><span>Temel: Ücretsiz</span><span>•</span><span>Premium: Mevcut</span>
     </div>
     <div class="legal-note">
       ⚠️ Bu uygulama resmi acil müdahale hizmetlerinin yerine geçmez. Ciddi bir yaralanma veya tehlike durumunda vakit kaybetmeden <strong>112</strong>'yi arayın.
-      <br><br><a href="privacy.html" target="_blank">Gizlilik Politikası</a> · <a href="privacy.html#terms" target="_blank">Kullanım Koşulları</a>
+      <br><br><a href="https://acildurumapp.com/privacy.html" target="_blank" rel="noopener noreferrer">Gizlilik Politikası</a> · <a href="https://acildurumapp.com/privacy.html#terms" target="_blank" rel="noopener noreferrer">Kullanım Koşulları</a>
     </div>
   </div>
 </section>
@@ -1762,9 +1583,9 @@ footer p{font-size:.8rem;color:var(--text3);margin-left:auto}
     <div class="ft-logo">ROTA<span>+</span></div>
     <p>Trekking &amp; Dağcılık/Doğa Navigasyon Platformu — © 2026 Rota+</p>
     <div class="ft-links">
-      <a href="privacy.html" target="_blank">Gizlilik Politikası</a>
-      <a href="privacy.html#terms" target="_blank">Kullanım Koşulları</a>
-      <a href="privacy.html#delete" target="_blank">Veri Silme</a>
+      <a href="https://acildurumapp.com/privacy.html" target="_blank" rel="noopener noreferrer">Gizlilik Politikası</a>
+      <a href="https://acildurumapp.com/privacy.html#terms" target="_blank" rel="noopener noreferrer">Kullanım Koşulları</a>
+      <a href="https://acildurumapp.com/privacy.html#delete" target="_blank" rel="noopener noreferrer">Veri Silme</a>
       <a href="mailto:destek@rotaplus.app">İletişim</a>
     </div>
   </div>
@@ -1776,33 +1597,6 @@ const nav = document.getElementById('nav');
 window.addEventListener('scroll', () => {
   nav.classList.toggle('scrolled', window.scrollY > 40);
 });
-
-// ── STATS COUNTER ──
-function animateCounter(el, target, suffix) {
-  const start = performance.now();
-  const duration = 1800;
-  const update = (now) => {
-    const p = Math.min((now - start) / duration, 1);
-    const ease = 1 - Math.pow(1 - p, 3);
-    el.textContent = Math.floor(ease * target).toLocaleString('tr') + suffix;
-    if (p < 1) requestAnimationFrame(update);
-  };
-  requestAnimationFrame(update);
-}
-const statsObs = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      document.querySelectorAll('.stat-item').forEach(item => {
-        const id = item.querySelector('.stat-num').id;
-        const el = document.getElementById(id);
-        animateCounter(el, +item.dataset.target, item.dataset.suffix || '');
-      });
-      statsObs.disconnect();
-    }
-  });
-}, { threshold: 0.3 });
-const statsEl = document.getElementById('stats');
-if (statsEl) statsObs.observe(statsEl);
 
 // ── SYSTEMS TABS ──
 document.querySelectorAll('.sys-tab').forEach(btn => {
@@ -1857,13 +1651,14 @@ if (stickyCta && heroBtns) {
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   let W, H, dots = [];
+  const staticMotion = matchMedia('(prefers-reduced-motion: reduce)').matches || innerWidth < 520;
   function resize() {
     W = canvas.width = canvas.offsetWidth;
     H = canvas.height = canvas.offsetHeight;
   }
   resize();
-  window.addEventListener('resize', resize);
-  for (let i = 0; i < 60; i++) {
+  window.addEventListener('resize', () => { resize(); if (staticMotion) draw(); });
+  for (let i = 0; i < (staticMotion ? 24 : 42); i++) {
     dots.push({
       x: Math.random() * 1200,
       y: Math.random() * 800,
@@ -1898,13 +1693,13 @@ if (stickyCta && heroBtns) {
         }
       }
     }
-    requestAnimationFrame(draw);
+    if (!staticMotion) requestAnimationFrame(draw);
   }
   draw();
 })();
 
 // ── SOS STEP SLIDES ──
-let sosTimer;
+
 function showStep(n) {
   document.querySelectorAll('.sos-slide').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.step-dot').forEach(d => d.classList.remove('active'));
@@ -1914,8 +1709,6 @@ function showStep(n) {
   if (dot) dot.classList.add('active');
   const bar = document.getElementById('stepProgressBar');
   if (bar) bar.style.width = (n * 25) + '%';
-  clearTimeout(sosTimer);
-  sosTimer = setTimeout(() => showStep(n < 4 ? n + 1 : 1), 4000);
 }
 showStep(1);
 
@@ -1942,5 +1735,6 @@ const fadeObs = new IntersectionObserver((entries) => {
 }, { threshold: 0.1 });
 fadeEls.forEach(el => fadeObs.observe(el));
 </script>
+  <script src="site-interactions.js"></script>
 </body>
 </html>

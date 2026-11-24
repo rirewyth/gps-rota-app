@@ -15,7 +15,7 @@ import {
   Clock
 } from 'lucide-react';
 import { soundFx } from '../audio';
-import { analyzeLocation, getElevationProfile, getTacticalMicroWeather } from '../utils/geoAnalysis';
+import { analyzeLocation, getElevationProfile, getTacticalMicroWeather } from '../utils/terrainMath';
 
 export default function MissionBriefingModal({
   user = null,

@@ -11,7 +11,8 @@ import {
   Compass,
   RadioTower,
   ShieldCheck,
-  ClipboardList
+  ClipboardList,
+  Send
 } from 'lucide-react';
 
 export default function Header({
@@ -26,6 +27,9 @@ export default function Header({
   activeLayer = 'TOPO_ESRI',
   onSelectLayer = () => {},
   onOpenDispatchLog = () => {},
+  onOpenTeamMessage = () => {},
+  onOpenReports = () => {},
+  reportsCount = 0,
   dispatchedTeamsCount = 3
 }) {
   const [time, setTime] = useState(new Date());
@@ -114,6 +118,26 @@ export default function Header({
             TÜRKİYE
           </button>
         </div>
+
+        {/* İHBARLAR BUTONU */}
+        <button
+          onClick={onOpenReports}
+          className="px-2.5 py-0.5 bg-amber-950/70 border border-amber-400/70 text-amber-200 hover:bg-amber-900 font-bold text-[10px] flex items-center gap-1.5 shadow-[0_0_10px_rgba(245,158,11,0.25)] cursor-pointer"
+          title="Rota+ Emniyetteyim'den Gelen Afet / Olay İhbarları"
+        >
+          <AlertTriangle className="w-3 h-3 text-amber-400" />
+          <span>İHBARLAR ({reportsCount})</span>
+        </button>
+
+        {/* EKİBE MESAJ GEÇ BUTONU */}
+        <button
+          onClick={onOpenTeamMessage}
+          className="px-2.5 py-0.5 bg-[#FF4D26]/20 border border-[#FF4D26]/70 text-[#FF8A65] hover:bg-[#FF4D26]/30 font-bold text-[10px] flex items-center gap-1.5 shadow-[0_0_10px_rgba(255,77,38,0.25)] cursor-pointer"
+          title="Rota+ Emniyetteyim Kullanıcılarına / Ekip Koduna Mesaj Gönder"
+        >
+          <Send className="w-3 h-3 text-[#FF6E40]" />
+          <span>EKİBE MESAJ GEÇ</span>
+        </button>
 
         {/* GÖREV GÜNLÜĞÜ & SEVK MODALI BUTONU */}
         <button

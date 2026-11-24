@@ -24,6 +24,7 @@ class _UsersScreenState extends State<UsersScreen> {
 
   // Global Arama State'leri
   final TextEditingController _searchController = TextEditingController();
+  List<DocumentSnapshot> _allUsersCache = [];
   List<DocumentSnapshot> _searchResults = [];
   bool _isSearching = false;
   bool _searchLoading = false;
@@ -33,6 +34,19 @@ class _UsersScreenState extends State<UsersScreen> {
   void initState() {
     super.initState();
     _loadTeamId();
+    _loadAllUsers();
+  }
+
+  Future<void> _loadAllUsers() async {
+    try {
+      final snap = await FirebaseFirestore.instance
+          .collection('users')
+          .limit(150)
+          .get();
+      if (mounted) {
+        setState(() => _allUsersCache = snap.docs);
+      }
+    } catch (_) {}
   }
 
   Future<void> _loadTeamId() async {
@@ -55,8 +69,8 @@ class _UsersScreenState extends State<UsersScreen> {
 
   void _onSearchChanged(String query) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(milliseconds: 500), () {
-      if (query.length > 1) {
+    _debounce = Timer(const Duration(milliseconds: 250), () {
+      if (query.trim().isNotEmpty) {
         _performSearch(query);
       } else {
         setState(() {
@@ -74,21 +88,42 @@ class _UsersScreenState extends State<UsersScreen> {
     });
 
     try {
-      final q = query.toLowerCase().replaceAll('@', '');
-      // Firestore prefix matching: search >= q and search < q + 'z'
-      final results = await FirebaseFirestore.instance
-          .collection('users')
-          .where('username', isGreaterThanOrEqualTo: q)
-          .where('username', isLessThanOrEqualTo: q + '\uf8ff')
-          .limit(20)
-          .get();
+      final q = query.trim().toLowerCase().replaceAll('@', '');
+      if (_allUsersCache.isEmpty) {
+        await _loadAllUsers();
+      }
 
-      setState(() {
-        _searchResults = results.docs;
-        _searchLoading = false;
-      });
+      final matches = _allUsersCache.where((doc) {
+        final data = doc.data() as Map<String, dynamic>? ?? {};
+        final name = (data['name'] ?? data['ad'] ?? '').toString().toLowerCase();
+        final username = (data['username'] ?? '').toString().toLowerCase();
+        final teamName = (data['team_name'] ?? '').toString().toLowerCase();
+        final teamId = (data['team_id'] ?? '').toString().toLowerCase();
+        return name.contains(q) ||
+            username.contains(q) ||
+            teamName.contains(q) ||
+            teamId.contains(q);
+      }).toList();
+
+      // Eger cache'de bulunamadiysa Firestore username prefix ile de dene
+      if (matches.isEmpty && q.isNotEmpty) {
+        final results = await FirebaseFirestore.instance
+            .collection('users')
+            .where('username', isGreaterThanOrEqualTo: q)
+            .where('username', isLessThanOrEqualTo: '$q\uf8ff')
+            .limit(20)
+            .get();
+        matches.addAll(results.docs);
+      }
+
+      if (mounted) {
+        setState(() {
+          _searchResults = matches;
+          _searchLoading = false;
+        });
+      }
     } catch (_) {
-      setState(() => _searchLoading = false);
+      if (mounted) setState(() => _searchLoading = false);
     }
   }
 
@@ -213,7 +248,7 @@ class _UsersScreenState extends State<UsersScreen> {
               onChanged: _onSearchChanged,
               style: const TextStyle(color: Colors.white, fontSize: 14),
               decoration: InputDecoration(
-                hintText: 'Kullanıcı adı ara (örn: @bora)...',
+                hintText: 'İsim, @kullanıcı adı veya ekip ara...',
                 hintStyle: const TextStyle(color: Colors.white38, fontSize: 13),
                 prefixIcon: const Icon(Icons.search, color: kOrangeU, size: 20),
                 suffixIcon: _searchController.text.isNotEmpty
@@ -242,9 +277,13 @@ class _UsersScreenState extends State<UsersScreen> {
           ? const Center(child: CircularProgressIndicator(color: kOrangeU))
           : _isSearching
               ? _buildSearchResults()
-              : _teamId == null
-                  ? _buildNoTeamMessage()
-                  : _buildTeamMembers(),
+              : _allUsersCache.isNotEmpty
+                  ? ListView.builder(
+                      itemCount: _allUsersCache.length,
+                      padding: const EdgeInsets.all(16),
+                      itemBuilder: (ctx, index) => _buildUserTile(_allUsersCache[index]),
+                    )
+                  : (_teamId == null ? _buildNoTeamMessage() : _buildTeamMembers()),
     );
   }
 

@@ -9,7 +9,9 @@ import UavThermalOverlay from './components/UavThermalOverlay';
 import MissionBriefingModal from './components/MissionBriefingModal';
 import TimelineReplayBar from './components/TimelineReplayBar';
 import DispatchMissionLog, { INITIAL_TEAMS, INITIAL_STORYLINE } from './components/DispatchMissionLog';
-import { subscribeToFirebaseUsers } from './firebase';
+import TeamMessageModal from './components/TeamMessageModal';
+import ReportsModal from './components/ReportsModal';
+import { subscribeToFirebaseUsers, subscribeToFirebaseReports } from './firebase';
 import { soundFx } from './audio';
 import { 
   analyzeLocation, 
@@ -18,7 +20,7 @@ import {
   calculateSmartSearchCone,
   calculateDistanceMeters,
   calculateEtaMinutes
-} from './utils/geoAnalysis';
+} from './utils/terrainMath';
 
 export default function App() {
   const [rawUsers, setRawUsers] = useState([]); // 100% Real Users from Firebase
@@ -27,6 +29,9 @@ export default function App() {
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [targetCoords, setTargetCoords] = useState([38.43, 27.18]); // İzmir Default Center
   const [activeLayer, setActiveLayer] = useState('TOPO_ESRI');
+  const [isTeamMsgModalOpen, setIsTeamMsgModalOpen] = useState(false);
+  const [isReportsModalOpen, setIsReportsModalOpen] = useState(false);
+  const [reports, setReports] = useState([]);
   const [isMuted, setIsMuted] = useState(true); // Default muted so no screaming on load
   const [dbStatus, setDbStatus] = useState({ status: 'CONNECTING', message: 'Firebase veritabanı bağlanıyor...' });
   const [logs, setLogs] = useState([
@@ -103,6 +108,13 @@ export default function App() {
 
     return () => unsubscribe();
   }, [addLog, isMuted]);
+
+  useEffect(() => {
+    const unsubReports = subscribeToFirebaseReports((list) => {
+      setReports(list);
+    });
+    return () => unsubReports();
+  }, []);
 
   // Compute users with local test overrides
   const users = useMemo(() => {
@@ -390,6 +402,9 @@ export default function App() {
           soundFx.playSelect();
         }}
         onOpenDispatchLog={() => setIsDispatchLogOpen(true)}
+        onOpenTeamMessage={() => setIsTeamMsgModalOpen(true)}
+        onOpenReports={() => setIsReportsModalOpen(true)}
+        reportsCount={reports.length}
         dispatchedTeamsCount={teams.length}
       />
 
@@ -526,6 +541,25 @@ export default function App() {
         storyline={storyline}
         onUpdateStoryline={setStoryline}
         onCenterMap={(coords, zoom = 16) => setTargetCoords({ coords, zoom, timestamp: Date.now() })}
+      />
+
+      {/* EKİBE MESAJ GEÇ MODALI */}
+      <TeamMessageModal
+        isOpen={isTeamMsgModalOpen}
+        onClose={() => setIsTeamMsgModalOpen(false)}
+        users={users}
+        onSentSuccess={(count, msg) => {
+          addLog(`📡 EKİBE MESAJ GEÇİLDİ (${count} KİŞİ): "${msg}"`);
+        }}
+      />
+
+      {/* GELEN AFET & OLAY İHBARLARI MODALI */}
+      <ReportsModal
+        isOpen={isReportsModalOpen}
+        onClose={() => setIsReportsModalOpen(false)}
+        reports={reports}
+        users={users}
+        onCenterReport={(coords) => setTargetCoords({ coords, zoom: 15, timestamp: Date.now() })}
       />
 
     </div>

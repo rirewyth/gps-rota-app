@@ -1,0 +1,74 @@
+{
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "totalFrames": 1670,
+  "totalDurationSec": 55.666666666666664,
+  "scenes": [
+    {
+      "id": "ad_hook",
+      "dur_sec": 8.473438000000002,
+      "title": "ŞEBEKE ÇÖKTÜĞÜNDE",
+      "sub": "Peki şimdi ne yapacaksın?",
+      "tag": "UYARI",
+      "startFrame": 0,
+      "endFrame": 254,
+      "durationFrames": 254
+    },
+    {
+      "id": "ad_deprem",
+      "dur_sec": 11.817104,
+      "title": "DEPREM & ENKAZ ALTI",
+      "sub": "Sesin kısılsa bile kurtarma ekipleri seni bulur.",
+      "tag": "AFET PROTOKOLÜ",
+      "screen": "s04_deprem.jpg",
+      "startFrame": 254,
+      "endFrame": 609,
+      "durationFrames": 355
+    },
+    {
+      "id": "ad_gps",
+      "dur_sec": 8.287667,
+      "title": "SIFIR İNTERNET CANLI GPS",
+      "sub": "Doğrudan uydu bağlantısıyla çevrimdışı izohipsli sahra haritası.",
+      "tag": "SEYRÜSEFER",
+      "screen": "s03_rota.jpg",
+      "startFrame": 609,
+      "endFrame": 858,
+      "durationFrames": 249
+    },
+    {
+      "id": "ad_autosos",
+      "dur_sec": 10.098833,
+      "title": "AUTO-SOS & HAREKETSİZLİK",
+      "sub": "Kaza veya bayılma anında otomatik siren ve acil durum çağrısı.",
+      "tag": "DEADMAN SWITCH",
+      "screen": "s02_takip.jpg",
+      "startFrame": 858,
+      "endFrame": 1161,
+      "durationFrames": 303
+    },
+    {
+      "id": "ad_ilkyardim",
+      "dur_sec": 8.984271000000001,
+      "title": "ÇEVRİMDIŞI İLK YARDIM",
+      "sub": "Turnike, kanama ve dağcılık düğümleri internetsiz elinin altında.",
+      "tag": "ACİL MÜDAHALE",
+      "screen": "s05_ilkyardim.jpg",
+      "screen2": "s06_rehber.jpg",
+      "startFrame": 1161,
+      "endFrame": 1431,
+      "durationFrames": 270
+    },
+    {
+      "id": "ad_outro",
+      "dur_sec": 7.9802290000000005,
+      "title": "ROTA+",
+      "sub": "Acil durum kapını çalmadan önce indir.",
+      "tag": "HEMEN İNDİR",
+      "startFrame": 1431,
+      "endFrame": 1670,
+      "durationFrames": 239
+    }
+  ]
+}

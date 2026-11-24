@@ -128,7 +128,7 @@ class _EarthquakeFeedScreenState extends State<EarthquakeFeedScreen> {
                   ),
                   children: [
                     TileLayer(
-                      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      urlTemplate: 'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
                       userAgentPackageName: 'com.rotaplus.mountaineering',
                     ),
                     MarkerLayer(

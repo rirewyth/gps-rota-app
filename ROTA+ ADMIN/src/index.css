@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+:root {
+  --brand-orange: #FF4D26;
+  --brand-orange-light: #FF6E40;
+  --brand-cyan: #00E5FF;
+  --brand-cyan-dim: #0891B2;
+  --tactical-dark: #02050D;
+  --tactical-panel: rgba(4, 9, 20, 0.96);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #02040A;
+  color: #F8FAFC;
+  font-family: 'Share Tech Mono', monospace, -apple-system, sans-serif;
+}
+
+@layer base {
+  .font-tactical {
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  .font-condensed {
+    font-family: 'Barlow Condensed', sans-serif;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(2, 5, 13, 0.9);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 229, 255, 0.35);
+  border-radius: 0px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 77, 38, 0.7);
+}

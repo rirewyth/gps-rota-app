@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350" role="img" aria-labelledby="title desc">
+  <title id="title">ROTA+ Instagram görseli: Çevrimdışı SOS</title>
+  <desc id="desc">Koyu zemin üzerinde turuncu ve turkuaz dağ manzarası. Başlık: Sinyal kesilince, planın ne?</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#080b0d"/>
+      <stop offset="0.58" stop-color="#111719"/>
+      <stop offset="1" stop-color="#07120f"/>
+    </linearGradient>
+    <linearGradient id="peak" x1="0" y1="0" x2="0.85" y2="1">
+      <stop offset="0" stop-color="#263333"/>
+      <stop offset="1" stop-color="#101718"/>
+    </linearGradient>
+    <linearGradient id="trail" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#00ffcc" stop-opacity=".12"/>
+      <stop offset=".52" stop-color="#ff5500"/>
+      <stop offset="1" stop-color="#ff5500" stop-opacity=".15"/>
+    </linearGradient>
+    <radialGradient id="glow">
+      <stop offset="0" stop-color="#ff5500" stop-opacity=".3"/>
+      <stop offset="1" stop-color="#ff5500" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#d8fff6" stroke-opacity=".035" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1080" height="1350" fill="url(#bg)"/>
+  <rect width="1080" height="1350" fill="url(#grid)"/>
+
+  <!-- Quiet contour lines -->
+  <g fill="none" stroke="#00ffcc" stroke-opacity=".12" stroke-width="2">
+    <path d="M-80 620c120-80 210-80 330-4s208 83 326 5 220-78 394 10 220 82 280 20"/>
+    <path d="M-90 657c132-78 227-73 340 0s210 80 327 1 220-74 384 9 231 80 300 22"/>
+    <path d="M-95 694c142-73 235-67 346 3s210 75 325 1 216-69 382 8 231 74 304 23"/>
+    <path d="M-100 730c146-69 243-61 351 5s206 68 321 0 216-63 379 8 235 69 309 24"/>
+    <path d="M-120 1080c160-85 289-82 413-5s262 89 388 6 234-91 416 4"/>
+    <path d="M-130 1120c161-82 289-78 413-4s262 86 388 5 237-86 421 5"/>
+    <path d="M-140 1160c160-78 291-73 414-4s260 82 389 4 240-82 424 6"/>
+  </g>
+
+  <!-- Brand header -->
+  <g font-family="Arial, Helvetica, sans-serif">
+    <path d="M72 75h8v34h-8z" fill="#ff5500"/>
+    <text x="98" y="105" fill="#fff" font-size="35" font-weight="800" letter-spacing="2">ROTA+</text>
+    <text x="1008" y="101" text-anchor="end" fill="#a5bbb6" font-size="15" font-weight="700" letter-spacing="3">OUTDOOR  /  GÜVENLİK</text>
+    <path d="M72 137H1008" stroke="#fff" stroke-opacity=".15"/>
+  </g>
+
+  <!-- Topic label -->
+  <g font-family="Arial, Helvetica, sans-serif">
+    <rect x="72" y="185" width="232" height="42" rx="21" fill="#ff5500" fill-opacity=".12" stroke="#ff5500" stroke-opacity=".72"/>
+    <circle cx="96" cy="206" r="5" fill="#ff5500"/>
+    <text x="113" y="212" fill="#ffb18c" font-size="16" font-weight="700" letter-spacing="2">ÇEVRİMDIŞI SOS</text>
+    <text x="72" y="316" fill="#f6f8f7" font-size="65" font-weight="800" letter-spacing="-2">Sinyal kesilince,</text>
+    <text x="72" y="396" fill="#f6f8f7" font-size="65" font-weight="800" letter-spacing="-2">planın <tspan fill="#00ffcc">hazır mı?</tspan></text>
+    <text x="76" y="452" fill="#b7c4c0" font-size="22" font-weight="400">Yola çıkmadan önce, bağlantı yoksa ne yapacağını düşün.</text>
+  </g>
+
+  <!-- Mountain illustration -->
+  <ellipse cx="670" cy="850" rx="460" ry="330" fill="url(#glow)"/>
+  <path d="M0 882 170 700l98 100 184-263 154 199 121-126 105 122 121-217 227 286v383H0Z" fill="#121b1c"/>
+  <path d="m452 537 47 61-49-22-37 31zM853 515l40 74-42-28-35 20z" fill="#d8fff6" fill-opacity=".5"/>
+  <path d="M0 940 188 785l125 92 145-105 124 135 161-110 122 94 126-90 89 65v369H0Z" fill="url(#peak)"/>
+  <path d="m190 785 58 46-61-18-34 31m305-72 57 57-78-28-37 37m324-53 56 42-69-17-40 31m303-15 48 37-62-16-37 22" fill="none" stroke="#00ffcc" stroke-opacity=".65" stroke-width="4"/>
+
+  <!-- A winding route and its marker: metaphor for preparation, not an app screen -->
+  <path d="M1080 1070c-147-34-233-93-305-77-73 17-95 122-205 103-74-13-118-79-188-67-75 13-110 113-188 93" fill="none" stroke="url(#trail)" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="770" cy="993" r="26" fill="#ff5500" fill-opacity=".18"/>
+  <circle cx="770" cy="993" r="10" fill="#ff5500"/>
+  <circle cx="770" cy="993" r="4" fill="#fff"/>
+  <path d="M770 951c-20 0-36 16-36 36 0 28 36 62 36 62s36-34 36-62c0-20-16-36-36-36Z" fill="none" stroke="#ff5500" stroke-width="3"/>
+
+  <!-- Hiker silhouette -->
+  <g transform="translate(493 868)" fill="#080b0d" stroke="#080b0d" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="0" cy="0" r="17"/>
+    <path d="M-13 21q13-11 27 0l14 61-18 9-9-35-9 37-21-5 11-49z"/>
+    <path d="m-24 45-28 35 9 7 31-28m39-15 28 29-8 9-34-22" fill="none" stroke-width="12"/>
+    <path d="m-18 88-17 57m31-59 8 57" fill="none" stroke-width="13"/>
+    <path d="m-39 145-15 5m56-7 16 5" fill="none" stroke-width="10"/>
+    <path d="m17 29 25 8-6 35-26-8z" fill="#ff5500" stroke="#ff5500"/>
+    <path d="m-24 20-10 55 12 6 22-51" fill="#00ffcc" stroke="#00ffcc" stroke-width="2"/>
+  </g>
+
+  <!-- Signal mark -->
+  <g transform="translate(925 816)" fill="none" stroke="#00ffcc" stroke-linecap="round" stroke-width="6" opacity=".9">
+    <path d="M-35-5a50 50 0 0 1 70 0M-23 9a33 33 0 0 1 46 0M-10 23a15 15 0 0 1 20 0"/>
+    <path d="M-37-35 37 39" stroke="#ff5500" stroke-width="8"/>
+  </g>
+
+  <!-- Closing copy -->
+  <g font-family="Arial, Helvetica, sans-serif">
+    <path d="M72 1214H1008" stroke="#fff" stroke-opacity=".18"/>
+    <text x="72" y="1267" fill="#fff" font-size="22" font-weight="700">Hazırlığını yap. ROTA+’ı keşfet.</text>
+    <text x="72" y="1305" fill="#9fb0ab" font-size="16">App Store  •  Google Play</text>
+    <text x="1008" y="1290" text-anchor="end" fill="#00ffcc" font-size="16" font-weight="700" letter-spacing="2">ROTAPLUS</text>
+  </g>
+</svg>

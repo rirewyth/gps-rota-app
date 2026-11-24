@@ -18,6 +18,7 @@ exports.sendNotificationOnNewItem = functions.firestore
         else if (type === 'message') title = 'Yeni Mesaj';
         else if (type === 'like') title = 'Yeni Begeni';
         else if (type === 'team_sos') title = '🚨 EKIP SOS!';
+        else if (type === 'nexus_dispatch') title = '📡 ROTA+ NEXUS KOMUTA';
 
         const userDoc = await admin.firestore().collection('users').doc(userId).get();
         if (!userDoc.exists) return null;
@@ -29,7 +30,7 @@ exports.sendNotificationOnNewItem = functions.firestore
         const payload = {
             notification: {
                 title: title,
-                body: ${fromUserName} ,
+                body: `${fromUserName}: ${text}`,
             },
             data: {
                 click_action: 'FLUTTER_NOTIFICATION_CLICK',
@@ -47,6 +48,13 @@ exports.sendNotificationOnNewItem = functions.firestore
                 notification: {
                     channelId: 'rota_plus_fcm_channel',
                     sound: 'default'
+                }
+            },
+            apns: {
+                payload: {
+                    aps: {
+                        sound: 'default'
+                    }
                 }
             }
         });
@@ -84,7 +92,7 @@ exports.onNewTeamMessage = functions.firestore
 
         const payload = {
             notification: {
-                title: ${teamName} - ,
+                title: `${teamName} - ${senderName}`,
                 body: text,
             },
             data: {
@@ -103,6 +111,13 @@ exports.onNewTeamMessage = functions.firestore
                 notification: {
                     channelId: 'rota_plus_fcm_channel',
                     sound: 'default'
+                }
+            },
+            apns: {
+                payload: {
+                    aps: {
+                        sound: 'default'
+                    }
                 }
             }
         });
@@ -136,7 +151,7 @@ exports.onSosAlert = functions.firestore
         const payload = {
             notification: {
                 title: '🚨 ACIL DURUM (SOS) 🚨',
-                body: ${senderName} acil durum sinyali gonderdi!,
+                body: `${senderName} acil durum sinyali gonderdi!`,
             },
             data: {
                 click_action: 'FLUTTER_NOTIFICATION_CLICK',

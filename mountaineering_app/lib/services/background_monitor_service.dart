@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'earthquake_service.dart';
@@ -194,7 +195,7 @@ class BackgroundMonitorService {
       }
       if (pos == null) return;
 
-      // Hava Durumu (30 dakikada bir)
+      // Hava Durumu (30 dakikada bir kontrol, ayni uyari 6 saatte en fazla 1 kez)
       try {
         if (_lastWeatherCheck == null ||
             DateTime.now().difference(_lastWeatherCheck!).inMinutes >= 30) {
@@ -202,13 +203,29 @@ class BackgroundMonitorService {
           final data = await WeatherService.getFullWeatherData(
               pos.latitude, pos.longitude);
           if (data != null) {
+            final prefs = await SharedPreferences.getInstance();
+            final nowMs = DateTime.now().millisecondsSinceEpoch;
+            const cooldownMs = 6 * 60 * 60 * 1000;
+
             if (data.current.isHazardous) {
-              await _showGenericNotification('AŞIRI HAVA DURUMU UYARISI',
-                  '${data.current.title}: ${data.current.description}');
+              final sig = 'cur_${data.current.title}_${data.current.description}';
+              final lastSig = prefs.getString('bg_last_weather_sig');
+              final lastMs = prefs.getInt('bg_last_weather_ms') ?? 0;
+              if (sig != lastSig || (nowMs - lastMs) > cooldownMs) {
+                await prefs.setString('bg_last_weather_sig', sig);
+                await prefs.setInt('bg_last_weather_ms', nowMs);
+                await _showGenericNotification('AŞIRI HAVA DURUMU UYARISI',
+                    '${data.current.title}: ${data.current.description}');
+              }
             }
             for (var alert in data.advancedAlerts) {
-              await _showGenericNotification(
-                  'HAVA DURUMU: ${alert.title}', alert.message);
+              final keyMs = 'bg_adv_ms_${alert.title.hashCode}';
+              final lastMs = prefs.getInt(keyMs) ?? 0;
+              if ((nowMs - lastMs) > cooldownMs) {
+                await prefs.setInt(keyMs, nowMs);
+                await _showGenericNotification(
+                    'HAVA DURUMU: ${alert.title}', alert.message);
+              }
             }
           }
         }
@@ -216,7 +233,7 @@ class BackgroundMonitorService {
         debugPrint('Hava durumu kontrol hatası: $e');
       }
 
-      // Deprem
+      // Deprem (Ayni depremi tekrar tekrar bildirme)
       try {
         final eqService = EarthquakeService();
         final quakes = await eqService
@@ -229,15 +246,22 @@ class BackgroundMonitorService {
 
         if (all.isNotEmpty) {
           final latest = all.first;
-          final minMag = await StorageHelper.getEqMinMag();
-          final maxDist = await StorageHelper.getEqMaxDist();
-          if (latest.mag >= minMag) {
-            final dist = Geolocator.distanceBetween(
-                    pos.latitude, pos.longitude, latest.lat, latest.lng) /
-                1000;
-            if (dist < maxDist) {
-              await _showCriticalEqNotification(
-                  latest.mag, dist / 3.5, latest.location, latest.lat, latest.lng);
+          final eqKey = '${latest.date}_${latest.location}_${latest.mag}';
+          final prefs = await SharedPreferences.getInstance();
+          final lastEqKey = prefs.getString('bg_last_eq_key');
+
+          if (eqKey != lastEqKey) {
+            await prefs.setString('bg_last_eq_key', eqKey);
+            final minMag = await StorageHelper.getEqMinMag();
+            final maxDist = await StorageHelper.getEqMaxDist();
+            if (latest.mag >= minMag) {
+              final dist = Geolocator.distanceBetween(
+                      pos.latitude, pos.longitude, latest.lat, latest.lng) /
+                  1000;
+              if (dist < maxDist) {
+                await _showCriticalEqNotification(
+                    latest.mag, dist / 3.5, latest.location, latest.lat, latest.lng);
+              }
             }
           }
         }

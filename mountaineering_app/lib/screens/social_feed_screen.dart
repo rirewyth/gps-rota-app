@@ -1007,19 +1007,6 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
             ),
           ),
         ),
-        floatingActionButton: Padding(
-          padding: const EdgeInsets.only(bottom: 78),
-          child: FloatingActionButton.small(
-            onPressed: _showCreatePostSheet,
-            backgroundColor: TacticalStyles.kPrimaryContainer,
-            elevation: 8,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
-              side: BorderSide(color: TacticalStyles.kPrimary.withOpacity(0.45)),
-            ),
-            child: const Icon(Icons.add_rounded, color: Colors.white, size: 22),
-          ),
-        ),
         body: Column(
           children: [
             _buildAnnouncementBanner(),
@@ -1340,13 +1327,30 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                                         const SizedBox(height: 6),
                                         Expanded(
                                           child: SingleChildScrollView(
-                                            child: Text(
-                                              d['body'] ?? '',
-                                              style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
-                                                color: TacticalStyles.kTextPrimary.withOpacity(0.9),
-                                                fontSize: 12,
-                                                height: 1.4,
-                                              ),
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  d['body'] ?? '',
+                                                  style: TextStyle(fontFamily: 'Helvetica', fontFamilyFallback: ['Helvetica Neue', 'Arial', 'sans-serif'], fontFeatures: [FontFeature.tabularFigures()], 
+                                                    color: TacticalStyles.kTextPrimary.withOpacity(0.9),
+                                                    fontSize: 12,
+                                                    height: 1.4,
+                                                  ),
+                                                ),
+                                                if ((d['imageBase64'] ?? '').toString().isNotEmpty) ...[
+                                                  const SizedBox(height: 8),
+                                                  ClipRRect(
+                                                    borderRadius: BorderRadius.circular(10),
+                                                    child: Image.memory(
+                                                      base64Decode(d['imageBase64']),
+                                                      width: double.infinity,
+                                                      height: 95,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ],
                                             ),
                                           ),
                                         ),

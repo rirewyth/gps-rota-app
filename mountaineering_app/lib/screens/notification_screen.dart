@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'profile_screen.dart';
 import 'chat_screen.dart';
 import '../services/tactical_styles.dart';
@@ -53,6 +54,27 @@ class NotificationScreen extends StatelessWidget {
               }
             },
             child: Text('Tümünü Oku', style: TacticalStyles.labelCaps(color: kOrange, size: 10.5)),
+          ),
+          TextButton(
+            onPressed: () async {
+              final col = FirebaseFirestore.instance
+                  .collection('notifications')
+                  .doc(myUid)
+                  .collection('items');
+              final items = await col.get();
+              if (items.docs.isEmpty) return;
+              final batch = FirebaseFirestore.instance.batch();
+              for (final doc in items.docs) {
+                batch.delete(doc.reference);
+              }
+              await batch.commit();
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Tüm bildirimler silindi.'), backgroundColor: Colors.redAccent),
+                );
+              }
+            },
+            child: Text('Tümünü Sil', style: TacticalStyles.labelCaps(color: Colors.redAccent, size: 10.5)),
           ),
         ],
       ),
@@ -109,7 +131,12 @@ class NotificationScreen extends StatelessWidget {
                       .update({'isRead': true});
 
                   if (!context.mounted) return;
-                  if (type == 'follow' && fromUserId.isNotEmpty) {
+                  if (type == 'nexus_dispatch' ||
+                      data['reportId'] != null ||
+                      data['fullAddress'] != null ||
+                      type == 'admin') {
+                    _showDispatchDetailSheet(context, data);
+                  } else if (type == 'follow' && fromUserId.isNotEmpty) {
                     Navigator.push(context, MaterialPageRoute(
                       builder: (_) => ProfileScreen(targetUserId: fromUserId),
                     ));
@@ -117,8 +144,6 @@ class NotificationScreen extends StatelessWidget {
                     Navigator.push(context, MaterialPageRoute(
                       builder: (_) => ChatScreen(targetUserId: fromUserId, targetUserName: fromUserName),
                     ));
-                  } else if (type == 'admin') {
-                    // Admin bildirimleri okunarak kapatılır
                   }
                 },
                 child: Container(
@@ -196,7 +221,26 @@ class NotificationScreen extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 4),
-                            Text(timeStr, style: const TextStyle(color: Colors.white38, fontSize: 11)),
+                            Row(
+                              children: [
+                                Text(timeStr, style: const TextStyle(color: Colors.white38, fontSize: 11)),
+                                if (type == 'nexus_dispatch' || data['reportId'] != null) ...[
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: Colors.cyanAccent.withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(4),
+                                      border: Border.all(color: Colors.cyanAccent.withValues(alpha: 0.45)),
+                                    ),
+                                    child: const Text(
+                                      'GÖREV DETAYI İÇİN DOKUN →',
+                                      style: TextStyle(color: Colors.cyanAccent, fontSize: 9.5, fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
                           ],
                         ),
                       ),
@@ -335,6 +379,227 @@ class NotificationScreen extends StatelessWidget {
             ],
           );
         },
+      ),
+    );
+  }
+
+  void _showDispatchDetailSheet(BuildContext context, Map<String, dynamic> data) {
+    final reportId = (data['reportId'] ?? '').toString();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: TacticalStyles.kSurfaceLow,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        top: false,
+        child: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>?>(
+          future: reportId.isNotEmpty
+              ? FirebaseFirestore.instance.collection('disaster_reports').doc(reportId).get()
+              : Future.value(null),
+          builder: (ctx, snap) {
+            final rep = snap.data?.data();
+            final disasterType = (rep?['disasterType'] ?? data['disasterType'] ?? 'GÖREV YÖNLENDİRME').toString();
+            final province = (rep?['province'] ?? data['province'] ?? '').toString().trim();
+            final district = (rep?['district'] ?? data['district'] ?? '').toString().trim();
+            final neighborhood = (rep?['neighborhood'] ?? data['neighborhood'] ?? '').toString().trim();
+            final street = (rep?['street'] ?? data['street'] ?? '').toString().trim();
+            final fullAddress = (rep?['fullAddress'] ?? data['fullAddress'] ?? '').toString().trim();
+            final dateTimeStr = (rep?['dateTimeStr'] ?? data['dateTimeStr'] ?? '').toString().trim();
+            final reporterName = (rep?['reporterName'] ?? data['reporterName'] ?? '').toString().trim();
+            final reporterPhone = (rep?['reporterPhone'] ?? data['reporterPhone'] ?? '').toString().trim();
+            final summary = (rep?['summary'] ?? data['summary'] ?? '').toString().trim();
+            final note = (data['note'] ?? '').toString().trim();
+            final rawText = (data['text'] ?? '').toString().trim();
+            final imgB64 = (rep?['imageBase64'] ?? '').toString().trim();
+            final lat = ((rep?['lat'] ?? data['lat']) as num?)?.toDouble();
+            final lng = ((rep?['lng'] ?? data['lng']) as num?)?.toDouble();
+
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(18, 14, 18, 22),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 42,
+                        height: 4,
+                        decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.redAccent.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: Colors.redAccent.withValues(alpha: 0.6)),
+                          ),
+                          child: Text(
+                            disasterType.toUpperCase(),
+                            style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 12),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        const Expanded(
+                          child: Text(
+                            'KOMUTA MERKEZİ GÖREV RAPORU',
+                            style: TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold, fontSize: 12),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close, color: Colors.white54),
+                          onPressed: () => Navigator.pop(ctx),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: TacticalStyles.recessedDecoration(radius: 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'DETAYLI KONUM & ADRES RAPORU',
+                            style: TextStyle(color: Colors.amberAccent, fontSize: 10, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 8),
+                          _detailRow('İl', province.isNotEmpty ? province : 'Belirtilmedi'),
+                          _detailRow('İlçe', district.isNotEmpty ? district : 'Belirtilmedi'),
+                          _detailRow('Mahalle', neighborhood.isNotEmpty ? neighborhood : 'Belirtilmedi'),
+                          _detailRow('Sokak / Cadde', street.isNotEmpty ? street : 'Belirtilmedi'),
+                          if (fullAddress.isNotEmpty) _detailRow('Açık Adres', fullAddress, valueColor: Colors.amberAccent),
+                          _detailRow(
+                            'GPS Koordinatı',
+                            (lat != null && lng != null)
+                                ? '${lat.toStringAsFixed(5)}, ${lng.toStringAsFixed(5)}'
+                                : 'Konum yok',
+                            valueColor: Colors.cyanAccent,
+                          ),
+                          if (dateTimeStr.isNotEmpty) _detailRow('İhbar Zamanı', dateTimeStr),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: TacticalStyles.recessedDecoration(radius: 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'İHBARCI & OLAY ÖZETİ',
+                            style: TextStyle(color: Colors.cyanAccent, fontSize: 10, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            '👤 İhbarcı: ${reporterName.isNotEmpty ? reporterName : '-'}   •   📞 ${reporterPhone.isNotEmpty ? reporterPhone : '-'}',
+                            style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            summary.isNotEmpty ? summary : rawText,
+                            style: const TextStyle(color: Colors.white70, fontSize: 13, height: 1.45),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (imgB64.isNotEmpty) ...[
+                      const SizedBox(height: 10),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.memory(
+                          base64Decode(imgB64),
+                          width: double.infinity,
+                          height: 180,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ],
+                    if (note.isNotEmpty) ...[
+                      const SizedBox(height: 10),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: kOrange.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: kOrange.withValues(alpha: 0.45)),
+                        ),
+                        child: Text('📌 Komuta Notu: $note', style: const TextStyle(color: Colors.white, fontSize: 12.5)),
+                      ),
+                    ],
+                    const SizedBox(height: 14),
+                    Row(
+                      children: [
+                        if (lat != null && lng != null)
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () async {
+                                final uri = Uri.parse('https://www.google.com/maps/search/?api=1&query=$lat,$lng');
+                                await launchUrl(uri, mode: LaunchMode.externalApplication);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.cyan.shade700,
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              ),
+                              icon: const Icon(Icons.directions, color: Colors.white, size: 18),
+                              label: const Text('HARİTADA AÇ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                            ),
+                          ),
+                        if (lat != null && lng != null && reporterPhone.isNotEmpty) const SizedBox(width: 10),
+                        if (reporterPhone.isNotEmpty)
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () async {
+                                final uri = Uri.parse('tel:${reporterPhone.replaceAll(' ', '')}');
+                                await launchUrl(uri);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF2E7D32),
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              ),
+                              icon: const Icon(Icons.phone, color: Colors.white, size: 18),
+                              label: const Text('İHBARCIYI ARA', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _detailRow(String label, String value, {Color valueColor = Colors.white}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 105,
+            child: Text('$label:', style: const TextStyle(color: Colors.white54, fontSize: 12)),
+          ),
+          Expanded(
+            child: Text(value, style: TextStyle(color: valueColor, fontSize: 12.5, fontWeight: FontWeight.w600)),
+          ),
+        ],
       ),
     );
   }

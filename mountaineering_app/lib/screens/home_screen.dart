@@ -32,6 +32,7 @@ import '../services/offline_map_manager.dart';
 import 'users_screen.dart';
 import 'first_aid_screen.dart';
 import 'emergency_id_card_screen.dart';
+import 'incident_report_screen.dart';
 import 'notification_screen.dart';
 import 'weather_screen.dart';
 import 'earthquake_module_screen.dart';
@@ -123,6 +124,7 @@ class _HomeDashboardState extends State<HomeDashboard>
   Timer? _presenceTimer;
   Timer? _activeUserTimer;
   int _activeUserCount = 1;
+  final int _nearbyMeshCount = 0;
 
   void _updatePresence() async {
     final user = FirebaseAuth.instance.currentUser;
@@ -796,6 +798,7 @@ class _HomeDashboardState extends State<HomeDashboard>
   }
 
   Future<void> _savePhone() async {
+    FocusScope.of(context).unfocus();
     await StorageHelper.setObserverPhone(_phoneController.text);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -1233,49 +1236,51 @@ class _HomeDashboardState extends State<HomeDashboard>
                       ],
                     ),
                   ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (_) => const UsersScreen()));
-                        },
-                        child: Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: TacticalStyles.kSurfaceHigh,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: TacticalStyles.kGlassBorder),
-                          ),
-                          child: const Icon(
-                            Icons.person_search_rounded,
-                            color: TacticalStyles.kPrimary,
-                            size: 18,
-                          ),
-                        ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            // ── HIZLI İLETİŞİM & ARAMA ÇUBUĞU (Göz Önünde) ──────
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _buildQuickActionPill(
+                      icon: Icons.person_search_rounded,
+                      label: 'KULLANICI ARA',
+                      accentColor: TacticalStyles.kPrimary,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const UsersScreen()),
                       ),
-                      const SizedBox(width: 6),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (_) => const DmListScreen()));
-                        },
-                        child: Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: TacticalStyles.kSurfaceHigh,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: TacticalStyles.kGlassBorder),
-                          ),
-                          child: const Icon(
-                            Icons.mark_email_unread_outlined,
-                            color: TacticalStyles.kOnSurface,
-                            size: 17,
-                          ),
-                        ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _buildQuickActionPill(
+                      icon: Icons.mark_email_unread_rounded,
+                      label: 'MESAJLAR',
+                      accentColor: const Color(0xFF00E5FF),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const DmListScreen()),
                       ),
-                    ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _buildQuickActionPill(
+                      icon: Icons.notifications_active_rounded,
+                      label: 'BİLDİRİM',
+                      accentColor: TacticalStyles.kPrimaryContainer,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const NotificationScreen()),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -1934,7 +1939,7 @@ class _HomeDashboardState extends State<HomeDashboard>
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              '$_activeUserCount CİHAZ',
+                              '$_nearbyMeshCount CİHAZ',
                               style: TacticalStyles.headline(
                                 color: TacticalStyles.kOnSurface,
                                 fontSize: 19,
@@ -1943,7 +1948,9 @@ class _HomeDashboardState extends State<HomeDashboard>
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Çevre arama menzili 1.4 km',
+                              _nearbyMeshCount > 0
+                                  ? 'Çevre arama menzili 1.4 km'
+                                  : 'Yakında cihaz yok • Tarama için dokun',
                               style: TacticalStyles.body(
                                 color: TacticalStyles.kOnSurfaceVariant,
                                 fontSize: 11.5,
@@ -2218,6 +2225,129 @@ class _HomeDashboardState extends State<HomeDashboard>
 
             const SizedBox(height: 8),
 
+            // ── AFET & OLAY İHBARI KARTI ─────────────────────────
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: TacticalPressable(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const IncidentReportScreen()),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 13),
+                  decoration: TacticalStyles.glassCardDecoration(
+                    radius: 14,
+                    borderColor:
+                        TacticalStyles.kPrimaryContainer.withOpacity(0.45),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(9),
+                        decoration: BoxDecoration(
+                          color:
+                              TacticalStyles.kPrimaryContainer.withOpacity(0.14),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(
+                          Icons.campaign_rounded,
+                          color: TacticalStyles.kPrimaryContainer,
+                          size: 19,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Afet & Olay İhbarı Bildir',
+                              style: TacticalStyles.headline(
+                                color: TacticalStyles.kOnSurface,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(
+                              'Deprem, sel, yangın fotoğraf & özet gönder',
+                              style: TacticalStyles.body(
+                                color: TacticalStyles.kOnSurfaceVariant,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(Icons.chevron_right_rounded,
+                          color: TacticalStyles.kOutline, size: 20),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            // ── DESTEK & HATA BİLDİRİMİ ─────
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(14),
+                onTap: _showSupportTicketDialog,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+                  decoration: TacticalStyles.glassCardDecoration(radius: 14),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: TacticalStyles.kPrimary.withValues(alpha: 0.14),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(
+                          Icons.support_agent_rounded,
+                          color: TacticalStyles.kPrimary,
+                          size: 19,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Destek & Hata Bildir',
+                              style: TacticalStyles.headline(
+                                color: TacticalStyles.kOnSurface,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(
+                              'Yöneticiye öneri, hata veya destek talebi gönder',
+                              style: TacticalStyles.body(
+                                color: TacticalStyles.kOnSurfaceVariant,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(Icons.chevron_right_rounded,
+                          color: TacticalStyles.kOutline, size: 20),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
             // ── ÇIĞ GÜVENLİK VE ARVA MODÜLÜ ─────
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -2449,6 +2579,9 @@ class _HomeDashboardState extends State<HomeDashboard>
                                 fontWeight: FontWeight.w600,
                               ),
                               keyboardType: TextInputType.phone,
+                              textInputAction: TextInputAction.done,
+                              onSubmitted: (_) => _savePhone(),
+                              onTapOutside: (_) => FocusScope.of(context).unfocus(),
                               decoration: InputDecoration(
                                 hintText: '+90 5XX XXX XXXX',
                                 hintStyle: TacticalStyles.telemetry(
@@ -3141,6 +3274,44 @@ class _HomeDashboardState extends State<HomeDashboard>
 
   // ─── YARDIMCI WİDGETLER ───────────────────────────────────────────────────
 
+  Widget _buildQuickActionPill({
+    required IconData icon,
+    required String label,
+    required Color accentColor,
+    required VoidCallback onTap,
+  }) {
+    return TacticalPressable(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+        decoration: TacticalStyles.glassCardDecoration(
+          radius: 12,
+          borderColor: accentColor.withOpacity(0.38),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: accentColor, size: 16),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TacticalStyles.labelCaps(
+                  color: TacticalStyles.kOnSurface,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.4,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildInfoCard({
     required String label,
     required String value,
@@ -3818,6 +3989,109 @@ class _HomeDashboardState extends State<HomeDashboard>
 
   Widget _buildDivider() {
     return Container(width: 1, height: 40, color: Colors.white10);
+  }
+
+  void _showSupportTicketDialog() {
+    final subjectCtrl = TextEditingController();
+    final msgCtrl = TextEditingController();
+    String category = 'Hata Bildirimi';
+    bool sending = false;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setD) => AlertDialog(
+          backgroundColor: TacticalStyles.kSurfaceLow,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          title: const Text('Destek & Hata Bildir', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                DropdownButtonFormField<String>(
+                  initialValue: category,
+                  dropdownColor: TacticalStyles.kSurfaceLowest,
+                  style: const TextStyle(color: Colors.white, fontSize: 13),
+                  items: const [
+                    DropdownMenuItem(value: 'Hata Bildirimi', child: Text('Hata Bildirimi')),
+                    DropdownMenuItem(value: 'Öneri / İstek', child: Text('Öneri / İstek')),
+                    DropdownMenuItem(value: 'Hesap / Destek', child: Text('Hesap / Destek')),
+                  ],
+                  onChanged: (v) => setD(() => category = v ?? 'Hata Bildirimi'),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: TacticalStyles.kSurfaceLowest,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: subjectCtrl,
+                  style: const TextStyle(color: Colors.white, fontSize: 13),
+                  decoration: InputDecoration(
+                    hintText: 'Konu başlığı...',
+                    hintStyle: const TextStyle(color: Colors.white38),
+                    filled: true,
+                    fillColor: TacticalStyles.kSurfaceLowest,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: msgCtrl,
+                  maxLines: 4,
+                  style: const TextStyle(color: Colors.white, fontSize: 13),
+                  decoration: InputDecoration(
+                    hintText: 'Detaylı açıklama yazın...',
+                    hintStyle: const TextStyle(color: Colors.white38),
+                    filled: true,
+                    fillColor: TacticalStyles.kSurfaceLowest,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('İPTAL', style: TextStyle(color: Colors.white54))),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: TacticalStyles.kPrimaryContainer),
+              onPressed: sending
+                  ? null
+                  : () async {
+                      final subj = subjectCtrl.text.trim();
+                      final msg = msgCtrl.text.trim();
+                      if (subj.isEmpty || msg.isEmpty) return;
+                      setD(() => sending = true);
+                      try {
+                        final u = FirebaseAuth.instance.currentUser;
+                        final uName = (await StorageHelper.getUserName() ?? u?.displayName ?? 'Operatör').trim();
+                        await FirebaseFirestore.instance.collection('support_tickets').add({
+                          'userId': u?.uid ?? '',
+                          'userName': uName,
+                          'userEmail': u?.email ?? '',
+                          'category': category,
+                          'subject': subj,
+                          'message': msg,
+                          'status': 'AÇIK',
+                          'timestamp': FieldValue.serverTimestamp(),
+                        });
+                        if (ctx.mounted) Navigator.pop(ctx);
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('✓ Destek talebiniz yöneticiye iletildi.'), backgroundColor: Color(0xFF2E7D32)),
+                          );
+                        }
+                      } catch (e) {
+                        setD(() => sending = false);
+                      }
+                    },
+              child: Text(sending ? 'GÖNDERİLİYOR...' : 'GÖNDER', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

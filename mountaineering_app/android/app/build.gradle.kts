@@ -72,7 +72,7 @@ flutter {
     source = "../.."
 }
 
-// Flutter'ın beklediği dizine AAB'yi kopyala (Gradle 8+ uyumluluğu)
+// Flutter'ın beklediği dizine AAB ve APK'ları kopyala (Gradle 8+ uyumluluğu)
 afterEvaluate {
     tasks.matching { it.name == "bundleRelease" }.configureEach {
         doLast {
@@ -81,6 +81,21 @@ afterEvaluate {
             if (src.exists()) {
                 dst.mkdirs()
                 src.copyTo(file("${dst}/app-release.aab"), overwrite = true)
+            }
+        }
+    }
+    tasks.matching { it.name == "assembleDebug" }.configureEach {
+        doLast {
+            val srcFlutter = file("${layout.buildDirectory.get()}/outputs/flutter-apk/app-debug.apk")
+            val srcApk = file("${layout.buildDirectory.get()}/outputs/apk/debug/app-debug.apk")
+            val src = if (srcFlutter.exists()) srcFlutter else srcApk
+            if (src.exists()) {
+                val dstFlutter = file("${rootProject.projectDir}/../build/app/outputs/flutter-apk")
+                val dstApk = file("${rootProject.projectDir}/../build/app/outputs/apk/debug")
+                dstFlutter.mkdirs()
+                dstApk.mkdirs()
+                src.copyTo(file("${dstFlutter}/app-debug.apk"), overwrite = true)
+                src.copyTo(file("${dstApk}/app-debug.apk"), overwrite = true)
             }
         }
     }

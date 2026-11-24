@@ -258,22 +258,6 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                     ],
                   ),
                 ),
-
-                const SizedBox(height: 60),
-
-                // Loading indicator
-                FadeIn(
-                  duration: const Duration(milliseconds: 600),
-                  delay: const Duration(milliseconds: 1200),
-                  child: SizedBox(
-                    width: 28,
-                    height: 28,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(kBlue.withOpacity(0.8)),
-                    ),
-                  ),
-                ),
               ],
             ),
 

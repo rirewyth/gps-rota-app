@@ -22,6 +22,7 @@ import '../data/mountain_database.dart';
 import '../services/routing_service.dart';
 import '../services/gpx_service.dart';
 import '../services/premium_service.dart';
+import 'live_tracking_screen.dart';
 import '../services/tactical_styles.dart';
 import '../main.dart';
 import 'dart:math';
@@ -1873,21 +1874,33 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen>
   Future<void> _importGpxKmlRoute() async {
     try {
       final imported = await GpxService.pickAndParseRouteFile();
-      if (imported == null) return;
-      await DatabaseHelper.instance.rotaKaydet(
+      if (imported == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Dosyada geçerli GPX/KML rota noktası bulunamadı.')),
+          );
+        }
+        return;
+      }
+      final id = await DatabaseHelper.instance.rotaKaydet(
         imported.name,
         imported.points,
         baslangicAdi: 'GPX/KML İçe Aktarım',
         bitisAdi: '${imported.points.length} Nokta',
         source: 'gpx_import',
       );
+      await DatabaseHelper.instance.rotayiAktifYap(id);
       await _rotaListesiYukle();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('"${imported.name}" (${imported.points.length} nokta) içe aktarıldı!'),
+            content: Text('"${imported.name}" (${imported.points.length} nokta) Takip haritasına yüklendi!'),
             backgroundColor: TacticalStyles.kTertiary,
           ),
+        );
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const LiveTrackingScreen()),
         );
       }
     } catch (e) {

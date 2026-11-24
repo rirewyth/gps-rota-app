@@ -5,6 +5,7 @@ import '../database_helper.dart';
 import 'package:animate_do/animate_do.dart';
 import 'register_screen.dart';
 import '../services/cloud_sync_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'onboarding_screen.dart';
@@ -64,6 +65,91 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> _ensureMandatoryName() async {
+    final user = FirebaseAuth.instance.currentUser;
+    String? existing = (await StorageHelper.getUserName())?.trim();
+    if ((existing == null || existing.isEmpty) && user?.displayName != null && user!.displayName!.trim().isNotEmpty) {
+      existing = user.displayName!.trim();
+      await StorageHelper.saveUserName(existing);
+    }
+    if ((existing == null || existing.isEmpty) && user != null) {
+      try {
+        final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+        final fsName = (doc.data()?['name'] ?? doc.data()?['ad'] ?? '').toString().trim();
+        if (fsName.isNotEmpty) {
+          existing = fsName;
+          await StorageHelper.saveUserName(fsName);
+        }
+      } catch (_) {}
+    }
+    if (existing != null && existing.isNotEmpty) return;
+    if (!mounted) return;
+
+    final nameCtrl = TextEditingController();
+    String localErr = '';
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDlgState) => PopScope(
+          canPop: false,
+          child: AlertDialog(
+            backgroundColor: kCardBg,
+            shape: RoundedRectangleBorder(side: const BorderSide(color: kOrange), borderRadius: BorderRadius.circular(14)),
+            title: Text('İSİM ZORUNLU', style: TacticalStyles.headline(color: kOrange, size: 18)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Devam etmek ve ekip/acil durum kayıtlarında görünebilmek için adınızı girin:', style: TextStyle(color: Colors.white70, fontSize: 13)),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: nameCtrl,
+                  autofocus: true,
+                  textInputAction: TextInputAction.done,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: const InputDecoration(
+                    filled: true,
+                    fillColor: TacticalStyles.kSurfaceLowest,
+                    hintText: 'Ad Soyad',
+                    hintStyle: TextStyle(color: Colors.white24),
+                    enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: TacticalStyles.kOutlineVariant)),
+                    focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: kOrange)),
+                  ),
+                ),
+                if (localErr.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Text(localErr, style: const TextStyle(color: Colors.redAccent, fontSize: 12, fontWeight: FontWeight.bold)),
+                ],
+              ],
+            ),
+            actions: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: kOrange),
+                onPressed: () async {
+                  final entered = nameCtrl.text.trim();
+                  if (entered.length < 2) {
+                    setDlgState(() => localErr = 'Lütfen geçerli bir isim girin.');
+                    return;
+                  }
+                  await StorageHelper.saveUserName(entered);
+                  if (user != null) {
+                    try {
+                      await user.updateDisplayName(entered);
+                      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({'name': entered}, SetOptions(merge: true));
+                    } catch (_) {}
+                  }
+                  if (ctx.mounted) Navigator.pop(ctx);
+                },
+                child: const Text('DEVAM ET', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   void _login() async {
     final email = _emailController.text.trim();
     final sifre = _passwordController.text;
@@ -101,6 +187,8 @@ class _LoginScreenState extends State<LoginScreen> {
           if (mounted) {
             await StorageHelper.setSosActive(false);
           }
+          await _ensureMandatoryName();
+          if (!mounted) return;
           final onboardingDone = prefs.getBool('onboarding_complete_v1') ?? false;
           if (!onboardingDone && mounted) {
             Navigator.pushReplacement(context, MaterialPageRoute(
@@ -113,6 +201,8 @@ class _LoginScreenState extends State<LoginScreen> {
           if (mounted) {
             await StorageHelper.setSosActive(false);
           }
+          await _ensureMandatoryName();
+          if (!mounted) return;
           // İlk giriş kontrolü — onboarding göster
           final prefs = await SharedPreferences.getInstance();
           final onboardingDone = prefs.getBool('onboarding_complete_v1') ?? false;
@@ -158,6 +248,8 @@ class _LoginScreenState extends State<LoginScreen> {
         if (mounted) {
           await StorageHelper.setSosActive(false);
         }
+        await _ensureMandatoryName();
+        if (!mounted) return;
         // İlk giriş kontrolü — onboarding göster
         final prefs = await SharedPreferences.getInstance();
         final onboardingDone = prefs.getBool('onboarding_complete_v1') ?? false;
@@ -191,6 +283,8 @@ class _LoginScreenState extends State<LoginScreen> {
         if (mounted) {
           await StorageHelper.setSosActive(false);
         }
+        await _ensureMandatoryName();
+        if (!mounted) return;
         // İlk giriş kontrolü — onboarding göster
         final prefs = await SharedPreferences.getInstance();
         final onboardingDone = prefs.getBool('onboarding_complete_v1') ?? false;

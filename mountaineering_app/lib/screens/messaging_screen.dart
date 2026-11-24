@@ -464,7 +464,7 @@ class _MessagingScreenState extends State<MessagingScreen> with SingleTickerProv
           ),
           children: [
             TileLayer(
-              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              urlTemplate: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
               userAgentPackageName: 'RotaPlus_Tactical_v1.0',
             ),
             MarkerLayer(markers: markers),

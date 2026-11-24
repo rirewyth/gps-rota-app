@@ -44,7 +44,7 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
 
   // Premium Harita Katmanları
   String _selectedMapLayer = 'Topografik';
-  String _mapTileUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+  String _mapTileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}';
   bool _isPremiumUser = false;
   bool _isHighDetailTerrain = false;
   

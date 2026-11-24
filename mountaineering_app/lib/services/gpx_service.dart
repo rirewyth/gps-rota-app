@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -66,15 +67,27 @@ class GpxService {
 
   static Future<GpxImportedRoute?> pickAndParseRouteFile() async {
     final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['gpx', 'kml', 'xml'],
+      type: FileType.any,
+      withData: true,
     );
     if (result == null || result.files.isEmpty) return null;
-    final path = result.files.single.path;
-    if (path == null) return null;
+    final picked = result.files.single;
+    final lowerName = picked.name.toLowerCase();
+    if (!(lowerName.endsWith('.gpx') || lowerName.endsWith('.kml') || lowerName.endsWith('.xml'))) {
+      throw const FormatException('Lütfen .gpx veya .kml uzantılı bir rota dosyası seçin.');
+    }
 
-    final raw = await File(path).readAsString();
-    final fileName = result.files.single.name.replaceAll(RegExp(r'\.(gpx|kml|xml)$', caseSensitive: false), '');
+    String raw = '';
+    if (picked.bytes != null && picked.bytes!.isNotEmpty) {
+      raw = utf8.decode(picked.bytes!, allowMalformed: true);
+    } else if (picked.path != null) {
+      raw = await File(picked.path!).readAsString();
+    } else {
+      return null;
+    }
+    raw = raw.replaceFirst('\uFEFF', '');
+
+    final fileName = picked.name.replaceAll(RegExp(r'\.(gpx|kml|xml)$', caseSensitive: false), '');
     final parsed = parseRouteContent(raw, fallbackName: fileName);
     if (parsed.points.isEmpty) return null;
     return parsed;

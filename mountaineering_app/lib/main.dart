@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui';
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'storage_helper.dart';
 import 'services/cloud_sync_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -371,6 +372,7 @@ class _MainAppScreenState extends State<MainAppScreen> {
   void _listenNotifications() {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
+    bool isFirstSnapshot = true;
     FirebaseFirestore.instance
         .collection('notifications')
         .doc(uid)
@@ -378,24 +380,69 @@ class _MainAppScreenState extends State<MainAppScreen> {
         .where('isRead', isEqualTo: false)
         .orderBy('timestamp', descending: true)
         .snapshots()
-        .listen((snap) {
-      if (mounted) {
-        final count = snap.docs.length;
-        if (count > _unreadNotifCount && snap.docs.isNotEmpty) {
-          final lastDoc = snap.docs.first.data();
+        .listen((snap) async {
+      if (!mounted) return;
+      final count = snap.docs.length;
+      setState(() => _unreadNotifCount = count);
+
+      if (snap.docs.isEmpty) {
+        isFirstSnapshot = false;
+        return;
+      }
+
+      final prefs = await SharedPreferences.getInstance();
+      final seenList = prefs.getStringList('notified_firestore_ids_v1') ?? <String>[];
+      final seenSet = seenList.toSet();
+
+      if (isFirstSnapshot) {
+        isFirstSnapshot = false;
+        // Uygulama acildiginda eski okunmamis bildirimleri tekrar calip durmasin
+        bool changed = false;
+        for (final d in snap.docs) {
+          if (seenSet.add(d.id)) changed = true;
+        }
+        if (changed) {
+          final trimmed = seenSet.toList();
+          if (trimmed.length > 200) {
+            await prefs.setStringList('notified_firestore_ids_v1', trimmed.sublist(trimmed.length - 200));
+          } else {
+            await prefs.setStringList('notified_firestore_ids_v1', trimmed);
+          }
+        }
+        return;
+      }
+
+      bool updated = false;
+      for (final change in snap.docChanges) {
+        if (change.type == DocumentChangeType.added) {
+          final docId = change.doc.id;
+          if (seenSet.contains(docId)) continue;
+          seenSet.add(docId);
+          updated = true;
+
+          final lastDoc = change.doc.data();
+          if (lastDoc == null) continue;
           final type = lastDoc['type'] ?? '';
           final fromUserName = lastDoc['fromUserName'] ?? 'Biri';
           final text = lastDoc['text'] ?? 'Yeni bir bildiriminiz var.';
-          
+
           String title = 'Acil Durum Bildirimi';
           if (type == 'follow') title = 'Yeni Takip';
           else if (type == 'message') title = 'Yeni Mesaj';
           else if (type == 'like') title = 'Yeni Beğeni';
           else if (type == 'team_sos') title = '🚨 EKİP SOS!';
+          else if (type == 'nexus_dispatch') title = '📡 ROTA+ NEXUS KOMUTA';
 
-          _showLocalNotification(title, '$fromUserName $text');
+          await _showLocalNotification(title, '$fromUserName $text');
         }
-        setState(() => _unreadNotifCount = count);
+      }
+
+      if (updated) {
+        final trimmed = seenSet.toList();
+        await prefs.setStringList(
+          'notified_firestore_ids_v1',
+          trimmed.length > 200 ? trimmed.sublist(trimmed.length - 200) : trimmed,
+        );
       }
     });
   }

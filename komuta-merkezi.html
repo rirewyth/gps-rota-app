@@ -6,8 +6,8 @@
 <title>ROTA+ KRİZ YÖNETİM MERKEZİ (NEXUS V3)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<!-- Leaflet CSS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<!-- CesiumJS 3D Globe CSS -->
+<link href="https://cesium.com/downloads/cesiumjs/releases/1.123/Build/Cesium/Widgets/widgets.css" rel="stylesheet"/>
 <style>
 /* ── RESET & BASE ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -74,6 +74,7 @@ body::after {
 /* ── CENTER MAP ── */
 .map-area { grid-area: map; position: relative; background: var(--bg); overflow: hidden; }
 #map { width: 100%; height: 100%; }
+.cesium-widget-credits { display: none !important; }
 .map-overlay-hud { position: absolute; top: 16px; left: 16px; right: 16px; pointer-events: none; z-index: 1000; display: flex; justify-content: space-between; }
 .hud-box { background: rgba(10, 13, 20, 0.85); border: 1px solid var(--accent); padding: 12px 16px; backdrop-filter: blur(4px); color: var(--accent); transition: 0.3s; }
 .hud-title { font-size: 10px; opacity: 0.8; margin-bottom: 4px; }
@@ -199,6 +200,7 @@ body::after {
       <label class="filter-lbl"><input type="checkbox" id="chk-quakes" checked onchange="renderIncidents()"> Deprem</label>
       <label class="filter-lbl"><input type="checkbox" id="chk-fires" checked onchange="renderIncidents()"> Yangın</label>
       <label class="filter-lbl" style="color:var(--accent);"><input type="checkbox" id="chk-radar" onchange="toggleWeatherRadar()"> Yağış Radarı</label>
+      <label class="filter-lbl" style="color:var(--safe-green);"><input type="checkbox" id="chk-sat" onchange="toggleSatelliteLayer()"> 3D Uydu</label>
     </div>
 
     <div id="map"></div>
@@ -220,8 +222,8 @@ body::after {
   </footer>
 </div>
 
-<!-- LEAFLET -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<!-- CESIUMJS 3D GLOBE -->
+<script src="https://cesium.com/downloads/cesiumjs/releases/1.123/Build/Cesium/Cesium.js"></script>
 <!-- FIREBASE COMPAT SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -268,16 +270,87 @@ body::after {
     }
   }
 
-  // MAP INIT
-  const map = L.map('map', { zoomControl: false, attributionControl: false }).setView([39.0, 35.0], 6);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
-  L.control.zoom({ position: 'bottomright' }).addTo(map);
+  // CESIUMJS 3D GLOBE INIT (Token gerektirmez - Taktik Karanlik & Uydu katmanli)
+  const darkBaseProvider = new Cesium.UrlTemplateImageryProvider({
+    url: 'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
+    maximumLevel: 19
+  });
+  const satBaseProvider = new Cesium.UrlTemplateImageryProvider({
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    maximumLevel: 18
+  });
+
+  const viewer = new Cesium.Viewer('map', {
+    baseLayer: new Cesium.ImageryLayer(darkBaseProvider),
+    baseLayerPicker: false,
+    geocoder: false,
+    homeButton: false,
+    sceneModePicker: false,
+    navigationHelpButton: false,
+    animation: false,
+    timeline: false,
+    fullscreenButton: false,
+    selectionIndicator: false,
+    infoBox: false,
+    skyBox: false,
+    skyAtmosphere: new Cesium.SkyAtmosphere()
+  });
+
+  viewer.scene.backgroundColor = Cesium.Color.fromCssColorString('#05070a');
+  viewer.scene.globe.baseColor = Cesium.Color.fromCssColorString('#05070a');
+  viewer.scene.globe.enableLighting = false;
+
+  // Turkiye 3D baslangic acisi
+  viewer.camera.setView({
+    destination: Cesium.Cartesian3.fromDegrees(35.0, 38.8, 1650000),
+    orientation: {
+      heading: Cesium.Math.toRadians(0),
+      pitch: Cesium.Math.toRadians(-72),
+      roll: 0.0
+    }
+  });
+
+  // Harita uzerinden hedef secimi (3D Pick)
+  const cesiumHandler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+  cesiumHandler.setInputAction((movement) => {
+    const picked = viewer.scene.pick(movement.position);
+    if (Cesium.defined(picked) && picked.id && picked.id._incidentId) {
+      focusIncident(picked.id._incidentId);
+    }
+  }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+  function flyToTarget(lat, lng, heightMeters = 18000) {
+    viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(lng, lat - 0.06, heightMeters),
+      orientation: {
+        heading: Cesium.Math.toRadians(0),
+        pitch: Cesium.Math.toRadians(-48),
+        roll: 0.0
+      },
+      duration: 1.5
+    });
+  }
+
+  let satLayer = null;
+  function toggleSatelliteLayer() {
+    const isChecked = document.getElementById('chk-sat').checked;
+    if (satLayer) {
+      viewer.imageryLayers.remove(satLayer, true);
+      satLayer = null;
+    }
+    if (isChecked) {
+      satLayer = viewer.imageryLayers.addImageryProvider(satBaseProvider, 1);
+      addLog('SYS', 'CesiumJS 3D Uydu (Esri World Imagery) katmanı aktif edildi.', 'safe');
+    } else {
+      addLog('SYS', 'Taktik Karanlık harita moduna dönüldü.', 'safe');
+    }
+  }
 
   let weatherRadarLayer = null;
 
   async function toggleWeatherRadar() {
     const isChecked = document.getElementById('chk-radar').checked;
-    if(weatherRadarLayer) { map.removeLayer(weatherRadarLayer); weatherRadarLayer = null; }
+    if(weatherRadarLayer) { viewer.imageryLayers.remove(weatherRadarLayer, true); weatherRadarLayer = null; }
     
     if(isChecked) {
       addLog('SYS', 'Meteoroloji Canlı Yağış Radarı indiriliyor...', 'safe');
@@ -285,36 +358,34 @@ body::after {
         const res = await fetch('https://api.rainviewer.com/public/weather-maps.json');
         const data = await res.json();
         const latestTime = data.radar.past[data.radar.past.length - 1].time;
-        weatherRadarLayer = L.tileLayer(`https://tilecache.rainviewer.com/v2/radar/${latestTime}/256/{z}/{x}/{y}/2/1_1.png`, {
-          opacity: 0.6, zIndex: 10
-        }).addTo(map);
-        addLog('SYS', 'Yağış Radarı aktif edildi.', 'safe');
+        const radarProvider = new Cesium.UrlTemplateImageryProvider({
+          url: `https://tilecache.rainviewer.com/v2/radar/${latestTime}/256/{z}/{x}/{y}/2/1_1.png`,
+          maximumLevel: 12
+        });
+        weatherRadarLayer = viewer.imageryLayers.addImageryProvider(radarProvider);
+        weatherRadarLayer.alpha = 0.65;
+        addLog('SYS', 'Yağış Radarı 3D küre üzerinde aktif edildi.', 'safe');
       } catch(e) {
         addLog('SYS-ERR', 'Radar sunucusuna ulaşılamadı.', 'warn');
       }
     }
   }
 
-  // SVG ICONS
-  const svgFire = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FF8C00" stroke="#FF2A2A" stroke-width="1.5"><path d="M12 2c0 0-4 4.5-4 9 0 2.2 1.8 4 4 4s4-1.8 4-4c0-4.5-4-9-4-9zm0 10.5c-1.4 0-2.5-1.1-2.5-2.5 0-1.1.9-2.5 2.5-4.5 1.6 2 2.5 3.4 2.5 4.5 0 1.4-1.1 2.5-2.5 2.5z"/></svg>`;
-  const svgQuake = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#FF2A2A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`;
-  const svgTeam = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#00E5FF" stroke="#fff" stroke-width="1"><polygon points="12,2 22,22 12,17 2,22"/></svg>`;
-  const svgSOS = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FF2A2A" stroke="#fff" stroke-width="1"><polygon points="12,2 22,22 12,17 2,22"/></svg>`;
+  // SVG ICONS (Cesium Billboard Data URI)
+  const svgFire = `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="#FF8C00" stroke="#FF2A2A" stroke-width="1.5"><path d="M12 2c0 0-4 4.5-4 9 0 2.2 1.8 4 4 4s4-1.8 4-4c0-4.5-4-9-4-9zm0 10.5c-1.4 0-2.5-1.1-2.5-2.5 0-1.1.9-2.5 2.5-4.5 1.6 2 2.5 3.4 2.5 4.5 0 1.4-1.1 2.5-2.5 2.5z"/></svg>`;
+  const svgQuake = `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#FF2A2A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`;
+  const svgTeam = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="#00E5FF" stroke="#ffffff" stroke-width="1.2"><polygon points="12,2 22,22 12,17 2,22"/></svg>`;
+  const svgSOS = `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="#FF2A2A" stroke="#ffffff" stroke-width="1.2"><polygon points="12,2 22,22 12,17 2,22"/></svg>`;
 
-  const getIcon = (type, isLocked = false) => {
-    let svg = ''; let shadow = ''; let clss = type;
-    if(type === 'fire') { svg = svgFire; shadow = 'var(--warn-orange)'; }
-    else if(type === 'quake') { svg = svgQuake; shadow = 'var(--alert-red)'; }
-    else if(type === 'sos') { svg = svgSOS; shadow = 'var(--alert-red)'; clss = 'team'; }
-    else { svg = svgTeam; shadow = 'var(--accent)'; }
-    
-    let lockHtml = isLocked ? `<div class="target-lock ${type === 'quake' || type === 'fire' || type === 'sos' ? 'red' : ''}"></div>` : '';
-
-    return L.divIcon({ 
-      className: 'custom-icon', 
-      html: `${lockHtml}<div class="blip-svg ${clss}" style="filter: drop-shadow(0 0 10px ${shadow})">${svg}</div>`, 
-      iconSize: [32,32], iconAnchor: [16,16] 
-    });
+  const iconCache = {};
+  const getIconUri = (type) => {
+    if (iconCache[type]) return iconCache[type];
+    let svg = svgTeam;
+    if (type === 'fire') svg = svgFire;
+    else if (type === 'quake') svg = svgQuake;
+    else if (type === 'sos') svg = svgSOS;
+    iconCache[type] = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    return iconCache[type];
   };
 
   // STATE
@@ -428,7 +499,7 @@ body::after {
     document.getElementById('toast-container').appendChild(toast);
     
     setTimeout(() => { overlay.classList.remove('active'); toast.remove(); }, 10000);
-    map.flyTo([incident.lat, incident.lng], 11, {duration: 1.5});
+    flyToTarget(incident.lat, incident.lng, 45000);
     addLog('SYS', `OTOMATİK RADAR: Bölgeye odaklanıldı (${incident.location})`, 'alert');
   }
 
@@ -519,7 +590,7 @@ body::after {
     const incidentList = document.getElementById('incident-list');
     teamList.innerHTML = ''; incidentList.innerHTML = '';
     
-    mapLayers.forEach(l => map.removeLayer(l)); mapLayers = [];
+    mapLayers.forEach(e => viewer.entities.remove(e)); mapLayers = [];
     
     const showTeams = document.getElementById('chk-teams').checked;
     const showQuakes = document.getElementById('chk-quakes').checked;
@@ -559,15 +630,76 @@ body::after {
       
       if(isTeam) teamList.appendChild(card); else incidentList.appendChild(card);
 
-      // Map Marker
+      // CesiumJS 3D Globe Billboard Marker
       const isLocked = focusedIncidentId === inc.id;
-      const marker = L.marker([inc.lat, inc.lng], {icon: getIcon(inc.type, isLocked), zIndexOffset: isLocked ? 1000 : 0}).addTo(map);
-      mapLayers.push(marker);
+      const entity = viewer.entities.add({
+        position: Cesium.Cartesian3.fromDegrees(inc.lng, inc.lat, 50),
+        billboard: {
+          image: getIconUri(inc.type),
+          width: isLocked ? 42 : 30,
+          height: isLocked ? 42 : 30,
+          verticalOrigin: Cesium.VerticalOrigin.CENTER,
+          disableDepthTestDistance: Number.POSITIVE_INFINITY
+        },
+        label: isTeam || isLocked ? {
+          text: inc.title.replace(/<[^>]*>/g, '').substring(0, 26),
+          font: '11px "Share Tech Mono", monospace',
+          fillColor: inc.type === 'sos' || inc.type === 'quake' || inc.type === 'fire'
+            ? Cesium.Color.fromCssColorString('#FF6B6B')
+            : Cesium.Color.fromCssColorString('#00E5FF'),
+          outlineColor: Cesium.Color.BLACK,
+          outlineWidth: 3,
+          style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+          pixelOffset: new Cesium.Cartesian2(0, -24),
+          disableDepthTestDistance: Number.POSITIVE_INFINITY
+        } : undefined
+      });
+      entity._incidentId = inc.id;
+      mapLayers.push(entity);
+
+      if(isLocked) {
+        const lockColor = (inc.type === 'quake' || inc.type === 'fire' || inc.type === 'sos')
+          ? Cesium.Color.fromCssColorString('#FF2A2A')
+          : Cesium.Color.fromCssColorString('#00E5FF');
+        const lockRing = viewer.entities.add({
+          position: Cesium.Cartesian3.fromDegrees(inc.lng, inc.lat),
+          ellipse: {
+            semiMajorAxis: 2500,
+            semiMinorAxis: 2500,
+            material: lockColor.withAlpha(0.15),
+            outline: true,
+            outlineColor: lockColor,
+            outlineWidth: 2
+          }
+        });
+        mapLayers.push(lockRing);
+      }
 
       if(inc.type === 'quake') {
         const rad = inc.raw ? (inc.raw.mag * 8000) : 20000;
-        const c1 = L.circle([inc.lat, inc.lng], { color: '#FF2A2A', fillColor: '#FF2A2A', fillOpacity: 0.1, radius: rad, weight: 1 }).addTo(map);
-        const c2 = L.circle([inc.lat, inc.lng], { color: '#FF2A2A', fillColor: 'transparent', radius: rad*0.5, weight: 2, dashArray: '5,5' }).addTo(map);
+        const quakeColor = Cesium.Color.fromCssColorString('#FF2A2A');
+        const c1 = viewer.entities.add({
+          position: Cesium.Cartesian3.fromDegrees(inc.lng, inc.lat),
+          ellipse: {
+            semiMajorAxis: rad,
+            semiMinorAxis: rad,
+            material: quakeColor.withAlpha(0.1),
+            outline: true,
+            outlineColor: quakeColor.withAlpha(0.8),
+            outlineWidth: 1.5
+          }
+        });
+        const c2 = viewer.entities.add({
+          position: Cesium.Cartesian3.fromDegrees(inc.lng, inc.lat),
+          ellipse: {
+            semiMajorAxis: rad * 0.5,
+            semiMinorAxis: rad * 0.5,
+            material: quakeColor.withAlpha(0.05),
+            outline: true,
+            outlineColor: quakeColor,
+            outlineWidth: 2
+          }
+        });
         mapLayers.push(c1, c2);
       }
     });
@@ -581,9 +713,9 @@ body::after {
     if(incidentList.innerHTML === '') incidentList.innerHTML = '<div style="padding:16px; color:var(--text-muted); font-size:11px;">Risk tespit edilmedi.</div>';
   }
 
-  // WIND PROPAGATION CONE
+  // WIND PROPAGATION CONE (Cesium 3D Polygon)
   function drawWindCone(lat, lng, windSpeedKm, windDirDeg) {
-    if(windLayer) map.removeLayer(windLayer);
+    if(windLayer) { viewer.entities.remove(windLayer); windLayer = null; }
     if(windSpeedKm < 5) return;
     
     const lengthMeters = windSpeedKm * 300; 
@@ -594,26 +726,37 @@ body::after {
     const dLat = lengthMeters / earthR;
     const dLng = lengthMeters / (earthR * Math.cos(Math.PI * lat / 180));
     
-    const p1 = [lat, lng];
-    const p2 = [ lat + (dLat * Math.cos(angleRad - spread)) * (180/Math.PI), lng + (dLng * Math.sin(angleRad - spread)) * (180/Math.PI) ];
-    const p3 = [ lat + (dLat * Math.cos(angleRad + spread)) * (180/Math.PI), lng + (dLng * Math.sin(angleRad + spread)) * (180/Math.PI) ];
+    const lat2 = lat + (dLat * Math.cos(angleRad - spread)) * (180/Math.PI);
+    const lng2 = lng + (dLng * Math.sin(angleRad - spread)) * (180/Math.PI);
+    const lat3 = lat + (dLat * Math.cos(angleRad + spread)) * (180/Math.PI);
+    const lng3 = lng + (dLng * Math.sin(angleRad + spread)) * (180/Math.PI);
 
-    windLayer = L.polygon([p1, p2, p3], {
-      color: 'transparent', fillColor: '#FF2A2A', fillOpacity: 0.4, className: 'alert-overlay active'
-    }).addTo(map);
-    mapLayers.push(windLayer);
+    windLayer = viewer.entities.add({
+      polygon: {
+        hierarchy: Cesium.Cartesian3.fromDegreesArray([lng, lat, lng2, lat2, lng3, lat3]),
+        material: Cesium.Color.fromCssColorString('#FF2A2A').withAlpha(0.42),
+        outline: true,
+        outlineColor: Cesium.Color.fromCssColorString('#FF8C00')
+      }
+    });
   }
 
-  // DISPATCH ANIMATION
+  // DISPATCH ANIMATION (Cesium 3D Glowing Arc)
   window.dispatchTo = function(lat, lng) {
-    if(dispatchLayer) map.removeLayer(dispatchLayer);
-    const base = [39.92, 32.85];
-    dispatchLayer = L.polyline([base, [lat, lng]], {
-      color: '#00E5FF', weight: 4, dashArray: '10, 15', className: 'laser-route'
-    }).addTo(map);
-    mapLayers.push(dispatchLayer);
+    if(dispatchLayer) { viewer.entities.remove(dispatchLayer); dispatchLayer = null; }
+    dispatchLayer = viewer.entities.add({
+      polyline: {
+        positions: Cesium.Cartesian3.fromDegreesArrayHeights([32.85, 39.92, 500, lng, lat, 500]),
+        width: 5,
+        material: new Cesium.PolylineGlowMaterialProperty({
+          glowPower: 0.25,
+          color: Cesium.Color.fromCssColorString('#00E5FF')
+        }),
+        clampToGround: false
+      }
+    });
     addLog('SYS-DISPATCH', `AFAD Ekipleri ${lat.toFixed(2)}, ${lng.toFixed(2)} koordinatlarına sevk edildi. İntikal başladı!`, 'safe');
-    alert("Birlik sevk emri verildi! Haritada intikal lazer izini görebilirsiniz.");
+    alert("Birlik sevk emri verildi! 3D küre üzerinde intikal lazer hattını görebilirsiniz.");
   }
 
   // FOCUS & DETAILS (TARGET LOCK)
@@ -624,8 +767,8 @@ body::after {
     const inc = incidents.find(i => i.id === id);
     if(!inc) return;
 
-    // Hedefe tıklayınca iyice yaklaştırarak pinlenmiş hissi ver
-    map.flyTo([inc.lat, inc.lng], 15, {duration: 1.5});
+    // 3D egimli kamera ile hedefe kilitlen
+    flyToTarget(inc.lat, inc.lng, 16000);
     document.getElementById('detail-title').innerText = `HEDEF: ${inc.id}`;
     if(inc.isNewIncident) inc.isNewIncident = false;
 

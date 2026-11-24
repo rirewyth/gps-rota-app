@@ -2375,16 +2375,55 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     );
   }
 
+  Future<List<Map<String, dynamic>>> _loadActivityRoutes() async {
+    bool isWalked(Map<String, dynamic> r) {
+      final src = (r['source'] ?? '').toString().toLowerCase();
+      final dur = (r['duration_seconds'] ?? r['durationSeconds'] ?? 0) as num;
+      final steps = (r['steps'] ?? 0) as num;
+      if (src == 'live_tracking' || src == 'tracked') return true;
+      return dur > 0 || steps > 0;
+    }
+
+    if (_isOwnProfile) {
+      final all = await DatabaseHelper.instance.tumRotalarGetir();
+      return all.where(isWalked).take(8).toList().reversed.toList();
+    }
+
+    try {
+      final targetUid = widget.targetUserId;
+      if (targetUid == null || targetUid.isEmpty) return [];
+      final snap = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(targetUid)
+          .collection('routes')
+          .orderBy('created_at', descending: true)
+          .limit(20)
+          .get();
+      final walked = snap.docs
+          .map((d) => d.data())
+          .where(isWalked)
+          .take(8)
+          .toList()
+          .reversed
+          .toList();
+      if (walked.isNotEmpty) return walked;
+    } catch (_) {}
+
+    return [];
+  }
+
   Widget _buildElevationActivityChartCard() {
     return FutureBuilder<List<Map<String, dynamic>>>(
-      future: DatabaseHelper.instance.tumRotalarGetir(),
+      future: _loadActivityRoutes(),
       builder: (context, snapshot) {
-        final routes = (snapshot.data ?? []).take(8).toList().reversed.toList();
+        final routes = snapshot.data ?? [];
         final spots = <FlSpot>[];
         double totalKm = 0;
         double totalGain = 0;
         for (int i = 0; i < routes.length; i++) {
-          final elev = (routes[i]['elevation_gain'] as num?)?.toDouble() ?? 0.0;
+          final elev = (routes[i]['elevation_gain'] as num?)?.toDouble() ??
+              (routes[i]['elevationGain'] as num?)?.toDouble() ??
+              0.0;
           final dist = ((routes[i]['distance'] as num?)?.toDouble() ?? 0.0) / 1000.0;
           totalKm += dist;
           totalGain += elev;

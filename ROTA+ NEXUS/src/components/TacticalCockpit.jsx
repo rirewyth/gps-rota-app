@@ -39,7 +39,7 @@ import {
   getTacticalMicroWeather,
   calculateSearchZoneProbability,
   calculateSurvivalMetrics
-} from '../utils/geoAnalysis';
+} from '../utils/terrainMath';
 
 // --- SUB-COMPONENT: SVG ELEVATION & SLOPE CROSS-SECTION CHART (FEATURE 2) ---
 function ElevationProfileHUD({ profile }) {

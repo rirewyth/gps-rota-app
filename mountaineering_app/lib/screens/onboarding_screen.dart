@@ -136,10 +136,20 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   }
 
   Future<void> _finish() async {
+    final enteredName = _adSoyadCtrl.text.trim();
+    if (enteredName.isEmpty || enteredName.toLowerCase() == 'anonim') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Lütfen kendi adınızı ve soyadınızı girin.'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
     setState(() => _saving = true);
     try {
       final user = FirebaseAuth.instance.currentUser;
-      final finalName = _adSoyadCtrl.text.trim().isEmpty ? 'Anonim' : _adSoyadCtrl.text.trim();
+      final finalName = enteredName;
       
       if (user != null) {
         await FirebaseFirestore.instance.collection('users').doc(user.uid).set({

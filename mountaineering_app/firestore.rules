@@ -93,6 +93,42 @@ service cloud.firestore {
       allow read, update, delete: if isAdmin();
     }
 
+    // Afet & Olay İhbarları - ROTA+ NEXUS komuta merkezi için herkese açık okuma
+    match /disaster_reports/{reportId} {
+      allow read: if true;
+      allow create, update: if request.auth != null;
+      allow delete: if isAdmin();
+    }
+
+    // Engellenen IP Adresleri (Sahte ihbar koruması)
+    match /banned_ips/{ipId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Admin İşlem Kayıtları (Audit Log)
+    match /admin_logs/{logId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Güvenli Toplanma & Yardım Noktaları
+    match /safe_zones/{zoneId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Tehlikeli / Yasaklı Bölgeler (Red Zone)
+    match /hazard_zones/{zoneId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Destek & Hata Bildirimleri
+    match /support_tickets/{ticketId} {
+      allow create: if request.auth != null;
+      allow read, update, delete: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
     // Yangınlar
     match /fires/{fireId} {
       allow read: if true;

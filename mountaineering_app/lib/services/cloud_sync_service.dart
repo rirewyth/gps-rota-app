@@ -158,7 +158,17 @@ class CloudSyncService {
     try {
       // 3. Verileri belirle
       String email = (data?['email'] ?? cUser.email) ?? 'no-email@rota.plus';
-      String name = (data?['name'] ?? data?['ad'] ?? cUser.displayName) ?? 'Anonim';
+      String fallbackName = (cUser.displayName?.trim().isNotEmpty == true)
+          ? cUser.displayName!.trim()
+          : (email.contains('@') ? email.split('@').first : 'Operatör');
+      String rawName = (data?['name'] ?? data?['ad'] ?? cUser.displayName ?? '').toString().trim();
+      String name = (rawName.isEmpty || rawName.toLowerCase() == 'anonim') ? fallbackName : rawName;
+      if (rawName.isEmpty || rawName.toLowerCase() == 'anonim') {
+        FirebaseFirestore.instance.collection('users').doc(cUser.uid).set({
+          'name': name,
+          'ad': name,
+        }, SetOptions(merge: true)).catchError((_) {});
+      }
       bool isPremium = data?['is_premium'] == true;
       
       // 4. Yerelde kullaniciyi bul veya olustur (Bu asama hayati onem tasiyor)

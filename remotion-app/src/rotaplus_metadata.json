@@ -1,0 +1,137 @@
+{
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "totalFrames": 2811,
+  "totalDurationSec": 93.7,
+  "scenes": [
+    {
+      "id": "hook",
+      "dur_sec": 8.81275,
+      "tag": "UYARI",
+      "title": "ŞEBEKE YOK",
+      "sub": "ROTA+ ÇALIŞMAYA DEVAM EDER",
+      "startFrame": 0,
+      "endFrame": 264,
+      "durationFrames": 264
+    },
+    {
+      "id": "s01",
+      "dur_sec": 8.81275,
+      "num": "01",
+      "tag": "METEOROLOJİ",
+      "title": "KOKPİT & METEOROLOJİ",
+      "sub": "Hava durumu, barometre, irtifa ve pusula tek bakışta elinizin altında.",
+      "screen": "s01_kokpit.jpg",
+      "startFrame": 264,
+      "endFrame": 528,
+      "durationFrames": 264
+    },
+    {
+      "id": "s02",
+      "dur_sec": 9.509354,
+      "num": "02",
+      "tag": "NAVİGASYON",
+      "title": "CANLI GPS TAKİBİ",
+      "sub": "Canlı GPS takibiyle adımlarınızı haritaya işleyin, rotanızı asla kaybetmeyin.",
+      "screen": "s02_takip.jpg",
+      "startFrame": 528,
+      "endFrame": 813,
+      "durationFrames": 285
+    },
+    {
+      "id": "s03",
+      "dur_sec": 8.301917,
+      "num": "03",
+      "tag": "GÜVENLİK",
+      "title": "AUTO-SOS PRO",
+      "sub": "Hareketsizlik sensörü, bayılma veya kaza anında otomatik devreye girer.",
+      "screen": "s02_takip.jpg",
+      "startFrame": 813,
+      "endFrame": 1062,
+      "durationFrames": 249
+    },
+    {
+      "id": "s04",
+      "dur_sec": 8.441229,
+      "num": "04",
+      "tag": "HARİTA",
+      "title": "TOPOGRAFİK ROTA",
+      "sub": "İzohipsli sahra haritasıyla internet olmadan yeni rotalar çizin ve ara nokta ekleyin.",
+      "screen": "s03_rota.jpg",
+      "startFrame": 1062,
+      "endFrame": 1315,
+      "durationFrames": 253
+    },
+    {
+      "id": "s05",
+      "dur_sec": 8.162604,
+      "num": "05",
+      "tag": "GÜVENLİK AĞI",
+      "title": "EKİP GÜVENLİK AĞI",
+      "sub": "Sahadaki tüm ekip üyelerinin durumunu ve anlık yardım çağrılarını koordinatlarıyla görün.",
+      "screen": "s07_sos.jpg",
+      "startFrame": 1315,
+      "endFrame": 1560,
+      "durationFrames": 245
+    },
+    {
+      "id": "s06",
+      "dur_sec": 9.416479,
+      "num": "06",
+      "tag": "AFET",
+      "title": "DEPREM & ENKAZ MODU",
+      "sub": "Tek dokunuşla Güvendeyim mesajı atın, hayatta kalma sayacı ve ses arama dedektörünü başlatın.",
+      "screen": "s04_deprem.jpg",
+      "startFrame": 1560,
+      "endFrame": 1842,
+      "durationFrames": 282
+    },
+    {
+      "id": "s07",
+      "dur_sec": 8.069708,
+      "num": "07",
+      "tag": "İLKYARDIM",
+      "title": "ACİL İLK YARDIM",
+      "sub": "Yaralanma ve travmalarda adım adım sesli ve görsel müdahale rehberi sunar.",
+      "screen": "s05_ilkyardim.jpg",
+      "startFrame": 1842,
+      "endFrame": 2084,
+      "durationFrames": 242
+    },
+    {
+      "id": "s08",
+      "dur_sec": 8.859188,
+      "num": "08",
+      "tag": "DAĞCILIK",
+      "title": "HAYATTA KALMA REHBERİ",
+      "sub": "Teknik dağcılık düğümleri ve sahra protokolleri internetsiz elinizin altında.",
+      "screen": "s06_rehber.jpg",
+      "startFrame": 2084,
+      "endFrame": 2350,
+      "durationFrames": 266
+    },
+    {
+      "id": "s09",
+      "dur_sec": 8.301917,
+      "num": "09",
+      "tag": "DONANIM",
+      "title": "ASKERİ DONANIM UYUMU",
+      "sub": "L-Band uydu uyumu ve minimum pil tüketimiyle en zorlu şartlarda yanınızda.",
+      "screen": "s01_kokpit.jpg",
+      "startFrame": 2350,
+      "endFrame": 2599,
+      "durationFrames": 249
+    },
+    {
+      "id": "outro",
+      "dur_sec": 7.051438,
+      "tag": "İNDİR",
+      "title": "ROTA+",
+      "sub": "ZORLU KOŞULLARDA YANINDA.",
+      "startFrame": 2599,
+      "endFrame": 2811,
+      "durationFrames": 212
+    }
+  ]
+}

@@ -20,6 +20,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:just_audio/just_audio.dart';
 import 'dart:io';
 import '../services/premium_service.dart';
+import '../storage_helper.dart';
 import '../services/routing_service.dart';
 import '../services/cloud_sync_service.dart';
 import '../services/tactical_styles.dart';
@@ -116,9 +117,9 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
         final loc = LatLng(last.latitude, last.longitude);
         setState(() => _myLatLng = loc);
         if (_isFirstLocationFetch) {
-          _isFirstLocationFetch = false;
           try {
             _mapController.move(loc, 14.5);
+            _isFirstLocationFetch = false;
           } catch (_) {}
         }
       }
@@ -127,9 +128,9 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
         final loc = LatLng(current.latitude, current.longitude);
         setState(() => _myLatLng = loc);
         if (_isFirstLocationFetch) {
-          _isFirstLocationFetch = false;
           try {
             _mapController.move(loc, 14.5);
+            _isFirstLocationFetch = false;
           } catch (_) {}
         }
       }
@@ -145,11 +146,13 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
           : const LocationSettings(accuracy: LocationAccuracy.medium, distanceFilter: 10),
     ).listen((pos) {
       if (!mounted) return;
+      final loc = LatLng(pos.latitude, pos.longitude);
+      setState(() => _myLatLng = loc);
       
       if (_isFirstLocationFetch) {
-        _isFirstLocationFetch = false;
         try {
-          _mapController.move(LatLng(pos.latitude, pos.longitude), 14.0);
+          _mapController.move(loc, 14.5);
+          _isFirstLocationFetch = false;
         } catch (_) {}
       }
       
@@ -1827,22 +1830,57 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
   }
 
   Future<void> _sendQuickTacticalSignal(String code, String label, String emoji) async {
-    if (_teamId == null) return;
+    if (_teamId == null || _teamId!.trim().isEmpty) return;
     try {
+      LatLng? loc = _myLatLng;
+      if (loc == null) {
+        try {
+          final last = await Geolocator.getLastKnownPosition();
+          if (last != null) {
+            loc = LatLng(last.latitude, last.longitude);
+          } else {
+            final curr = await Geolocator.getCurrentPosition(
+              locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
+            ).timeout(const Duration(seconds: 4));
+            loc = LatLng(curr.latitude, curr.longitude);
+          }
+          if (mounted && loc != null) {
+            setState(() => _myLatLng = loc);
+          }
+        } catch (_) {}
+      }
+
+      if (loc == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Konum alınamadı! Haritada pin bırakmak için GPS sinyalini bekleyin.'),
+              backgroundColor: Colors.orangeAccent,
+            ),
+          );
+        }
+        return;
+      }
+
+      final storedName = (await StorageHelper.getUserName())?.trim();
+      final senderName = (storedName != null && storedName.isNotEmpty)
+          ? storedName
+          : (FirebaseAuth.instance.currentUser?.displayName ?? 'Operatör');
+
       await FirebaseFirestore.instance
           .collection('teams')
-          .doc(_teamId)
+          .doc(_teamId!.trim())
           .collection('messages')
           .add({
         'type': 'tactical_signal',
         'signalCode': code,
         'signalLabel': label,
         'signalEmoji': emoji,
-        'text': '$emoji TAKTİK SİNYAL: $label',
+        'text': '$emoji TAKTİK SİNYAL: $label ($senderName)',
         'senderId': _myUid,
-        'senderName': FirebaseAuth.instance.currentUser?.displayName ?? 'Operatör',
-        if (_myLatLng != null) 'lat': _myLatLng!.latitude,
-        if (_myLatLng != null) 'lng': _myLatLng!.longitude,
+        'senderName': senderName,
+        'lat': loc.latitude,
+        'lng': loc.longitude,
         'timestamp': FieldValue.serverTimestamp(),
       });
       if (mounted) {
@@ -2360,8 +2398,8 @@ class _TeamScreenState extends State<TeamScreen> with TickerProviderStateMixin {
                           TileLayer(
                             urlTemplate: _isPremiumUser 
                                 ? 'https://api.mapbox.com/styles/v1/mapbox/outdoors-v12/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1Ijoic2VyY2Fub3JhbGwiLCJhIjoiY21vdGxneTR1MDZkNjJ1czl5OG4xZGRtNSJ9.aZd3CyiISCcxlcR0hXkhhQ'
-                                : 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                            userAgentPackageName: 'com.example.mountaineering_app',
+                                : 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+                            userAgentPackageName: 'com.rotaplus',
                             maxZoom: 22,
                             maxNativeZoom: _isPremiumUser ? 20 : 19,
                           ),

@@ -427,29 +427,19 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
   }
 
   void _toggleBleBeacon() async {
-    if (Platform.isIOS) {
-      if (!mounted) return;
-      showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          backgroundColor: kCardBg,
-          title: const Text('iOS Kısıtlaması', style: TextStyle(color: kOrange)),
-          content: const Text('Apple işletim sistemi kısıtlamaları nedeniyle Bluetooth Mesh yayın özelliği iPhone cihazlarda tam olarak desteklenmemektedir.', style: TextStyle(color: TacticalStyles.kOnSurfaceVariant)),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('ANLADIM', style: TextStyle(color: kOrange))),
-          ],
-        )
-      );
-      return;
-    }
-
     if (_isBleBeaconActive) {
-      await Nearby().stopAdvertising();
-      setState(() => _isBleBeaconActive = false);
+      try {
+        await Nearby().stopAdvertising();
+      } catch (_) {}
+      if (mounted) setState(() => _isBleBeaconActive = false);
     } else {
-      var status = await Permission.bluetoothAdvertise.request();
-      if (!status.isGranted) {
-        return;
+      if (Platform.isAndroid) {
+        var status = await Permission.bluetoothAdvertise.request();
+        if (!status.isGranted) {
+          return;
+        }
+      } else if (Platform.isIOS) {
+        await Permission.bluetooth.request();
       }
       try {
         bool success = await Nearby().startAdvertising(
@@ -459,12 +449,16 @@ class _EarthquakeModuleScreenState extends State<EarthquakeModuleScreen> with Ti
           onConnectionResult: (id, status) {},
           onDisconnected: (id) {},
         );
-        if (success) {
+        if (success && mounted) {
           setState(() => _isBleBeaconActive = true);
         }
       } catch (e) {
         debugPrint(e.toString());
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('BLE başlatılamadı. Bluetooth açık olduğundan emin olun.')));
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('BLE / Mesh yayını başlatılamadı. Bluetooth ve Yerel Ağ iznini kontrol edin.')),
+          );
+        }
       }
     }
   }
